@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dotnetconcurrency.huanlin.cc/sitemap.xml

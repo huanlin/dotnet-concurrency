@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW" xml:lang="zh-TW"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+
+<title>第 4 章：例外處理與取消 – 深入淺出 .NET 10 併發程式設計</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../ch05/thread-synchronization.html" rel="next">
+<link href="../ch03/async-await-essentials.html" rel="prev">
+<link href="../images/cover-tw.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "沒有結果",
+    "search-matching-documents-text": "符合的文件",
+    "search-copy-link-title": "複製搜尋連結",
+    "search-hide-matches-text": "隱藏其他符合的結果",
+    "search-more-match-text": "更多符合結果",
+    "search-more-matches-text": "更多符合結果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "送出",
+    "search-label": "搜尋"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../styles-html.css">
+<meta property="og:title" content="第 4 章：例外處理與取消 – 深入淺出 .NET 10 併發程式設計">
+<meta property="og:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch04/images/cooperative-cancellation-tw.png">
+<meta property="og:site_name" content="深入淺出 .NET 10 併發程式設計">
+<meta property="og:image:height" content="740">
+<meta property="og:image:width" content="1200">
+<meta name="twitter:title" content="第 4 章：例外處理與取消 – 深入淺出 .NET 10 併發程式設計">
+<meta name="twitter:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch04/images/cooperative-cancellation-tw.png">
+<meta name="twitter:image-height" content="740">
+<meta name="twitter:image-width" content="1200">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/zh-tw/ch04/exceptions-and-cancellation.html">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1：基礎觀念和語法</a></li><li class="breadcrumb-item"><a href="../ch04/exceptions-and-cancellation.html"><span class="chapter-title">第 4 章：例外處理與取消</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜尋" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">深入淺出 .NET 10 併發程式設計</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/huanlin/dotnet-concurrency" title="原始碼" class="quarto-navigation-tool px-1" aria-label="原始碼"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜尋"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">首頁</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">作者序</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-book.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">關於本書</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-author.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">關於作者</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1：基礎觀念和語法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch01/introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 1 章：理解執行緒與非同步</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch02/threads-and-tasks.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 2 章：.NET 中的執行緒與工作</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch03/async-await-essentials.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 3 章：async 與 await</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch04/exceptions-and-cancellation.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 4 章：例外處理與取消</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2：併發挑戰與平行加速</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 5 章：執行緒同步與經典問題</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch06/thread-safety-and-immutable-collections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 6 章：執行緒安全與不可變集合</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch07/parallel-programming-and-plinq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 7 章：平行處理與 PLINQ</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3：進階模式與實戰應用</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch08/async-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 8 章：非同步資料流與資源管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch09/advanced-task-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 9 章：Task 進階用法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch10/async-patterns-and-practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 10 章：實戰案例與最佳實務</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch11/async-api-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 11 章：非同步 API 設計指南</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目錄</h2>
+   
+  <ul>
+  <li><a href="#await-如何處理例外" id="toc-await-如何處理例外" class="nav-link active" data-scroll-target="#await-如何處理例外"><code>await</code> 如何處理例外</a>
+  <ul class="collapse">
+  <li><a href="#小心射後不理的陷阱" id="toc-小心射後不理的陷阱" class="nav-link" data-scroll-target="#小心射後不理的陷阱">小心「射後不理」的陷阱</a></li>
+  </ul></li>
+  <li><a href="#aggregateexception-的角色" id="toc-aggregateexception-的角色" class="nav-link" data-scroll-target="#aggregateexception-的角色"><code>AggregateException</code> 的角色</a>
+  <ul class="collapse">
+  <li><a href="#task.whenall-與多重例外" id="toc-task.whenall-與多重例外" class="nav-link" data-scroll-target="#task.whenall-與多重例外"><code>Task.WhenAll</code> 與多重例外</a></li>
+  </ul></li>
+  <li><a href="#sec-graceful-task-cancellation" id="toc-sec-graceful-task-cancellation" class="nav-link" data-scroll-target="#sec-graceful-task-cancellation">妥善取消任務</a>
+  <ul class="collapse">
+  <li><a href="#sec-requesting-cancellation" id="toc-sec-requesting-cancellation" class="nav-link" data-scroll-target="#sec-requesting-cancellation">發出取消請求</a></li>
+  <li><a href="#sec-listening-for-cancellation" id="toc-sec-listening-for-cancellation" class="nav-link" data-scroll-target="#sec-listening-for-cancellation">監聽並向下傳遞取消訊號</a></li>
+  <li><a href="#註冊取消回呼cancellation-callbacks" id="toc-註冊取消回呼cancellation-callbacks" class="nav-link" data-scroll-target="#註冊取消回呼cancellation-callbacks">註冊取消回呼（cancellation callbacks）</a></li>
+  <li><a href="#不可取消的-token" id="toc-不可取消的-token" class="nav-link" data-scroll-target="#不可取消的-token">不可取消的 Token</a></li>
+  </ul></li>
+  <li><a href="#sec-implementing-timeouts" id="toc-sec-implementing-timeouts" class="nav-link" data-scroll-target="#sec-implementing-timeouts">實作逾時機制</a>
+  <ul class="collapse">
+  <li><a href="#可測試的逾時機制timeprovider-.net-8" id="toc-可測試的逾時機制timeprovider-.net-8" class="nav-link" data-scroll-target="#可測試的逾時機制timeprovider-.net-8">可測試的逾時機制：<code>TimeProvider</code> (.NET 8+)</a></li>
+  </ul></li>
+  <li><a href="#結語" id="toc-結語" class="nav-link" data-scroll-target="#結語">結語</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1：基礎觀念和語法</a></li><li class="breadcrumb-item"><a href="../ch04/exceptions-and-cancellation.html"><span class="chapter-title">第 4 章：例外處理與取消</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="chapter-04" class="quarto-section-identifier"><span class="chapter-title">第 4 章：例外處理與取消</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">修改於</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026年7月21日</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>在理想的世界裡，每一次網路請求都會成功，每一個檔案都能順利讀取。但在現實世界中，網路會中斷，檔案會遺失，資料庫也可能逾時。一個穩健的應用程式，必須能妥善處理這些非預期的狀況。除此之外，由於非同步操作通常不會立刻完成，如果使用者在資料下載完成前回到上一頁，或者直接關閉了應用程式，我們也必須能取消那些仍在背景進行的任務，以免白白浪費系統資源。</p>
+<p>為了處理各種不完美的情況，你會需要了解本章的兩大主題：<strong>例外處理（exception handling）</strong>與<strong>任務取消（cancellation）</strong>。</p>
+<p>本章的學習目標包括：</p>
+<ul>
+<li>如何使用 <code>try-catch</code> 語法來捕捉 <code>await</code> 拋出的例外。</li>
+<li>了解 <code>AggregateException</code> 的角色，以及 <code>await</code> 如何簡化它。</li>
+<li>掌握 .NET 中標準的任務取消模式：<code>CancellationTokenSource</code> 與 <code>CancellationToken</code>。</li>
+<li>學會為非同步操作實作逾時（timeout）機制。</li>
+</ul>
+<hr>
+<section id="await-如何處理例外" class="level2">
+<h2 class="anchored" data-anchor-id="await-如何處理例外"><code>await</code> 如何處理例外</h2>
+<p><code>async/await</code> 最令人讚賞的設計之一，就在於它讓非同步的例外處理寫起來幾乎和傳統的同步程式碼一樣直覺。這意味著，我們依然可以使用熟悉的 <code>try-catch</code> 區塊來捕捉非同步工作所拋出的錯誤。不過，它的底層運作方式，還是有幾個值得特別留意的細節。</p>
+<p>先看一個可能失敗的非同步操作，例如嘗試從一個不存在的網址下載內容：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="op">{</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>    <span class="co">// HttpClient 在要求失敗或無法解析主機名稱時，</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// 可能拋出 HttpRequestException</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="kw">return</span> content<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>當 <code>GetStringAsync</code> 執行時，如果因為網路連線問題而引發 <code>HttpRequestException</code>，這個例外並不會立刻在當下爆發出來。相反地，它會先被<strong>捕捉並儲存在該方法回傳的 <code>Task</code> 物件中</strong>。此時，該 <code>Task</code> 的狀態就會被標記為 <code>Faulted</code>（出現故障）。</p>
+<p>換句話說，這個例外會一直待在 <code>Task</code> 裡面，直到你的程式碼真正去 <code>await</code> 它的時候，先前儲存的例外才會被<strong>重新拋出（re-thrown）</strong>。</p>
+<p>也正因為這個「延遲拋出」的機制，我們便能很自然地用標準的 <code>try-catch</code> 區塊來處理它。就像這樣：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1"></a><span class="dt">var</span> url <span class="op">=</span> <span class="st">"https://this-host-does-not-exist.invalid"</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">try</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="dt">string</span> content <span class="op">=</span> await <span class="fu">DownloadPageAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"下載成功！"</span><span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="op">}</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="kw">catch</span> <span class="op">(</span>HttpRequestException ex<span class="op">)</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="op">{</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"發生網路錯誤："</span><span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1"></a>發生網路錯誤：</span>
+<span id="cb3-2"><a href="#cb3-2"></a>No such host is known. (this-host-does-not-exist.invalid:443)</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>你可以看到，這個行為非常直觀：只要用 <code>try-catch</code> 區塊包住那些你認為可能出錯的 <code>await</code> 呼叫，就像在撰寫同步程式碼一樣。至於背後那些把例外裝進 Task、再從 Task 裡拿出來拋出的細節，編譯器產生的狀態機會替我們妥善處理。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch04/DemoExceptionHandling">DemoExceptionHandling</a></p>
+</blockquote>
+<section id="小心射後不理的陷阱" class="level3">
+<h3 class="anchored" data-anchor-id="小心射後不理的陷阱">小心「射後不理」的陷阱</h3>
+<p>了解了 <code>await</code> 重新拋出例外的機制後，接著來看一個很常見的陷阱：如果你啟動了一個非同步方法，卻<strong>既沒有 <code>await</code> 它，也沒有在稍後去觀察那個回傳的 <code>Task</code></strong>，也就是所謂的「射後不理」（fire-and-forget）模式，那麼該方法所拋出的例外就很容易被吞噬，最後演變成難以除錯的「靜默失敗」。</p>
+<blockquote class="blockquote">
+<p>這裡所謂「觀察」一個 <code>Task</code>，通常指的是 <code>await</code> 它、呼叫 <code>Wait()</code> 或讀取 <code>Exception</code> 屬性，讓執行環境知道你已經看過它的失敗結果。</p>
+</blockquote>
+<p>底下是個錯誤示範：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">public</span> <span class="dt">void</span> <span class="fu">Button_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> EventArgs e<span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="co">// ✘ 錯誤示範：沒有 await！</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="co">// 若 SaveDataAsync 回傳 Task 並拋出例外，這裡完全捕捉不到，</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="co">// 程式通常也不會崩潰。使用者會以為儲存成功了，但其實失敗了。</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>    _ <span class="op">=</span> <span class="fu">SaveDataAsync</span><span class="op">();</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>正如先前所說，當一個 <code>Task</code> 發生錯誤卻沒有被等待時，例外就會一直「躲」在那個 <code>Task</code> 物件裡。雖然使用 discard 運算子 (<code>_</code>) 可以消除編譯器的「未等待」警告，但它<strong>無法</strong>解決例外被吞掉的根本問題。日後，當 Garbage Collector（GC）回收這個死掉的 <code>Task</code> 時，可能會觸發 <code>TaskScheduler.UnobservedTaskException</code> 事件，但在預設情況下，這不會導致程式崩潰，因此這類錯誤往往就變成了難以察覺的「靜默失敗」。</p>
+<p>換言之，「先啟動任務，稍後再 <code>await</code>」這種作法本身沒有問題；真正危險的是把 <code>Task</code> 直接丟掉不管。這會導致呼叫端再也無從得知該任務最後到底是成功、失敗，還是被取消。</p>
+<p>此外，還有一點需要特別釐清：這裡討論的靜默失敗，僅限於<strong>回傳 <code>Task</code> 或 <code>Task&lt;T&gt;</code> 的非同步方法</strong>。如果該非同步方法的回傳型別是 <code>async void</code>（例如常見的 UI 事件處理器），情況就完全不同了。在 <code>async void</code> 方法中發生的例外<strong>不會</strong>被包進任何 <code>Task</code> 裡。它會直接被拋給當時的 <code>SynchronizationContext</code>（如果有的話），或是拋到 <code>ThreadPool</code>。這通常會成為「未處理的例外」（unhandled exception），進而導致整支程式崩潰（crash）。因此，除了 UI 事件處理器等必要情境外，我們應該盡量避免使用 <code>async void</code>。</p>
+<blockquote class="blockquote">
+<p>關於 <code>SynchronizationContext</code> 的說明，請參閱第 3 章。</p>
+</blockquote>
+<p><strong>最佳實務</strong>：</p>
+<ol type="1">
+<li><strong>盡量避免 fire-and-forget</strong>：除非你有非常明確的理由，否則至少要在某個時間點 <code>await</code> 它，或以其他方式明確觀察它的完成結果。</li>
+<li><strong>如果必須 fire-and-forget</strong>：請使用 <code>SafeFireAndForget</code> 擴充方法（需自行實作或使用第三方套件）來記錄錯誤，或者在該非同步方法內部最外層包上 <code>try-catch</code> 確保例外不會外洩。</li>
+</ol>
+</section>
+</section>
+<section id="aggregateexception-的角色" class="level2">
+<h2 class="anchored" data-anchor-id="aggregateexception-的角色"><code>AggregateException</code> 的角色</h2>
+<p>除了前面介紹的基本例外拋出機制，在探索 .NET 非同步 API 的過程中，你遲早會遇到一個名為 <code>AggregateException</code> 的特殊例外類型。聽到「Aggregate（聚合）」，你大概可以猜到，它的設計目的就是作為一個可以<strong>包裹一個或多個例外的容器</strong>。</p>
+<p>為了理解它什麼時候會出現，先來看看不使用 <code>await</code> 的情況。當你使用 <code>Task.Wait()</code> 或 <code>Task.Result</code> 這種阻塞式的方法去等待一個故障的 <code>Task</code> 時，任務裡的原始例外（例如 <code>HttpRequestException</code>）不會直接被拋出；它會先被包進一個 <code>AggregateException</code> 裡面，然後才一起拋出。參考以下範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1"></a><span class="dt">var</span> faultyTask <span class="op">=</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="st">"https://host-not-exist.invalid"</span><span class="op">);</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">try</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    <span class="co">// 使用 .Wait() 會拋出 AggregateException</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>    faultyTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="op">}</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException ex<span class="op">)</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="op">{</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a>    <span class="co">// 我們需要從 .InnerExceptions 集合中解開真正的例外</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a>    <span class="dt">var</span> realException <span class="op">=</span> ex<span class="op">.</span><span class="fu">InnerExceptions</span><span class="op">.</span><span class="fu">First</span><span class="op">();</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a>        <span class="st">"捕捉到 AggregateException，真正的錯誤是："</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>        <span class="op">+</span> realException<span class="op">.</span><span class="fu">GetType</span><span class="op">().</span><span class="fu">Name</span><span class="op">);</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a href="#cb6-1"></a>捕捉到 AggregateException，真正的錯誤是：HttpRequestException</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這裡故意使用同步阻塞的 <code>Wait()</code> 方法，就是為了示範這件事：出錯的 Task 在「非 <code>await</code>」的情境下，會把多個原始例外包裝成 <code>AggregateException</code>。然而在實務上，我們當然還是應該優先使用 <code>await</code>。</p>
+<p><code>Wait()</code> 之所以用 <code>AggregateException</code> 來包裹，是因為同步等待的情境下，多個並行任務有可能同時失敗，必須有辦法把多個例外一口氣帶出來；而 <code>await</code> 是逐一非同步地等待，所以編譯器可以直接幫我們<strong>解開（unwrap）</strong> <code>AggregateException</code>，並拋出其中一個原始例外，而不是把一整個 <code>AggregateException</code> 包裹丟給我們自行拆解。</p>
+<p>這也正好解釋了，為什麼在本章最前面那個下載頁面的範例中，我們可以直接 <code>catch (HttpRequestException ex)</code>。有了 <code>await</code> 的幫忙，例外處理的程式碼變得更加專注且簡潔。</p>
+<p>既然 <code>await</code> 這麼聰明，那我們是不是就不需要理會 <code>AggregateException</code> 了呢？其實不然。在某些進階情境下，它還是會派上用場。例如，當我們使用 <code>Task.WhenAll</code> 來等待多個可能同時失敗的任務時，就需要費點工夫來處理。</p>
+<section id="task.whenall-與多重例外" class="level3">
+<h3 class="anchored" data-anchor-id="task.whenall-與多重例外"><code>Task.WhenAll</code> 與多重例外</h3>
+<p>當我們使用 <code>Task.WhenAll</code> 同時等待多個任務時，事情就稍微複雜了一些。想像一下，如果這<strong>多個</strong>任務不幸地都失敗了，那麼 <code>Task.WhenAll</code> 所回傳的那個代表整體進度的任務，就會一口氣包含<strong>所有</strong>發生的例外。</p>
+<p>當你對這個整體任務使用 <code>await</code> 時，剛才提過 <code>await</code> 會自動解開包裹，但它在面對多重例外時有個限制：它<strong>只會傳播其中一個例外</strong>。究竟是哪一個，並不保證固定；至於其他例外，則會繼續留在該 <code>Task</code> 的 <code>Exception</code> 屬性裡。請看以下範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">try</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>    <span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>    await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="op">}</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="op">{</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>    <span class="co">// 這裡只會捕捉到其中一個錯誤</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"捕捉到：{ex.Message}"</span><span class="op">);</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb8-1"><a href="#cb8-1"></a>捕捉到：Error 1</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>如你所見，第二個任務的錯誤並沒有被捕捉到。為了解決這個問題，如果你真的需要確保捕捉並處理<strong>所有</strong>發生的錯誤，就不能單靠 <code>await</code> 拋出的例外；你必須回過頭去檢查 <code>Task</code> 物件本身的 <code>Exception</code> 屬性（因為它的型別正是 <code>AggregateException</code>）。</p>
+<p>修改後的程式碼如下：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1"></a><span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="dt">var</span> allTasks <span class="op">=</span> Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">try</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>    await allTasks<span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="op">}</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="kw">catch</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>    <span class="co">// 檢查 allTasks.Exception 來取得所有錯誤</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>    <span class="kw">foreach</span> <span class="op">(</span><span class="dt">var</span> innerEx <span class="kw">in</span> allTasks<span class="op">.</span><span class="fu">Exception</span><span class="op">!.</span><span class="fu">InnerExceptions</span><span class="op">)</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a>    <span class="op">{</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"錯誤：{innerEx.Message}"</span><span class="op">);</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a>    <span class="op">}</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a href="#cb10-1"></a>錯誤：Error 1</span>
+<span id="cb10-2"><a href="#cb10-2"></a>錯誤：Error 2</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch04/DemoAggregateException">DemoAggregateException</a></p>
+</blockquote>
+<p>這個範例在 <code>catch</code> 區塊中的 <code>foreach</code> 陳述式，使用了 null 寬容運算子（null-forgiving operator）<code>!</code>，用意是告訴編譯器：「這裡我確定不會是 null，不用出警告。」若想進一步了解 null 寬容運算子，可參考<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/operators/null-forgiving">微軟文件</a>或 <a href="https://ippobooks.com/books/modern-csharp/">《現代 C#：AI 時代的開發者修煉》</a> 第 3 章：空值安全。</p>
+<blockquote class="blockquote">
+<p><strong>Tip</strong></p>
+<p>在防禦性程式設計中，如果你真的很在意多筆併發操作（例如多筆資料庫寫入）中「每一次」的失敗原因，建議不要只看 <code>await</code> 拋出的第一個例外。你可以像上面的範例一樣，把 <code>AggregateException</code> 裡面的所有 <code>InnerExceptions</code> 都記錄（log）下來，這樣就不會漏掉其他連帶的錯誤資訊了。</p>
+</blockquote>
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/standard/asynchronous-programming-patterns/consuming-the-task-based-asynchronous-pattern">Consuming the Task-based Asynchronous Pattern</a> 有更完整的 <code>Task.WhenAll</code>、例外聚合與 <code>await</code> 行為說明。</p>
+</section>
+</section>
+<section id="sec-graceful-task-cancellation" class="level2">
+<h2 class="anchored" data-anchor-id="sec-graceful-task-cancellation">妥善取消任務</h2>
+<p>看完如何捕捉與處理非預期的例外之後，接著把焦點轉向另一個同樣重要的主題：任務的取消。</p>
+<p>為了處理「取消」的情境，.NET 提供了一套標準且清楚的「協同式取消（cooperative cancellation）」模式。所謂的「協同」，顧名思義，就是指取消操作並非粗暴地直接砍掉執行緒；相對地，它是採取溝通的方式：由發起方負責「發出取消的請求」，而正在執行任務的一方則負責「主動監聽該請求，並在適當時機自行中止任務」。這也意味著，如果工作端根本沒有監聽 <code>CancellationToken</code>，取消訊號就會被忽視，工作會繼續跑到自然結束為止。</p>
+<p>這個模式是由兩個核心類別所組成：</p>
+<ul>
+<li><code>System.Threading.CancellationTokenSource</code>（CTS）：負責<strong>建立與發出</strong>取消訊號的物件。可以把它想像成一個「取消按鈕」。</li>
+<li><code>System.Threading.CancellationToken</code>：負責<strong>傳遞與監聽</strong>取消訊號的物件。它是一個輕量的結構，代表一份可傳遞的取消訊號，會被傳遞給需要被取消的非同步方法。</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/cooperative-cancellation-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>要掌握這個模式，可以先把它簡化成三個步驟：<strong>建立 CTS</strong> → <strong>傳遞 Token</strong> → <strong>在工作端監聽取消訊號，並且在呼叫端妥善處理取消例外</strong>。</p>
+<p>接著分別來看如何發出取消請求，以及工作端要如何監聽這個訊號。</p>
+<section id="sec-requesting-cancellation" class="level3">
+<h3 class="anchored" data-anchor-id="sec-requesting-cancellation">發出取消請求</h3>
+<p>整個取消流程的起點，是先建立一個 <code>CancellationTokenSource</code> 物件（簡稱 CTS）：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">// 1. 建立 CancellationTokenSource</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">// 2. 從 CTS 取得 CancellationToken</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">// 3. 將 token 傳遞給你的非同步方法</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">// （此處僅展示「傳遞 token」，完整等待與例外處理見後續範例）</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">// 4. 在未來的某個時間點，當你決定要取消時...</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"使用者決定取消操作！"</span><span class="op">);</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// 按下「取消按鈕」</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>當你呼叫 <code>cts.Cancel()</code> 之後，取消訊號就會立刻發送出去，而所有從這個 CTS 所取得的 <code>CancellationToken</code> 都會同步收到這個取消的通知。不過，這個通知並不等於強制終止執行緒；它只是把 Token 的狀態切換為「已要求取消」，並執行已註冊的取消回呼。真正的停止時機，仍取決於工作端何時檢查 Token，或底層支援取消的 API 何時觀察到這個訊號。</p>
+<blockquote class="blockquote">
+<p><strong>Note:</strong></p>
+<p>從 .NET 8 開始，<code>CancellationTokenSource</code> 也提供了 <code>CancelAsync()</code>。如果你需要「等待」所有註冊在 <code>CancellationToken</code> 上的回呼（callbacks）或相關取消通知流程都執行完畢，再繼續往下做其他事，就可以使用 <code>await cts.CancelAsync()</code>。本章這裡先使用 <code>cts.Cancel()</code>，是因為範例要聚焦在「發出取消請求」這個基本概念，而且這個範例本身也不需要等到取消回呼全部完成後，才能繼續往下處理。</p>
+</blockquote>
+</section>
+<section id="sec-listening-for-cancellation" class="level3">
+<h3 class="anchored" data-anchor-id="sec-listening-for-cancellation">監聽並向下傳遞取消訊號</h3>
+<p>看完發起方的動作，現在把視角切換到另一端。負責執行任務的非同步方法，必須把這個 <code>CancellationToken</code> 當作參數接收進來，接著承擔起兩項責任：</p>
+<ol type="1">
+<li><strong>週期性地檢查它</strong>：如果你的方法包含迴圈或是多個費時的步驟，就必須在過程中不斷檢查是否有收到取消請求。</li>
+<li><strong>一路向下傳遞（pass-through）它</strong>：把你手上的這個 Token 繼續傳遞給底下所有支援取消的呼叫（例如資料庫查詢、HTTP 請求，或是其他的非同步方法）。</li>
+</ol>
+<p>這也是在撰寫 C# 非同步程式時很重要的最佳實務：<strong>「讓 Token 一路傳下去」</strong>。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/pass-through-token-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>以下範例同時展示了「持續檢查」和「向下傳遞」。在閱讀程式碼時請特別留意：這個方法不但會在迴圈中主動檢查是否需要取消，同時在呼叫底層的 <code>Task.Delay</code> 時，也沒有忘記把同一個 <code>token</code> 傳遞下去。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">static</span> async Task <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="op">{</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作已開始..."</span><span class="op">);</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>    <span class="kw">try</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="op">{</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a>        <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a>        <span class="op">{</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>            <span class="co">// 檢查是否已經收到取消請求 (例如在運算密集的迴圈內)</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a>            token<span class="op">.</span><span class="fu">ThrowIfCancellationRequested</span><span class="op">();</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a></span>
+<span id="cb12-11"><a href="#cb12-11"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"正在執行第 {i + 1}/10 部分的工作..."</span><span class="op">);</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a></span>
+<span id="cb12-13"><a href="#cb12-13"></a>            <span class="co">// 重要：將 token 繼續向下傳遞給任何支援的底層 API！</span></span>
+<span id="cb12-14"><a href="#cb12-14"></a>            await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">1000</span><span class="op">,</span> token<span class="op">);</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a>        <span class="op">}</span></span>
+<span id="cb12-16"><a href="#cb12-16"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作順利完成。"</span><span class="op">);</span></span>
+<span id="cb12-17"><a href="#cb12-17"></a>    <span class="op">}</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a>    <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb12-19"><a href="#cb12-19"></a>    <span class="op">{</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作已被取消。"</span><span class="op">);</span></span>
+<span id="cb12-21"><a href="#cb12-21"></a>        <span class="kw">throw</span><span class="op">;</span> <span class="co">// 通常需要繼續往外拋</span></span>
+<span id="cb12-22"><a href="#cb12-22"></a>    <span class="op">}</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>正如上面程式碼所展示的，在非同步工作的內部，我們通常會在迴圈或是某些關鍵步驟的開頭，呼叫 <code>token.ThrowIfCancellationRequested()</code> 來檢查 <code>token</code> 是否已經被取消了。如果真的被取消，這個方法就會拋出 <code>OperationCanceledException</code> 中斷任務。</p>
+<blockquote class="blockquote">
+<p><code>ThrowIfCancellationRequested</code> 會拋出 <code>OperationCanceledException</code>，而 <a href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.delay"><code>Task.Delay</code></a> 亦有可能拋出 <code>OperationCanceledException</code> 或其衍生型別 <code>TaskCanceledException</code>。</p>
+</blockquote>
+<p>那麼，當工作端拋出中斷例外後，呼叫端會發生什麼事呢？當我們 <code>await</code> 一個已經被取消的 <code>Task</code> 時，剛才提到的 <code>OperationCanceledException</code>（或者是它的衍生型別，像是 <code>TaskCanceledException</code>）就會被重新拋出。因此，我們只要在呼叫端的 <code>catch</code> 區塊中捕捉這個特定型別的例外，就能清楚分辨：原來任務是因為被取消而停止，而不是遭遇了什麼嚴重的系統錯誤。</p>
+<p>換句話說，取消例外（canceled exception）通常屬於預期流程，並不代表程式一定有 bug 或出錯了；如果捕捉到其他類型的例外，才需要另行處理。下面的範例把呼叫端和工作端的行為串在一起：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">// 1. 建立 CancellationTokenSource</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">// 2. 從 CTS 取得 CancellationToken</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">// 3. 將 token 傳遞給你的非同步方法 (先不要立刻 await，讓它在背景跑)</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">// 模擬使用者操作了一段時間後決定取消</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a>await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2500</span><span class="op">);</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">// 4. 在未來的某個時間點，當你決定要取消時...</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"</span><span class="sc">\n</span><span class="st">[呼叫端] 使用者決定取消操作！"</span><span class="op">);</span></span>
+<span id="cb13-15"><a href="#cb13-15"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// 按下「取消按鈕」</span></span>
+<span id="cb13-16"><a href="#cb13-16"></a></span>
+<span id="cb13-17"><a href="#cb13-17"></a><span class="kw">try</span></span>
+<span id="cb13-18"><a href="#cb13-18"></a><span class="op">{</span></span>
+<span id="cb13-19"><a href="#cb13-19"></a>    await workTask<span class="op">;</span> <span class="co">// 等待背景工作結束</span></span>
+<span id="cb13-20"><a href="#cb13-20"></a><span class="op">}</span></span>
+<span id="cb13-21"><a href="#cb13-21"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb13-22"><a href="#cb13-22"></a><span class="op">{</span></span>
+<span id="cb13-23"><a href="#cb13-23"></a>    <span class="co">// 這是預期的</span></span>
+<span id="cb13-24"><a href="#cb13-24"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"呼叫端捕捉到 OperationCanceledException。"</span><span class="op">);</span></span>
+<span id="cb13-25"><a href="#cb13-25"></a><span class="op">}</span></span>
+<span id="cb13-26"><a href="#cb13-26"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb13-27"><a href="#cb13-27"></a><span class="op">{</span></span>
+<span id="cb13-28"><a href="#cb13-28"></a>    <span class="co">// 這才是真正的錯誤</span></span>
+<span id="cb13-29"><a href="#cb13-29"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"工作發生異常：{ex.Message}"</span><span class="op">);</span></span>
+<span id="cb13-30"><a href="#cb13-30"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a href="#cb14-1"></a>背景工作已開始...</span>
+<span id="cb14-2"><a href="#cb14-2"></a>正在執行第 1/10 部分的工作...</span>
+<span id="cb14-3"><a href="#cb14-3"></a>正在執行第 2/10 部分的工作...</span>
+<span id="cb14-4"><a href="#cb14-4"></a>正在執行第 3/10 部分的工作...</span>
+<span id="cb14-5"><a href="#cb14-5"></a></span>
+<span id="cb14-6"><a href="#cb14-6"></a>[呼叫端] 使用者決定取消操作！</span>
+<span id="cb14-7"><a href="#cb14-7"></a>背景工作已被取消。</span>
+<span id="cb14-8"><a href="#cb14-8"></a>呼叫端捕捉到 OperationCanceledException。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch04/DemoCancellationToken">DemoCancellationToken</a></p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/operation-canceled-exception-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> 許多 .NET 內建的非同步 API（例如 <code>HttpClient</code> 的諸多方法，還有前面看過的 <code>Task.Delay</code> 等）都有提供接收 <code>CancellationToken</code> 的多載版本。請盡可能地使用它們，因為這些 API 在底層往往已經為你提供了最有效率的取消監聽邏輯。也就是說，取消訊號可以直接接到等待、計時器或 I/O 流程中，而不是只能等你的程式下一次手動輪詢 Token 時才反應。</p>
+</blockquote>
+<p>任務取消的原因可能不只一個。例如：</p>
+<ul>
+<li><strong>情況 A：</strong> 最外層的呼叫端反悔了，直接把傳入的 <code>token</code> 取消。</li>
+<li><strong>情況 B：</strong> 內層引用的某個套件或元件，因為自己等太久（逾時）而自行取消，並拋出了 <code>OperationCanceledException</code>。</li>
+</ul>
+<p>遇到這種狀況時，C# 的 <code>when</code> 子句就能派上用場。它可以用來限縮 <code>catch</code> 捕捉例外的範圍，讓你的程式碼只處理自己關心的取消情境。例如，如果你只想確認「是不是呼叫端傳入的那個 token 觸發了取消」，可以這樣寫：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException oce<span class="op">)</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>    <span class="fu">when</span> <span class="op">(</span>oce<span class="op">.</span><span class="fu">CancellationToken</span> <span class="op">==</span> token<span class="op">)</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="op">{</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"呼叫端已要求取消。"</span><span class="op">);</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>不過要注意，這種比對方式並不是放諸四海皆準。若中途使用了 <code>CreateLinkedTokenSource</code>，或是底層 API 拋出的 <code>OperationCanceledException</code> 攜帶的是另一個 token，<code>oce.CancellationToken</code> 就不一定等於你原本傳入的那個 token。碰到多個取消來源時，通常更可靠的做法，是用稍後的逾時範例那樣檢查你自己持有的來源 token 是否已經 <code>IsCancellationRequested</code>。</p>
+</section>
+<section id="註冊取消回呼cancellation-callbacks" class="level3">
+<h3 class="anchored" data-anchor-id="註冊取消回呼cancellation-callbacks">註冊取消回呼（cancellation callbacks）</h3>
+<p>到目前為止，我們看到的都是如何主動檢查 Token。但有些時候，你手上使用的舊版或第三方 API 可能並不直接支援傳入 <code>CancellationToken</code>；又或者，你需要在任務被取消的那一瞬間，順手做一些額外的清理工作，例如關閉一個已經開啟的 socket 連線、或是刪掉剛才寫到一半的暫存檔。這時可以利用 <code>CancellationToken.Register</code> 方法來註冊取消時的回呼動作：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">using</span> <span class="dt">var</span> registration <span class="op">=</span> token<span class="op">.</span><span class="fu">Register</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="op">{</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"收到取消通知，開始清理資源..."</span><span class="op">);</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>    <span class="co">// 例如：關閉自訂連線、刪除暫存檔，或通知其他元件停止工作</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="op">});</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">// ... 執行操作 ...</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>呼叫 <code>Register</code> 方法後，它會回傳一個實作了 <code>IDisposable</code> 介面的 <code>CancellationTokenRegistration</code> 物件。因此，只要把這個註冊動作寫在 <code>using</code> 宣告或 <code>using</code> 區塊裡，就能確保在操作完成、或者取消回呼（cancellation callbacks）執行完畢後，相關資源都能被正確釋放回收。這個動作看似微不足道，對於避免記憶體洩漏（memory leak）卻很重要。</p>
+<p>實務上，取消回呼（callbacks）的程式碼應該盡量保持短小精悍，並且要設計成可重入（reentrant）。因為 callback 可能在取消流程中被執行，如果它做了過度耗時的工作，就會拖慢或嚴重干擾整個取消流程。所謂可重入，指的是即使同一段清理邏輯被重複進入，或和其他清理流程交錯執行，也不應破壞物件狀態。</p>
+<blockquote class="blockquote">
+<p><strong>Important: 註冊回呼的記憶體洩漏陷阱</strong></p>
+<p>這裡有個容易被忽略的細節：如果傳入的 <code>CancellationToken</code> 是來自一個<strong>長壽命（long-lived）</strong> 的來源（例如 ASP.NET Core 的 <code>ApplicationStopping</code>，或是存活於整個應用程式生命週期的全域 CTS），而我們在每個短暫的操作中呼叫 <code>token.Register(...)</code> 卻<strong>沒有把它 <code>Dispose</code> 掉</strong>，會發生什麼事呢？</p>
+<p>答案是：你的 callback 委派（以及它所參照到的變數與物件）會被那個長壽命的 CTS 持續保留。久而久之，這就會造成記憶體洩漏（memory leak）。所以，請務必養成好習慣，像範例中那樣使用 <code>using</code> 區塊，或是明確呼叫 <code>.Dispose()</code> 來註銷（unregister）回呼。</p>
+</blockquote>
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/standard/threading/cancellation-in-managed-threads">Cancellation in Managed Threads</a> 整理了 <code>CancellationToken</code>、<code>Register</code>、linked token，以及取消回呼與 <code>Dispose</code> 的注意事項。</p>
+</section>
+<section id="不可取消的-token" class="level3">
+<h3 class="anchored" data-anchor-id="不可取消的-token">不可取消的 Token</h3>
+<p>有時候，雖然你呼叫的方法在其簽章中要求你必須傳入 <code>CancellationToken</code>，但你其實不打算提供任何取消機制。遇到這種情況，標準的作法就是傳入 <code>CancellationToken.None</code>。就像這樣：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode csharp code-with-copy"><code class="sourceCode cs"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 明確表示：對此操作，我不打算提供取消機制</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>await <span class="fu">DoSomethingAsync</span><span class="op">(</span>CancellationToken<span class="op">.</span><span class="fu">None</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這比傳入 <code>default(CancellationToken)</code> 更具可讀性，因為它清楚表達了你的意圖。</p>
+</section>
+</section>
+<section id="sec-implementing-timeouts" class="level2">
+<h2 class="anchored" data-anchor-id="sec-implementing-timeouts">實作逾時機制</h2>
+<p>學會這套取消模式後，實作「逾時（timeout）」就很自然了。所謂的「逾時」，本質上只是「當指定的時間一到，便自動發出取消請求」。</p>
+<p><code>CancellationTokenSource</code> 的建構函式提供了一個方便的多載版本。你只要在建立它時傳入一個時間長度，它就會在該段時間過後，自動幫你呼叫 <code>Cancel()</code>。</p>
+<p>先來看一個簡單的範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb18-1"><a href="#cb18-1"></a><span class="co">// 建立一個 3 秒後會自動取消的 CTS</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">3</span><span class="op">));</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="kw">try</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="op">{</span></span>
+<span id="cb18-6"><a href="#cb18-6"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"開始執行一個最多只能跑 3 秒的工作..."</span><span class="op">);</span></span>
+<span id="cb18-7"><a href="#cb18-7"></a>    <span class="co">// 假設這個工作內部需要跑 10 秒以上</span></span>
+<span id="cb18-8"><a href="#cb18-8"></a>    await <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="op">}</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb18-11"><a href="#cb18-11"></a><span class="op">{</span></span>
+<span id="cb18-12"><a href="#cb18-12"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"工作因為逾時而被取消了！"</span><span class="op">);</span></span>
+<span id="cb18-13"><a href="#cb18-13"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這個範例的重點在於，負責執行任務的 <code>DoSomeLongRunningWorkAsync</code> 方法本身完全不用知道「逾時」這個概念；它只要監聽傳入的 <code>CancellationToken</code> 就好。做為呼叫端，我們只要建立一個會自動取消的 CTS，就能為任何支援 Token 的非同步操作加上逾時限制。這是一個高度可組合（composable）的模式。</p>
+<p>不過，在上例中，我們之所以能直接把捕捉到的 <code>OperationCanceledException</code> 解讀為發生了「逾時」，是因為該範例裡<strong>只有一個取消來源</strong>（也就是我們所建立的那個會自動取消的 CTS）。實務上，你的 API 往往同時還會接收從外部傳入的 <code>CancellationToken</code>，而面對這種雙重來源的情況，你就不能直接把 <code>OperationCanceledException</code> 認定為發生逾時；你需要像下一節介紹的那樣，寫一些邏輯來進一步分辨某次取消究竟是因為跑太久引發的「逾時」，還是呼叫端主動取消了任務。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch04/DemoTimeouts">DemoTimeouts</a></p>
+</blockquote>
+<p>底下是範例程式 DemoTimeouts 的執行結果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a href="#cb19-1"></a>開始執行一個最多只能跑 3 秒的工作...</span>
+<span id="cb19-2"><a href="#cb19-2"></a>背景工作已開始...</span>
+<span id="cb19-3"><a href="#cb19-3"></a>正在執行第 1/10 部分的工作...</span>
+<span id="cb19-4"><a href="#cb19-4"></a>正在執行第 2/10 部分的工作...</span>
+<span id="cb19-5"><a href="#cb19-5"></a>正在執行第 3/10 部分的工作...</span>
+<span id="cb19-6"><a href="#cb19-6"></a>背景工作已被取消。</span>
+<span id="cb19-7"><a href="#cb19-7"></a>工作因為逾時而被取消了！</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="可測試的逾時機制timeprovider-.net-8" class="level3">
+<h3 class="anchored" data-anchor-id="可測試的逾時機制timeprovider-.net-8">可測試的逾時機制：<code>TimeProvider</code> (.NET 8+)</h3>
+<p>本節要說明如何利用 .NET 的 <code>TimeProvider</code> 把「逾時」從真實的系統時間中解耦出來，讓你的 timeout 邏輯可以快速且穩定地在單元測試中驗證。</p>
+<p>回顧上一節介紹的逾時機制，雖然它寫起來簡單又好用，但一到了單元測試就會碰到一個痛點：我們很難去控制系統時間。試想，如果你需要驗證某個「等待 30 秒後逾時」的邏輯，難道真的要在測試執行時，讓它空轉跑滿 30 秒嗎？這種作法會讓整個測試套件變得又慢又不穩定。</p>
+<p>.NET 8 引入了 <code>System.TimeProvider</code> 抽象類別，用來處理這個問題。它允許我們在測試中「快轉」時間，還能對時間的流逝進行精確的控制。</p>
+<p>此模式需要 .NET 8+；在測試端可搭配 <code>Microsoft.Extensions.TimeProvider.Testing</code> 套件（命名空間為 <code>Microsoft.Extensions.Time.Testing</code>）中的 <code>FakeTimeProvider</code>。使用時，第一步通常是透過依賴注入（dependency injection）或方法參數，把 <code>TimeProvider</code> 傳入服務中。在正式環境下，我們會注入 <code>TimeProvider.System</code>；而在測試時，則改注入 <code>FakeTimeProvider</code>。</p>
+<p>範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">public</span> <span class="kw">class</span> <span class="fu">MyService</span><span class="op">(</span>TimeProvider timeProvider<span class="op">)</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="op">{</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a>   <span class="kw">public</span> async Task <span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a>   <span class="op">{</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a>      <span class="co">// 使用 CancellationTokenSource 的建構函式來傳入 TimeProvider</span></span>
+<span id="cb20-6"><a href="#cb20-6"></a>      <span class="co">// 這與 new CancellationTokenSource(delay) 類似，但它是可測試的！</span></span>
+<span id="cb20-7"><a href="#cb20-7"></a>      <span class="dt">var</span> seconds <span class="op">=</span> TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">);</span></span>
+<span id="cb20-8"><a href="#cb20-8"></a>      <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>seconds<span class="op">,</span> timeProvider<span class="op">);</span></span>
+<span id="cb20-9"><a href="#cb20-9"></a>      <span class="co">// 連結外部傳入的 token (如果外部取消，我們也要取消)</span></span>
+<span id="cb20-10"><a href="#cb20-10"></a>      <span class="kw">using</span> <span class="dt">var</span> linkedCts <span class="op">=</span></span>
+<span id="cb20-11"><a href="#cb20-11"></a>         CancellationTokenSource<span class="op">.</span><span class="fu">CreateLinkedTokenSource</span><span class="op">(</span></span>
+<span id="cb20-12"><a href="#cb20-12"></a>            token<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb20-13"><a href="#cb20-13"></a>      <span class="kw">try</span></span>
+<span id="cb20-14"><a href="#cb20-14"></a>      <span class="op">{</span></span>
+<span id="cb20-15"><a href="#cb20-15"></a>         await <span class="fu">DoActualWorkAsync</span><span class="op">(</span>linkedCts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb20-16"><a href="#cb20-16"></a>      <span class="op">}</span></span>
+<span id="cb20-17"><a href="#cb20-17"></a>      <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb20-18"><a href="#cb20-18"></a>         <span class="fu">when</span> <span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">.</span><span class="fu">IsCancellationRequested</span></span>
+<span id="cb20-19"><a href="#cb20-19"></a>              <span class="op">&amp;&amp;</span> <span class="op">!</span>token<span class="op">.</span><span class="fu">IsCancellationRequested</span><span class="op">)</span></span>
+<span id="cb20-20"><a href="#cb20-20"></a>      <span class="op">{</span></span>
+<span id="cb20-21"><a href="#cb20-21"></a>         <span class="co">// 只有在 timeout token 已取消、</span></span>
+<span id="cb20-22"><a href="#cb20-22"></a>         <span class="co">// 且外部 token 尚未取消時，才視為逾時</span></span>
+<span id="cb20-23"><a href="#cb20-23"></a>         <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"操作已逾時。"</span><span class="op">);</span></span>
+<span id="cb20-24"><a href="#cb20-24"></a>      <span class="op">}</span></span>
+<span id="cb20-25"><a href="#cb20-25"></a>   <span class="op">}</span></span>
+<span id="cb20-26"><a href="#cb20-26"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這裡先用 <code>CancellationTokenSource</code> 的 <code>CreateLinkedTokenSource</code> 方法，把兩個本來獨立的取消訊號連結（合併）在一起：一端是外部傳進來的主動取消（<code>token</code>），另一端則是靠時間驅動的逾時取消（<code>cts.Token</code>）。這是為了確保：只要這兩端的任何一方觸發了取消訊號，都能順利停止後續的工作。</p>
+<p>另外值得注意的是，<code>CreateLinkedTokenSource</code> 方法會回傳一個全新的 <code>CancellationTokenSource</code> 實體，我們將它妥善保存在 <code>linkedCts</code> 變數裡備用。也因此，範例使用 <code>using var linkedCts</code> 來確保它會被釋放：linked CTS 會向來源 Token 註冊取消通知，用完後釋放它，才能解除這些註冊，避免短生命週期的操作被長生命週期的 Token 間接保留。</p>
+<p>前置作業準備好後，程式隨即進入 <code>try</code> 區塊，開始執行非同步工作。若有取消例外發生，關鍵就在於 <code>catch</code> 捕捉時搭配的例外篩選條件：我們藉由判斷當下狀態，限定只有在「timeout token 已經被觸發取消、同時外部 token 卻還沒有被取消」的條件下，才改為拋出更具語意的 <code>TimeoutException</code>。如果是呼叫端主動取消（外部 token 觸發），我們就什麼都不做，讓系統保留原始 <code>OperationCanceledException</code> 的取消語意。</p>
+<blockquote class="blockquote">
+<p>註：為了聚焦逾時與取消流程，上例省略了 <code>DoActualWorkAsync</code> 的實作細節；完整可編譯版本請參考本節附的範例專案。</p>
+</blockquote>
+<p>了解服務端的實作方式後，接著來看測試。</p>
+<p>撰寫單元測試時，只要改用 <code>Microsoft.Extensions.Time.Testing</code> 裡面的 <code>FakeTimeProvider</code> 來當替身，傳入一個模擬用的 <code>TimeProvider</code>，就能自由操控時間。</p>
+<p><code>FakeTimeProvider</code> 並不會真的更改系統時間，它只是攔截程式碼對 <code>TimeProvider</code> API（例如 <code>GetUtcNow()</code>）的呼叫，並回傳人為設定的假時間，因此不會影響系統或其他執行緒的時間感知。參考以下範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb21-1"><a href="#cb21-1"></a><span class="op">[</span>Fact<span class="op">]</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="kw">public</span> async Task <span class="fu">Should_Throw_TimeoutException_When_Time_Passes</span><span class="op">()</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="op">{</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>    <span class="co">// Arrange</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>    <span class="dt">var</span> fakeTime <span class="op">=</span> <span class="kw">new</span> <span class="fu">FakeTimeProvider</span><span class="op">();</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a>    <span class="dt">var</span> service <span class="op">=</span> <span class="kw">new</span> <span class="fu">MyService</span><span class="op">(</span>fakeTime<span class="op">);</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a></span>
+<span id="cb21-8"><a href="#cb21-8"></a>    <span class="co">// Act</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a>    <span class="dt">var</span> task <span class="op">=</span> service<span class="op">.</span><span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken<span class="op">.</span><span class="fu">None</span><span class="op">);</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a></span>
+<span id="cb21-11"><a href="#cb21-11"></a>    <span class="co">// Assert: 此時任務應該還沒完成</span></span>
+<span id="cb21-12"><a href="#cb21-12"></a>    Assert<span class="op">.</span><span class="fu">False</span><span class="op">(</span>task<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">);</span></span>
+<span id="cb21-13"><a href="#cb21-13"></a></span>
+<span id="cb21-14"><a href="#cb21-14"></a>    <span class="co">// Act: 讓時間快轉 30 秒 + 1 tick</span></span>
+<span id="cb21-15"><a href="#cb21-15"></a>    fakeTime<span class="op">.</span><span class="fu">Advance</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">)</span> <span class="op">+</span> TimeSpan<span class="op">.</span><span class="fu">FromTicks</span><span class="op">(</span><span class="dv">1</span><span class="op">));</span></span>
+<span id="cb21-16"><a href="#cb21-16"></a></span>
+<span id="cb21-17"><a href="#cb21-17"></a>    <span class="co">// Assert: 任務應該因為逾時而拋出 TimeoutException</span></span>
+<span id="cb21-18"><a href="#cb21-18"></a>    await Assert<span class="op">.</span><span class="fu">ThrowsAsync</span><span class="op">&lt;</span>TimeoutException<span class="op">&gt;(()</span> <span class="op">=&gt;</span> task<span class="op">);</span></span>
+<span id="cb21-19"><a href="#cb21-19"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>在上面的測試程式中，最後一個 assert 陳述句的意思是：「測試走到這裡時，我預期這個任務一定會拋出 <code>TimeoutException</code>」。以下進一步拆解說明：</p>
+<ul>
+<li><code>Assert.ThrowsAsync&lt;TimeoutException&gt;(...)</code> 是 xUnit 測試框架所提供的非同步斷言方法。它的功用就是在宣告：「我預期傳入括號裡的那個動作，最後必定會因為拋出 <code>TimeoutException</code> 而失敗。」</li>
+<li>括號裡的 <code>() =&gt; task</code> 則是一個 <code>Func&lt;Task&gt;</code> 委派。它等於是把那個「要被驗證的 task」交給 <code>ThrowsAsync</code> 去檢驗。</li>
+<li>最外層的 <code>await</code> 會等待斷言動作本身執行完成。一旦執行過程中真的出現 <code>TimeoutException</code>，則斷言成立，測試順利通過。</li>
+<li>反過來說，如果在執行期間沒有拋出任何例外，或者拋出的是其他例外型別（例如 <code>OperationCanceledException</code>），那麼測試便會失敗。</li>
+</ul>
+<p>透過 <code>TimeProvider</code>，我們不僅能寫出更穩健的逾時邏輯，也能讓那些動輒需要等待數十秒的測試，在幾毫秒內執行完畢，而不必真的去等待那些時間。這是 .NET 8 為需要處理時間的 API 帶來的重要改進。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch04/DemoTimeProviderTest">DemoTimeProviderTest</a></p>
+</blockquote>
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview">What is TimeProvider?</a></p>
+</section>
+</section>
+<section id="結語" class="level2">
+<h2 class="anchored" data-anchor-id="結語">結語</h2>
+<p>本章聚焦在非同步程式設計裡最常見的「非理想情境」。我們學會了如何用熟悉的 <code>try-catch</code> 處理非同步例外，也理解了 <code>await</code> 如何幫我們免去手動拆解 <code>AggregateException</code> 的負擔。</p>
+<p>更重要的是，我們掌握了 .NET 標準的協同式取消模式。透過 <code>CancellationTokenSource</code> 與 <code>CancellationToken</code>，我們不但能讓使用者主動取消長時間任務，也能替非同步操作加入逾時保護。</p>
+<p>現在，你已經具備撰寫穩健非同步程式碼的重要基礎：不只會處理成功路徑，也知道如何妥善因應失敗與取消。下一個挑戰則是，當多個非同步任務同時執行並共享資源時，該如何確保資料的完整性與一致性；這正是下一章「執行緒同步與經典問題」要探討的主題。</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+(() => {
+  const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+  if (!match) {
+    return;
+  }
+
+  const current = match[1];
+  const target = current === "zh-tw" ? "en" : "zh-tw";
+  const link = document.createElement("a");
+
+  link.className = "language-switch";
+  link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+    + window.location.search
+    + window.location.hash;
+  link.textContent = current === "zh-tw" ? "English" : "繁體中文";
+  link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+  link.setAttribute(
+    "aria-label",
+    current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+  );
+
+  const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+  if (sidebarHeader) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "language-switch-wrapper";
+    wrapper.appendChild(link);
+    sidebarHeader.appendChild(wrapper);
+    return;
+  }
+
+  const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+  const searchButton = header?.querySelector(".quarto-search-button");
+  if (header && searchButton) {
+    header.insertBefore(link, searchButton);
+  } else {
+    document.body.appendChild(link);
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已複製");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已複製");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dotnetconcurrency\.huanlin\.cc\/zh-tw\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../ch03/async-await-essentials.html" class="pagination-link" aria-label="第 3 章：async 與 await">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第 3 章：async 與 await</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../ch05/thread-synchronization.html" class="pagination-link" aria-label="第 5 章：執行緒同步與經典問題">
+        <span class="nav-page-text">第 5 章：執行緒同步與經典問題</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>免費試讀版：第 1 至第 4 章全文</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://huanlin.cc/">作者網站</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

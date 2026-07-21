@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://dotnetconcurrency.huanlin.cc/</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-author.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-book.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch00/preface.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch01/introduction.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch02/threads-and-tasks.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch03/async-await-essentials.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch04/exceptions-and-cancellation.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch05/thread-synchronization.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch06/thread-safety-and-immutable-collections.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch07/parallel-programming-and-plinq.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch08/async-streams.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch09/advanced-task-programming.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch10/async-patterns-and-practices.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/en/ch11/async-api-design.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch00/about-author.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch00/about-book.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch00/preface.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch01/introduction.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch02/threads-and-tasks.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch03/async-await-essentials.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch04/exceptions-and-cancellation.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch05/thread-synchronization.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch06/thread-safety-and-immutable-collections.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch07/parallel-programming-and-plinq.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch08/async-streams.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch09/advanced-task-programming.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch10/async-patterns-and-practices.html</loc></url>
+  <url><loc>https://dotnetconcurrency.huanlin.cc/zh-tw/ch11/async-api-design.html</loc></url>
+</urlset>

@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+
+<title>Chapter 2: Threads and tasks in .NET – Demystifying .NET 10 Asynchronous Programming</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../ch03/async-await-essentials.html" rel="next">
+<link href="../ch01/introduction.html" rel="prev">
+<link href="../images/cover-en.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../styles-html.css">
+<meta property="og:title" content="Chapter 2: Threads and tasks in .NET – Demystifying .NET 10 Asynchronous Programming">
+<meta property="og:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/en/ch02/images/thread-task-en.png">
+<meta property="og:site_name" content="Demystifying .NET 10 Asynchronous Programming">
+<meta property="og:image:height" content="616">
+<meta property="og:image:width" content="1199">
+<meta name="twitter:title" content="Chapter 2: Threads and tasks in .NET – Demystifying .NET 10 Asynchronous Programming">
+<meta name="twitter:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/en/ch02/images/thread-task-en.png">
+<meta name="twitter:image-height" content="616">
+<meta name="twitter:image-width" content="1199">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/en/ch02/threads-and-tasks.html">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1: Fundamentals</a></li><li class="breadcrumb-item"><a href="../ch02/threads-and-tasks.html"><span class="chapter-title">2 Threads and tasks in .NET</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Demystifying .NET 10 Asynchronous Programming</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/huanlin/dotnet-concurrency" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-book.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About this book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-author.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1: Fundamentals</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch01/introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">1 Understanding threads and asynchrony</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch02/threads-and-tasks.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">2 Threads and tasks in .NET</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch03/async-await-essentials.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">3 async and await</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch04/exceptions-and-cancellation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">4 Exception handling and cancellation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2: Concurrency and parallelism</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Thread synchronization and classic problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch06/thread-safety-and-immutable-collections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Thread safety and immutable collections</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch07/parallel-programming-and-plinq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Parallel processing and PLINQ</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3: Advanced topics</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch08/async-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Asynchronous streams and resource management</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch09/advanced-task-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Advanced Task programming</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch10/async-patterns-and-practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Practical scenarios and best practices</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch11/async-api-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Guidelines for designing asynchronous APIs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-traditional-challenges" id="toc-sec-traditional-challenges" class="nav-link active" data-scroll-target="#sec-traditional-challenges">The challenge of the traditional approach: the complexity of managing threads directly</a>
+  <ul class="collapse">
+  <li><a href="#sec-direct-thread-creation-thread-start" id="toc-sec-direct-thread-creation-thread-start" class="nav-link" data-scroll-target="#sec-direct-thread-creation-thread-start">Creating a thread directly: <code>Thread.Start</code></a></li>
+  <li><a href="#sec-threadpool-limitations" id="toc-sec-threadpool-limitations" class="nav-link" data-scroll-target="#sec-threadpool-limitations">Reusing threads: <code>ThreadPool</code></a></li>
+  </ul></li>
+  <li><a href="#sec-task-as-solution" id="toc-sec-task-as-solution" class="nav-link" data-scroll-target="#sec-task-as-solution">The core idea: <code>Task</code>, a higher-level abstraction that solves the complexity of thread management</a></li>
+  <li><a href="#sec-the-modern-approach-task-run" id="toc-sec-the-modern-approach-task-run" class="nav-link" data-scroll-target="#sec-the-modern-approach-task-run">The modern starting point: <code>Task.Run</code></a>
+  <ul class="collapse">
+  <li><a href="#do-not-use-task.run-to-call-asynchronous-io-methods" id="toc-do-not-use-task.run-to-call-asynchronous-io-methods" class="nav-link" data-scroll-target="#do-not-use-task.run-to-call-asynchronous-io-methods">Do not use <code>Task.Run</code> to call asynchronous I/O methods</a></li>
+  </ul></li>
+  <li><a href="#sec-task-lifecycle-and-status" id="toc-sec-task-lifecycle-and-status" class="nav-link" data-scroll-target="#sec-task-lifecycle-and-status">The lifecycle and states of <code>Task</code></a></li>
+  <li><a href="#sec-task-is-not-thread" id="toc-sec-task-is-not-thread" class="nav-link" data-scroll-target="#sec-task-is-not-thread">A task is not the same as a thread: from CPU-bound to I/O-bound work</a>
+  <ul class="collapse">
+  <li><a href="#task.delay-waiting-without-blocking-a-thread" id="toc-task.delay-waiting-without-blocking-a-thread" class="nav-link" data-scroll-target="#task.delay-waiting-without-blocking-a-thread"><code>Task.Delay</code>: waiting without blocking a thread</a></li>
+  <li><a href="#task.fromresult-a-promise-that-is-already-complete" id="toc-task.fromresult-a-promise-that-is-already-complete" class="nav-link" data-scroll-target="#task.fromresult-a-promise-that-is-already-complete"><code>Task.FromResult</code>: a promise that is already complete</a></li>
+  </ul></li>
+  <li><a href="#sec-foreground-vs-background-threads" id="toc-sec-foreground-vs-background-threads" class="nav-link" data-scroll-target="#sec-foreground-vs-background-threads">Foreground threads vs.&nbsp;background threads</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1: Fundamentals</a></li><li class="breadcrumb-item"><a href="../ch02/threads-and-tasks.html"><span class="chapter-title">2 Threads and tasks in .NET</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="chapter-02" class="quarto-section-identifier"><span class="chapter-title">Chapter 2: Threads and tasks in .NET</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">July 21, 2026</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In Chapter 1, we used the pizza-shop analogy to see why applications often need to handle multiple things at once. We also got our first glimpse of how multithreading and asynchronous programming can improve efficiency. At the same time, we saw the tradeoff: multithreading brings its own management complexity, including the cost of <strong>context switches</strong> and the difficulty of resource synchronization.</p>
+<p>This chapter steps into the .NET world and shows how those ideas appear in real code. The goal is to help you understand the two core concepts behind asynchrony and multitasking in .NET: <strong>threads</strong> and <strong>tasks</strong>. Along the way, we will see how modern tools help us avoid the pitfalls of traditional thread management.</p>
+<p>Many beginners confuse threads and tasks, but to write efficient, reliable asynchronous code, it helps to understand the distinction clearly. In simple terms:</p>
+<ul>
+<li>A <strong>thread</strong> is a lower-level concept. You can think of it as a “worker” that executes code.</li>
+<li>A <strong>task</strong> is a higher-level abstraction that represents a piece of “work” to be completed.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/thread-task-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:75.0%"></p>
+</figure>
+</div>
+<p>We will walk through the following key topics:</p>
+<ul>
+<li><strong>The challenge of the traditional approach</strong>: a quick review of the complexity and limitations of managing threads directly.</li>
+<li><strong>The core idea, <code>Task</code></strong>: understanding how <code>Task</code> acts as a higher-level abstraction that solves the pain points of traditional thread management.</li>
+<li><strong>The modern starting point, <code>Task.Run</code></strong>: learning how to start background work easily with <code>Task.Run</code>.</li>
+<li><strong>The lifecycle and states of <code>Task</code></strong>: seeing how a <code>Task</code> moves through different states from creation to completion.</li>
+<li><strong>A task is not the same as a thread</strong>: clarifying the fundamental difference between CPU-bound and I/O-bound work.</li>
+<li><strong>Foreground threads vs.&nbsp;background threads</strong>: understanding the key lifecycle difference between these two kinds of threads.</li>
+</ul>
+<hr>
+<section id="sec-traditional-challenges" class="level2">
+<h2 class="anchored" data-anchor-id="sec-traditional-challenges">The challenge of the traditional approach: the complexity of managing threads directly</h2>
+<p>In early versions of .NET, developers had to work with threads much more directly. That approach offered a great deal of control, but it also introduced significant complexity and several potential problems. Looking at these challenges first makes it easier to appreciate how modern asynchronous programming simplifies the model.</p>
+<blockquote class="blockquote">
+<p><strong>Prerequisite: the main thread and worker threads</strong></p>
+<p>In the upcoming examples, you will see two terms repeatedly:</p>
+<ul>
+<li><strong>The main thread</strong>: the initial thread assigned by the operating system when the application starts. If the main thread gets stuck and becomes blocked, the whole program may stop responding.</li>
+<li><strong>Worker threads</strong>: a general term for any threads other than the main thread that are used to do work. They might be extra threads that we create manually, or threads borrowed from the <code>ThreadPool</code>. Later in this chapter, we will define more precisely whether a given thread is technically a foreground or background thread in the .NET lifecycle.</li>
+</ul>
+</blockquote>
+<section id="sec-direct-thread-creation-thread-start" class="level3">
+<h3 class="anchored" data-anchor-id="sec-direct-thread-creation-thread-start">Creating a thread directly: <code>Thread.Start</code></h3>
+<p>First, consider the most traditional approach: manually creating a <code>System.Threading.Thread</code> object and then calling <code>Start</code> to begin its assigned work. Here is a simple example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"Main thread ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co">// Create a new thread to execute DoWork</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="dt">var</span> newThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(</span>DoWork<span class="op">);</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>newThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Main thread continues running..."</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"Worker thread ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Work is in progress..."</span><span class="op">);</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// Simulate 2 seconds of work</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Work is done."</span><span class="op">);</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample output:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>Main thread ID: 2</span>
+<span id="cb2-2"><a href="#cb2-2"></a>Main thread continues running...</span>
+<span id="cb2-3"><a href="#cb2-3"></a>Worker thread ID: 10</span>
+<span id="cb2-4"><a href="#cb2-4"></a>Work is in progress...</span>
+<span id="cb2-5"><a href="#cb2-5"></a>Work is done.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch02/DemoThreadStart">DemoThreadStart</a></p>
+</blockquote>
+<p>At first glance, the code might not look too complex. But once you use it in a real application, the problems quickly become obvious:</p>
+<ol type="1">
+<li><strong>It is expensive</strong>. Every time you create a new thread, the system must reserve a fairly large chunk of memory for that thread’s stack and spend additional resources on kernel-level setup. The actual stack size depends on the operating system and default configuration. On Windows, for example, the default reserved stack size is commonly about 1 MB. If you keep creating new threads for small jobs, it is like hiring a brand-new employee just to deliver a single takeout order. It is inefficient.</li>
+<li><strong>It is hard to manage</strong>. You have to manage the thread’s lifecycle manually, and it is difficult to retrieve a return value or handle exceptions cleanly.</li>
+</ol>
+<p><strong>Note:</strong> The statement above about Windows commonly reserving about 1 MB for the default thread stack is based on Microsoft documentation: <a href="https://learn.microsoft.com/windows/win32/procthread/thread-stack-size">Thread Stack Size</a>.</p>
+<blockquote class="blockquote">
+<p><strong>About <code>Thread.Sleep</code></strong></p>
+<p>Many examples in this book use <code>Thread.Sleep()</code>. In the sample programs, its main purpose is to deliberately create an easy-to-observe delay or blocking effect, so you can see thread switching, waiting, and control flow more clearly.</p>
+<p><code>Thread.Sleep</code> itself is not part of asynchronous programming. In fact, it is exactly the kind of “blocking wait” that we want to avoid with asynchronous techniques. To be precise, <strong><code>Thread.Sleep</code> blocks the thread</strong>, which means that thread cannot do any other work. It also does not represent real CPU-bound computation, because during <code>Sleep</code> the thread is not actually calculating anything. It is simply idle. In real I/O operations, we want to avoid blocking the thread while waiting. In real CPU-bound scenarios, the work is usually complex computation, not a call to <code>Sleep</code>.</p>
+</blockquote>
+</section>
+<section id="sec-threadpool-limitations" class="level3">
+<h3 class="anchored" data-anchor-id="sec-threadpool-limitations">Reusing threads: <code>ThreadPool</code></h3>
+<p>To solve the performance problem caused by <code>new Thread()</code>, .NET introduced the <strong>thread pool</strong>. You can think of it as .NET hiring a pool of resident “workers” (<code>Thread</code>) for your application in advance. When a work item needs to run, the runtime assigns an idle worker from that pool. When the work is finished, the worker goes back to the pool and waits for the next assignment instead of being terminated. This greatly improves resource efficiency.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/thread-pool-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>The basic logic in the following example is the same as in <code>DemoThreadStart</code>. The only difference is that this time we no longer create a thread manually. Instead, we let the thread pool assign an existing worker to handle the job:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"Main thread ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">// Queue a work item to the thread pool</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>ThreadPool<span class="op">.</span><span class="fu">QueueUserWorkItem</span><span class="op">(</span>_ <span class="op">=&gt;</span> <span class="fu">DoWork</span><span class="op">());</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a></span>
+<span id="cb3-7"><a href="#cb3-7"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Main thread continues running..."</span><span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span> <span class="co">// Wait for the background work to finish,</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>                    <span class="co">// or the main program might exit first.</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>    <span class="dt">var</span> msg <span class="op">=</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>        $<span class="st">"Background thread ID: "</span> <span class="op">+</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>        $<span class="st">"{Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work is in progress..."</span><span class="op">);</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// Simulate 2 seconds of work</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work is done."</span><span class="op">);</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch02/DemoThreadPool">DemoThreadPool</a></p>
+</blockquote>
+<p>If <code>ThreadPool</code> can reuse threads, does that solve the problem? Not completely. <code>ThreadPool</code> improves performance dramatically, but it still has two major drawbacks:</p>
+<ul>
+<li><strong>Fire-and-forget</strong>: <code>ThreadPool.QueueUserWorkItem(...)</code>, as shown here, is fire-and-forget, so it is hard to know when the work finishes or to retrieve a return value.</li>
+<li><strong>An exception black hole</strong>: if the background work fails, the main thread cannot directly catch an exception thrown on the background thread. This makes error handling cumbersome and potentially dangerous.</li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>Once you queue work to the <code>ThreadPool</code> with <code>ThreadPool.QueueUserWorkItem()</code>, the main thread continues executing. If the background work throws an exception while it is running, that exception surfaces as an unhandled exception on the background thread. The original caller—the main thread—cannot catch it with a <code>try-catch</code> block. In modern .NET, this usually causes the entire process to crash.</p>
+<p>To handle that situation safely, the developer must place a <code>try-catch</code> block inside the work item and then find a separate way to communicate the error back to the main program. That usually involves more complicated state sharing and synchronization mechanisms.</p>
+</blockquote>
+</section>
+</section>
+<section id="sec-task-as-solution" class="level2">
+<h2 class="anchored" data-anchor-id="sec-task-as-solution">The core idea: <code>Task</code>, a higher-level abstraction that solves the complexity of thread management</h2>
+<p>From this perspective, the direction of modern .NET is clear: we need an abstraction that sits at a higher level than direct thread management. In C#, <code>System.Threading.Tasks.Task</code> is that core abstraction for modern asynchronous programming. When you see a method return <code>Task</code> or <code>Task&lt;T&gt;</code>, it helps to think of it as a <strong>promise</strong> or a <strong>future</strong>:</p>
+<ul>
+<li><code>Task</code>: represents an asynchronous operation <strong>without a return value</strong>. It promises, “I will complete this work at some point in the future.”</li>
+<li><code>Task&lt;T&gt;</code>: represents an asynchronous operation <strong>with a return value</strong>. It promises, “I will complete this work at some point in the future and give you a result of type <code>T</code>.”</li>
+</ul>
+<p>The most valuable part of this “promise” model is that it decouples “the work to be done” from “the worker that executes it.” Once you have the <code>Task</code> object, you can track its state, such as whether it has completed or failed, and obtain its result when it is done, without worrying about which thread is actually running it.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/task-concept-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>This abstraction brings a major benefit. The .NET runtime can schedule and execute <code>Task</code> objects more efficiently based on current system load, the number of CPU cores, and other factors. For example, it can reuse existing threads and avoid the cost of creating and destroying threads repeatedly. As a result, <code>Task</code> improves on the pain points of traditional <code>Thread</code> and <code>ThreadPool</code> usage, including lifecycle management, returning values, and exception handling. That lets developers focus on “what work needs to be done” rather than “which worker should do it, and how it should be supervised.”</p>
+</section>
+<section id="sec-the-modern-approach-task-run" class="level2">
+<h2 class="anchored" data-anchor-id="sec-the-modern-approach-task-run">The modern starting point: <code>Task.Run</code></h2>
+<p>Think back to the pizza shop in Chapter 1. Our chef was mostly slowed down by “waiting for the oven,” which was an <strong>I/O-bound</strong> delay. But what if the chef receives a complicated handcrafted order and has to knead dough continuously for ten minutes? That kind of work, where the CPU must stay actively busy, is called <strong>CPU-bound</strong> work.</p>
+<p>When we face CPU-bound work, we still do not want it to tie up the head chef; in code, that “head chef” might be the UI thread or the main thread. A natural solution is to hand the work off to another helper in the kitchen. That is the core mission of <code>Task.Run</code>: combining the efficiency of <code>ThreadPool</code> with the abstraction benefits of <code>Task</code>.</p>
+<p>The role of <code>Task.Run</code> is simple: <strong>it hands a piece of work to the thread pool for execution and immediately returns a <code>Task</code> object that represents that work.</strong></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/task-run-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>Let’s start with a basic example. The following code sends a time-consuming operation to a background thread with <code>Task.Run</code> and then uses the returned <code>Task</code> object to wait for it to finish:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"Main thread ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Getting ready to use Task.Run for background work..."</span><span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">// Hand the work to the thread pool and get the Task object</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>Task task <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>    <span class="dt">var</span> msg <span class="op">=</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>        $<span class="st">"Background thread ID: "</span> <span class="op">+</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>        $<span class="st">"{Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work is in progress..."</span><span class="op">);</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a></span>
+<span id="cb4-15"><a href="#cb4-15"></a>    <span class="co">// Only to simulate a time-consuming synchronous operation.</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work is done."</span><span class="op">);</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="op">});</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a></span>
+<span id="cb4-20"><a href="#cb4-20"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>    <span class="st">"Main thread has called Task.Run "</span> <span class="op">+</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>    <span class="st">"and is free to do other things..."</span><span class="op">);</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">// Wait for the Task to complete</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a>task<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a></span>
+<span id="cb4-27"><a href="#cb4-27"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a>    <span class="st">"Confirmed that the Task has completed. "</span> <span class="op">+</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a>    <span class="st">"The main program is about to exit."</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample output:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href="#cb5-1"></a>Main thread ID: 2</span>
+<span id="cb5-2"><a href="#cb5-2"></a>Getting ready to use Task.Run for background work...</span>
+<span id="cb5-3"><a href="#cb5-3"></a>Main thread has called Task.Run and is free to do other things...</span>
+<span id="cb5-4"><a href="#cb5-4"></a>Background thread ID: 9</span>
+<span id="cb5-5"><a href="#cb5-5"></a>Background work is in progress...</span>
+<span id="cb5-6"><a href="#cb5-6"></a>Background work is done.</span>
+<span id="cb5-7"><a href="#cb5-7"></a>Confirmed that the Task has completed. The main program is about to exit.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here, <code>task.Wait()</code> is used only to ensure that the background work finishes before the Console application exits. In real asynchronous code, especially in UI or server-side applications, we should usually use <code>await</code> to wait for a <code>Task</code> asynchronously rather than calling <code>Wait()</code> and blocking the current thread. We will dig into that in the next chapter.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch02/DemoTaskRun">DemoTaskRun</a></p>
+</blockquote>
+<p>If the background work needs to return a value, <code>Task.Run</code> can handle that too:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>    <span class="st">"Getting ready to use Task.Run "</span> <span class="op">+</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>    <span class="st">"for background work that returns a value..."</span><span class="op">);</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">// Task&lt;string&gt; means this work will return a string in the future</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> taskWithResult <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="op">{</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>    <span class="kw">return</span> <span class="st">"This is the computed result from the background work"</span><span class="op">;</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="op">});</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a></span>
+<span id="cb6-12"><a href="#cb6-12"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Main thread continues running..."</span><span class="op">);</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">// Accessing .Result blocks the current thread</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">// until the Task completes and returns the result.</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="dt">string</span> result <span class="op">=</span> taskWithResult<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a></span>
+<span id="cb6-18"><a href="#cb6-18"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Result from background work: {result}"</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>However, one more point is important here. As mentioned earlier, calling <code>.Wait()</code> on a <code>Task</code> blocks the current thread. This example uses the <code>.Result</code> property to retrieve the result of asynchronous work, which also blocks the thread. When that happens, you lose the main benefit of asynchrony. Therefore, when writing asynchronous code, you should avoid calling <code>.Wait()</code> or reading <code>.Result</code> whenever possible.</p>
+<p>A more natural approach is to use the <code>await</code> keyword directly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">// (Assume this is inside an async Main method)</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>    <span class="st">"Getting ready to use async/await to wait "</span> <span class="op">+</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="st">"for background work without blocking..."</span><span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">// ✓ Correct approach: wait for the Task without blocking</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="dt">string</span> resultAsync <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="op">{</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a>    <span class="kw">return</span> <span class="st">"This is the result obtained with await"</span><span class="op">;</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="op">});</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a></span>
+<span id="cb7-13"><a href="#cb7-13"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Result from background work: {resultAsync}"</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>As you can see, after switching to <code>await</code>, the code preserves the benefits of asynchronous programming while still feeling direct and intuitive, almost like synchronous code. We will dig into the “magic” behind that in the next chapter.</p>
+<blockquote class="blockquote">
+<p><strong>Note:</strong> In this example, the code handed to <code>Task.Run</code> really does occupy a background thread while it is executing.</p>
+</blockquote>
+<p>Here is a useful point to remember: <strong><code>Task.Run</code> is best suited for CPU-bound work.</strong> For example, complex computation is a good candidate to move off the UI or main thread and run on a background thread instead.</p>
+<p>The rule of thumb for when to use <code>Task.Run</code> is simple. If an <code>async</code> method does purely computational work, such as encryption or format conversion, and that work would freeze the UI, you should offload it to a background thread with <code>Task.Run</code>. However, if the work is merely waiting for I/O, such as downloading a file or querying a database, <code>async/await</code> already prevents blocking, so <code>Task.Run</code> is unnecessary. The key question is whether the work is fundamentally CPU-bound or I/O-bound.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/when-use-task-run-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>How do you enable <code>await</code> in a Console app?</strong></p>
+<p>To use the <code>await</code> keyword at the program entry point, which is the <code>Main</code> method, you need to make sure the project is set up correctly.</p>
+<ul>
+<li><strong>The default Console project template in modern .NET</strong>: when you create a new Console application, it uses <a href="https://learn.microsoft.com/dotnet/csharp/tutorials/top-level-statements">top-level statements</a>. You do not need to define <code>Main</code>, and you can use <code>await</code> directly at the top of <code>Program.cs</code>. (.NET 6+)</li>
+<li><strong>Older versions of C#</strong>: you must change the signature of <code>Main</code> manually to <code>public static async Task Main(string[] args)</code>. (Note: <code>async Main</code> is supported starting from C# 7.1)</li>
+</ul>
+</blockquote>
+<section id="do-not-use-task.run-to-call-asynchronous-io-methods" class="level3">
+<h3 class="anchored" data-anchor-id="do-not-use-task.run-to-call-asynchronous-io-methods">Do not use <code>Task.Run</code> to call asynchronous I/O methods</h3>
+<p>The core job of <code>Task.Run</code> is to offload <strong>synchronous, CPU-bound</strong> work to a background thread so the caller stays responsive. However, many people take an I/O method that is <strong>already asynchronous</strong> and wrap it in <code>Task.Run</code> anyway.</p>
+<p>✘ Anti-pattern:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode csharp code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> json <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">async</span> <span class="op">()</span> <span class="op">=&gt;</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">));</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>✔ Correct approach:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode csharp code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dt">var</span> json <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>httpClient.GetStringAsync</code> is already asynchronous. When you <code>await</code> it, the current thread is already free to do other work while the network I/O is in progress. Wrapping it in <code>Task.Run</code> adds no benefit. Instead, it only adds unnecessary overhead: an extra thread-pool scheduling step and an extra delegate wrapper.</p>
+</section>
+</section>
+<section id="sec-task-lifecycle-and-status" class="level2">
+<h2 class="anchored" data-anchor-id="sec-task-lifecycle-and-status">The lifecycle and states of <code>Task</code></h2>
+<p>Once we obtain a <code>Task</code> object through <code>Task.Run</code> or some other mechanism, we can inspect its <code>Status</code> property, which uses the <code>TaskStatus</code> enum, to see where the operation is in its lifecycle. A typical <code>Task</code> goes through the following important states:</p>
+<ul>
+<li><code>Created</code>: the task has been created but has not yet been scheduled to run.</li>
+<li><code>WaitingForActivation</code>: the task is waiting to be activated. This is very common for asynchronous operations that depend on infrastructure to signal completion, such as <code>Task.Delay</code> or I/O work.</li>
+<li><code>WaitingToRun</code>: the task has been scheduled and is waiting for the thread pool to provide a thread.</li>
+<li><code>Running</code>: the task is currently executing.</li>
+<li><code>RanToCompletion</code>: the task finished successfully.</li>
+<li><code>Faulted</code>: the task failed because of an unhandled exception.</li>
+<li><code>Canceled</code>: the task was canceled.</li>
+</ul>
+<p>Besides <code>Status</code>, <code>Task</code> also provides several convenient Boolean properties: <code>IsCompleted</code>, <code>IsFaulted</code>, and <code>IsCanceled</code>. Note that <code>IsCompleted</code> will be <code>true</code> if the task is in any of the last three states listed above: <code>RanToCompletion</code>, <code>Faulted</code>, or <code>Canceled</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/task-status-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:95.0%"></p>
+</figure>
+</div>
+<p>These state names might seem abstract, so let’s observe the changes through a short example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>    <span class="st">"Creating and starting a task "</span> <span class="op">+</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a>    <span class="st">"that will intentionally fail..."</span><span class="op">);</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a>Task myTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="op">{</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>        <span class="st">"Task started and is about "</span> <span class="op">+</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a>        <span class="st">"to throw an exception..."</span><span class="op">);</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a>    <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">InvalidOperationException</span><span class="op">(</span><span class="st">"Oops, the task failed!"</span><span class="op">);</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="op">});</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="kw">try</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="op">{</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a>    <span class="co">// Intentionally wait for the task to complete</span></span>
+<span id="cb10-17"><a href="#cb10-17"></a>    <span class="co">// so we can observe its final state.</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a>    myTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="op">}</span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException<span class="op">)</span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="op">{</span></span>
+<span id="cb10-22"><a href="#cb10-22"></a>    <span class="co">// When Wait() is used on a failed Task,</span></span>
+<span id="cb10-23"><a href="#cb10-23"></a>    <span class="co">// the exception is wrapped in an AggregateException.</span></span>
+<span id="cb10-24"><a href="#cb10-24"></a>    <span class="co">// We catch and ignore it here</span></span>
+<span id="cb10-25"><a href="#cb10-25"></a>    <span class="co">// so we can observe the task's final state.</span></span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="op">}</span></span>
+<span id="cb10-27"><a href="#cb10-27"></a></span>
+<span id="cb10-28"><a href="#cb10-28"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Final task status: {myTask.Status}"</span><span class="op">);</span></span>
+<span id="cb10-29"><a href="#cb10-29"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsFaulted: {myTask.IsFaulted}"</span><span class="op">);</span></span>
+<span id="cb10-30"><a href="#cb10-30"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsCompleted: {myTask.IsCompleted}"</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sample output:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a href="#cb11-1"></a>Creating and starting a task that will intentionally fail...</span>
+<span id="cb11-2"><a href="#cb11-2"></a>Task started and is about to throw an exception...</span>
+<span id="cb11-3"><a href="#cb11-3"></a>Final task status: Faulted</span>
+<span id="cb11-4"><a href="#cb11-4"></a>IsFaulted: True</span>
+<span id="cb11-5"><a href="#cb11-5"></a>IsCompleted: True</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This code also demonstrates the exception-handling behavior mentioned earlier. When you use a traditional blocking approach such as <code>.Wait()</code> or <code>.Result</code> to wait on a <code>Task</code> that fails, the original exception gets wrapped inside an <code>AggregateException</code>. We will examine that mechanism, and how modern <code>await</code> “unwraps” the exception for you, in Chapter 4.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch02/DemoTaskStatus">DemoTaskStatus</a></p>
+</blockquote>
+</section>
+<section id="sec-task-is-not-thread" class="level2">
+<h2 class="anchored" data-anchor-id="sec-task-is-not-thread">A task is not the same as a thread: from CPU-bound to I/O-bound work</h2>
+<p>A common question is: “Does every <code>Task</code> mean that a background thread is running behind the scenes?”</p>
+<p>The answer is “no.”</p>
+<p><code>Task</code> is a very abstract concept. It represents only a “promise for the future.” That promise <strong>can</strong> be fulfilled by a background thread doing synchronous CPU work, such as when you use <code>Task.Run</code>. However, it <strong>can also represent work that does not occupy a dedicated thread while it is waiting</strong>.</p>
+<p>To clear up that misconception, let’s look at two common examples: <code>Task.Delay</code> and <code>Task.FromResult</code>. Both create <code>Task</code> objects, but neither requires an extra thread to sit around waiting.</p>
+<section id="task.delay-waiting-without-blocking-a-thread" class="level3">
+<h3 class="anchored" data-anchor-id="task.delay-waiting-without-blocking-a-thread"><code>Task.Delay</code>: waiting without blocking a thread</h3>
+<p>Do you remember <code>Thread.Sleep</code>? It makes the current thread sit idle and do nothing. If you use it on the main thread, the whole application freezes.</p>
+<p>For the need to “wait for a while without tying up a thread,” .NET provides an asynchronous alternative: <code>Task.Delay</code>. It represents “a task that will complete after a specified amount of time.” During that waiting period, there is usually <strong>no thread whose only job is to sit there waiting</strong>. Internally, it relies on a system timer. When the time is up, the runtime schedules the continuation to run later.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">// Simulate an asynchronous wait that does not block a thread</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>Task delayTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>That is why <code>Task.Delay</code> is often used to simulate I/O-bound waiting, such as waiting for a network packet or a database response.</p>
+</section>
+<section id="task.fromresult-a-promise-that-is-already-complete" class="level3">
+<h3 class="anchored" data-anchor-id="task.fromresult-a-promise-that-is-already-complete"><code>Task.FromResult</code>: a promise that is already complete</h3>
+<p>If you already have the result in hand, but the method signature requires you to return <code>Task&lt;T&gt;</code>, what should you do? In that case, you do not need to call <code>Task.Run</code> to have a background thread return the result. You can simply use <code>Task.FromResult</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">// Create a Task that is "born completed"</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="co">// and already carries the result 42.</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> completedTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">FromResult</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">// Its status is immediately RanToCompletion</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Status: {completedTask.Status}"</span><span class="op">);</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">// Get 42 right away, with no waiting required</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Result: {completedTask.Result}"</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The existence of <code>Task.FromResult</code> reinforces an important point: <code>Task</code> primarily represents an operation and its completion state. It can even represent work that was already complete the moment it was created, with no scheduling required at all.</p>
+<p>Understanding that “a task is not a thread” is a key step toward more advanced asynchronous thinking. With I/O-bound work, the <code>Task</code> we receive is often just waiting for a completion notification from the hardware or operating system. At that point, there usually is no background thread waiting for the result.</p>
+<blockquote class="blockquote">
+<p><strong>What happens underneath</strong></p>
+<p>At the operating-system and hardware level, when you start a truly asynchronous I/O operation, such as sending a network request or asking storage hardware to read a file, there usually is no CPU thread blocked while the data transfer is in progress.</p>
+<p>The mechanism behind this relies on hardware interrupts and the operating system’s I/O completion facilities, such as Windows IOCP, Linux epoll, or macOS kqueue:</p>
+<ol type="1">
+<li>Your program sends an I/O request to the operating system.</li>
+<li>The operating system hands the request to the hardware device, such as the network card or disk controller, and the CPU is free to run other threads immediately.</li>
+<li>When the hardware device finishes the transfer, it raises a hardware interrupt.</li>
+<li>The operating system receives that interrupt and places the result into a queue.</li>
+<li>After the .NET runtime receives the completion notification, it schedules an appropriate thread to process the result, marks your program’s <code>Task</code> as complete, and then continues running the code after the <code>await</code>.</li>
+</ol>
+<p>See Microsoft documentation: <a href="https://learn.microsoft.com/windows/win32/fileio/synchronous-and-asynchronous-i-o">Synchronous and asynchronous I/O</a></p>
+</blockquote>
+</section>
+</section>
+<section id="sec-foreground-vs-background-threads" class="level2">
+<h2 class="anchored" data-anchor-id="sec-foreground-vs-background-threads">Foreground threads vs.&nbsp;background threads</h2>
+<p>Now let’s turn the spotlight back to threads themselves. In .NET, threads can run in one of two modes: foreground or background. This distinction directly affects the lifetime of the application.</p>
+<ul>
+<li><strong>Foreground threads</strong>: as long as any foreground thread is still running, the application’s process stays alive.</li>
+<li><strong>Background threads</strong>: once all foreground threads have finished, the .NET runtime automatically terminates any background threads that are still running and then shuts the application down.</li>
+</ul>
+<p>The idea behind this design is that foreground threads do the application’s core work, while background threads handle auxiliary work that can be interrupted at any time, such as periodic autosaving or logging.</p>
+<p>Therefore, pay attention to where a thread comes from:</p>
+<ul>
+<li>Threads created with <code>new Thread()</code> are foreground threads by default. If you want to change it to a background thread, set its <code>IsBackground</code> property to <code>true</code>.</li>
+<li>Threads obtained from the <code>ThreadPool</code>, and therefore also the threads used by <code>Task.Run</code>, are always background threads.</li>
+</ul>
+<p>To make that distinction more concrete, let’s verify it with a simple example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">// Example 1: use Thread (foreground thread)</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="dt">var</span> foregroundThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="op">{</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Foreground thread finished."</span><span class="op">);</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="op">});</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a></span>
+<span id="cb14-8"><a href="#cb14-8"></a>foregroundThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a>    <span class="st">"The Main method (foreground) is about to exit, "</span> <span class="op">+</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a>    <span class="st">"but the program will wait for the foreground thread to finish."</span><span class="op">);</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a></span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co">// Example 2: use Task.Run (background thread)</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a>_ <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb14-15"><a href="#cb14-15"></a><span class="op">{</span></span>
+<span id="cb14-16"><a href="#cb14-16"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a></span>
+<span id="cb14-18"><a href="#cb14-18"></a>    <span class="co">// This line might never run</span></span>
+<span id="cb14-19"><a href="#cb14-19"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background thread finished."</span><span class="op">);</span></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="op">});</span></span>
+<span id="cb14-21"><a href="#cb14-21"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-22"><a href="#cb14-22"></a>    <span class="st">"The Main method (foreground) is about to exit, "</span> <span class="op">+</span></span>
+<span id="cb14-23"><a href="#cb14-23"></a>    <span class="st">"and the program will not wait for the background thread."</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch02/DemoForegroundBackgroundThreads">DemoForegroundBackgroundThreads</a></p>
+</blockquote>
+<p>When you run this code, you will first see the message that the <code>Main</code> method is ending. Then, about three seconds later, “Foreground thread finished.” appears, and only then does the program actually exit. The background thread started by <code>Task.Run</code> in example 2 intentionally sleeps longer, so it will usually be terminated when the main program ends and will not get a chance to print its completion message.</p>
+<p>Also note that this example deliberately uses a fire-and-forget style only so we can observe how foreground and background threads affect process lifetime. In a real application, you generally should not put important work in a “do not wait for completion” style unless you are very sure about the consequences.</p>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>This chapter began by examining the challenges of traditional thread management so we could see the complexity and limitations that come with using <code>Thread</code> and <code>ThreadPool</code> directly. We then introduced <code>Task</code> as a higher-level abstraction that lets developers focus on the work itself while handing low-level thread management over to the .NET runtime.</p>
+<p>By the end of this chapter, you know the basic tools for creating and managing asynchronous operations, and you also know how to use <code>Task.Run</code> to move CPU-bound work onto a background thread. However, the examples in this chapter use <code>task.Wait()</code> and <code>task.Result</code>, both of which still <strong>block</strong> the program. We will address that exact problem in the next chapter.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/decision-matrix-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+(() => {
+  const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+  if (!match) {
+    return;
+  }
+
+  const current = match[1];
+  const target = current === "zh-tw" ? "en" : "zh-tw";
+  const link = document.createElement("a");
+
+  link.className = "language-switch";
+  link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+    + window.location.search
+    + window.location.hash;
+  link.textContent = current === "zh-tw" ? "English" : "繁體中文";
+  link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+  link.setAttribute(
+    "aria-label",
+    current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+  );
+
+  const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+  if (sidebarHeader) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "language-switch-wrapper";
+    wrapper.appendChild(link);
+    sidebarHeader.appendChild(wrapper);
+    return;
+  }
+
+  const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+  const searchButton = header?.querySelector(".quarto-search-button");
+  if (header && searchButton) {
+    header.insertBefore(link, searchButton);
+  } else {
+    document.body.appendChild(link);
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dotnetconcurrency\.huanlin\.cc\/en\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../ch01/introduction.html" class="pagination-link" aria-label="1 Understanding threads and asynchrony">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">1 Understanding threads and asynchrony</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../ch03/async-await-essentials.html" class="pagination-link" aria-label="3 async and await">
+        <span class="nav-page-text"><span class="chapter-title">3 async and await</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Free preview edition: Chapters 1–4 in full</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://huanlin.cc/en/">Author website</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,88 @@
+/* HTML-only layout and preview-site components. */
+body {
+    max-width: 1600px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.page-rows-contents {
+    max-width: 1600px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.sidebar-navigation .sidebar-item a {
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    text-align: left;
+}
+
+#quarto-margin-sidebar li {
+    text-align: start;
+}
+
+.language-switch {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.3rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.2;
+    text-decoration: none;
+    box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08);
+}
+
+.quarto-secondary-nav .language-switch {
+    margin-left: 0.5rem;
+}
+
+.language-switch-wrapper {
+    margin-top: 0.75rem;
+}
+
+.language-switch:hover,
+.language-switch:focus {
+    color: var(--bs-link-color, #0d6efd);
+    text-decoration: none;
+}
+
+.full-edition-notice {
+    margin: 1.75rem 0;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid #cfe2ff;
+    border-left: 0.35rem solid #0d6efd;
+    border-radius: 0.5rem;
+    background: #f3f8ff;
+}
+
+.full-edition-notice > :first-child {
+    margin-top: 0;
+}
+
+.full-edition-notice > :last-child {
+    margin-bottom: 0;
+}
+
+.preview-status {
+    margin: 1rem 0 1.5rem;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+main.content > section:first-of-type > h2:nth-child(1) {
+    margin-top: 2em;
+}
+
+@media (max-width: 575.98px) {
+    .language-switch {
+        min-height: 1.85rem;
+        padding-right: 0.45rem;
+        padding-left: 0.45rem;
+        font-size: 0.8125rem;
+    }
+}

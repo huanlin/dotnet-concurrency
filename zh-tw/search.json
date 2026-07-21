@@ -1,0 +1,509 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "深入淺出 .NET 10 併發程式設計",
+    "section": "",
+    "text": "《深入淺出 .NET 10 併發程式設計》從執行緒與非同步的基本觀念開始，逐步說明 Task、async／await、取消、同步機制、平行處理，以及非同步 API 設計。\n這個網站是繁體中文免費試讀版，完整公開第 1 至第 4 章。第 5 至第 11 章提供主題摘要；如欲閱讀全書，請參閱正式出版版本。\n目錄\n\n作者序\n關於本書\n關於作者\n第 1 章：理解執行緒與非同步（免費全文）\n第 2 章：.NET 中的執行緒與工作（免費全文）\n第 3 章：async 與 await（免費全文）\n第 4 章：例外處理與取消（免費全文）\n第 5 章：執行緒同步與經典問題\n第 6 章：執行緒安全與不可變集合\n第 7 章：平行處理與 PLINQ\n第 8 章：非同步資料流與資源管理\n第 9 章：Task 進階用法\n第 10 章：實戰案例與最佳實務\n第 11 章：非同步 API 設計指南\n\n開始閱讀第 1 章 查看作者作品\n\n免費網頁版提供部分且持續修正的內容；正式版提供完整、經全書校訂且可離線保存的固定版本。",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>首頁</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/preface.html",
+    "href": "ch00/preface.html",
+    "title": "作者序",
+    "section": "",
+    "text": "非同步程式設計早已不是少數系統才會碰到的進階議題。今天無論是桌面應用程式、Web API、背景服務，還是雲端系統中的資料處理流程，只要牽涉到 I/O、併發工作或回應速度的要求，幾乎都離不開 Task、async/await 與各種相關機制。然而，真正讓人感到困難的，往往不是語法本身，而是背後那些不容易直接看見的執行流程、資源調度與設計取捨。\n這本書採取「理解優先」的方式編寫。考慮到目前普遍利用 AI 助手寫程式的情況，我希望讀者即使沒有真的親手輸入程式碼，光是閱讀書中的講解，也能從中獲益。特別是前面三章，我認為有助於奠定非同步程式設計的基礎觀念，並釐清常見疑問。越往後面的章節，實戰成分與 .NET API 的介紹會越來越多。\n在 AI 已經能夠迅速產生大量程式碼的今天，我認為這種理解能力依然很重要。AI 的確可以幫我們加快開發速度、產生樣板程式，甚至提出看似合理的解法；但它無法替你承擔產品品質的責任，也不能完全取代工程師在設計、驗證與取捨上的判斷。非同步與併發問題常常不是「能不能跑」而已，而是牽涉到正確性、可維護性、延展性與效能。當問題出現時，最後必須負責理解、追查與修正的人依然是開發者。\n從第四章開始，本書會進入實戰相關議題，包括例外處理、取消工作、競爭狀況、死結、執行緒安全、不可變設計、平行處理，以及非同步資料流等主題。此外，本書也會介紹 .NET 在這些場景下提供的關鍵工具與 API，例如執行緒安全的集合型別、不可變集合、Parallel 類別、PLINQ、IAsyncEnumerable&lt;T&gt; 與 Channel 等，並說明它們各自擅長解決什麼問題，以及在什麼情況下應該避免濫用。\n如果你正在閱讀這本書，我相信你多半已經意識到，非同步程式設計不是一項可有可無的附加技能，而是現代 .NET 開發者的重要基本能力。無論你是想補強觀念、整理零散知識，還是希望更有把握地與 AI 協作並審閱其產出，我都希望本書能提供一些幫助。\n持續學習，投資自己。\n\n蔡煥麟 （2026 年 3 月）",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>作者序</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html",
+    "href": "ch00/about-book.html",
+    "title": "關於本書",
+    "section": "",
+    "text": "目標讀者\n本書專注於現代 .NET 非同步程式設計的核心觀念、實務技巧與設計判斷。除了介紹 Task、async/await、取消、例外、同步機制、平行處理與非同步資料流之外，內容也會一路延伸到 API 設計與實戰應用，幫助你建立完整而可靠的知識體系。\n現在，利用 AI 工具寫程式已經相當普遍，然而從個人學習成長的角度來看，深厚的基礎知識才是長期競爭力與技術精進的關鍵。因此，本書特別注重基礎觀念與心智模型的建立，希望讀者真正理解：為什麼這樣寫比較好、什麼時候該用、什麼時候不該用哪些 API，以及用錯時可能付出什麼代價。\n本書適合已具備 C# 或其他程式語言基礎，想深入學習 .NET 非同步程式設計的開發者，尤其適合：",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#目標讀者",
+    "href": "ch00/about-book.html#目標讀者",
+    "title": "關於本書",
+    "section": "",
+    "text": "有聽過或者用過 async/await，但對底層運作與最佳實踐還沒有完整把握的人。\n想釐清 Task.Run、ConfigureAwait(false)、取消、逾時、例外處理等常見主題的人。\n想從「會用語法」進一步走向「能做設計判斷」的 .NET 工程師。\n想寫出更流暢、更穩定、更具延展性的應用程式的開發者。\n\n\n如果你需要一本講解 C# 進階語法的書，可參考《現代 C#：AI 時代的開發者修煉》。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#本書特色",
+    "href": "ch00/about-book.html#本書特色",
+    "title": "關於本書",
+    "section": "本書特色",
+    "text": "本書特色\n本書以 .NET 10 為主要平台，並盡量採用現代 .NET 開發中的建議做法來說明各項主題。\n為了幫助你更有效地學習，本書採用以下方式來引導內容：\n\n理解優先：先掌握基礎核心觀念，再談語法、API 與實作細節。\n實務導向：除了說明 API 怎麼用，也會討論適用情境、常見誤區與最佳實踐。\n圖表與類比輔助：透過圖示與具體比喻，幫助你理解較抽象的執行流程與設計觀念。\n範例程式碼連結：書中範例程式已上傳至 GitHub，並於適當處提供對應連結。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#閱讀方法",
+    "href": "ch00/about-book.html#閱讀方法",
+    "title": "關於本書",
+    "section": "閱讀方法",
+    "text": "閱讀方法\n本書可以循序閱讀，也可以依需求挑選主題閱讀；不過若你對非同步程式設計還在建立整體輪廓，建議先從前幾章一路往後讀，效果通常最好。\n章節依賴提示：\n\n第 1～4 章是全書基礎，建議優先閱讀。\n第 5～8 章會把前面的非同步觀念延伸到同步機制、平行處理、資料流與資源管理。\n第 9～11 章偏向進階主題與實戰應用，建立在前面章節之上。\n\n如果你是帶著某個具體問題來閱讀，例如「為什麼 UI 會卡住？」、「Task.Run 到底能不能這樣用？」或「ValueTask 值不值得採用？」也可以先跳到相關章節，再回頭補齊前面的觀念。\n重點還是要動手實作。閱讀過程中，若碰到任何不確定的地方，最好的方法往往不是多看兩遍，而是自己寫一個小範例跑跑看。只要親手驗證過一次，很多原本抽象的概念就會立刻變得具體。當然，你也可以跟 AI 助手一起協作，並且練習看懂 AI 產生的程式碼。\n閱讀裝置建議：建議優先使用電腦或平板來閱讀本書，以獲得較佳的程式碼與圖表閱讀體驗。若使用電子書閱讀器，則建議選擇較大尺寸的裝置。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#書寫慣例",
+    "href": "ch00/about-book.html#書寫慣例",
+    "title": "關於本書",
+    "section": "書寫慣例",
+    "text": "書寫慣例\n有些術語若翻成中文反而容易失真或增加理解成本，因此本書會視情況保留英文，例如 SynchronizationContext、ThreadPool、ExecutionContext 等名詞。第一次出現時通常會以中英並呈，之後則視上下文採用較自然、較不妨礙閱讀的寫法。",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#本書用到的工具",
+    "href": "ch00/about-book.html#本書用到的工具",
+    "title": "關於本書",
+    "section": "本書用到的工具",
+    "text": "本書用到的工具\n為了跟著本書實作練習，你需要準備：\n\n.NET 10 SDK 或更新版本\n開發工具：Visual Studio 2026、Visual Studio Code、Rider，或其他支援 .NET 的編輯器／IDE",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-book.html#範例程式",
+    "href": "ch00/about-book.html#範例程式",
+    "title": "關於本書",
+    "section": "範例程式",
+    "text": "範例程式\n本書的範例程式放在 GitHub 平台。網址如下：\nhttps://github.com/huanlin/dotnet-async-book-support",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>關於本書</span>"
+    ]
+  },
+  {
+    "objectID": "ch00/about-author.html",
+    "href": "ch00/about-author.html",
+    "title": "關於作者",
+    "section": "",
+    "text": "蔡煥麟（Michael Tsai）\n從事軟體開發與技術寫作十餘年，連續 20 年獲選微軟最有價值專家（Microsoft .NET MVP）。\n著有《深入淺出 .NET 10 非同步程式設計》、《現代 C#：AI 時代的開發者修煉》與《.NET 相依性注入》。\n譯有《軟體構築美學》與《物件導向分析設計與應用》。\n部落格：https://www.huanlintalk.com\nFacebook：https://www.facebook.com/huanlin.notes",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>關於作者</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html",
+    "href": "ch01/introduction.html",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "",
+    "text": "為何程式需要同時處理多件事？\n第一章會先用通俗易懂的方式展開。無論你之前有沒有接觸過執行緒和非同步程式設計，讀完這一章，都能先掌握一套清楚的核心概念，作為後續章節的基礎。\n你是否曾經遇過這種情況：在桌面應用程式中按下一個按鈕後，整個視窗變成一片空白，滑鼠游標一直轉圈圈，完全無法操作？或者，在瀏覽某個熱門購物網站時，網頁載入速度極慢，甚至直接顯示逾時錯誤？\n這些惱人的體驗，往往指向同一個核心問題：軟體沒有有效地處理「等待」。無論是等待檔案儲存、等待網路回應，或是等待資料庫查詢結果，這些等待如果處理不當，就會導致程式卡頓，使用者體驗變差。\n在數位時代，我們期待應用程式能提供即時回饋與流暢體驗。無論是讓桌面應用程式的使用者介面（UI）保持靈敏，還是讓網站伺服器同時服務成千上萬名使用者，背後都仰賴同一種能力：同時處理多項任務。若缺乏這種能力，應用程式的反應就會變得遲鈍，使用者體驗大打折扣，伺服器也無法應付現代網路的龐大流量。\n為了更具體瞭解這項能力，我們先用一間披薩店當作類比。請想像我們要一起經營這家店，從最原始的營運模式出發，逐步探索如何提升效率。沿著這條路走下去，我們自然會碰到 C# 程式設計中的兩個核心概念：多執行緒（multithreading） 和 非同步程式設計（asynchronous programming）。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#為何程式需要同時處理多件事",
+    "href": "ch01/introduction.html#為何程式需要同時處理多件事",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "",
+    "text": "本章學習路徑\n接下來，我們會用披薩店的類比依序看三種模式：\n\n模式一：同步的單一廚師；我們將從最基本的單執行緒模式開始，了解其運作方式與效率瓶頸。\n模式二：引進更多人手；接著探索多執行緒如何改善效率，以及它所帶來的新挑戰。\n模式三：超級高效的廚師；最後揭曉非同步程式設計的威力，以及 C# 如何透過 async/await 讓這一切變得自然又簡單。\n\n準備好了之後，我們就從這家披薩店最原始的經營模式開始，看看第一位廚師是如何工作的。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#模式一同步的單一廚師",
+    "href": "ch01/introduction.html#模式一同步的單一廚師",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "模式一：同步的單一廚師",
+    "text": "模式一：同步的單一廚師\n關鍵概念： 單執行緒、阻塞\n在披薩店剛開始營運時，店裡只有一位廚師。這位廚師就等同於程式世界中的 執行緒（thread），也就是執行所有工作的唯一單位。他的工作流程非常簡單：接到訂單、準備餅皮、放上配料、送入烤箱，然後等披薩烤好再取出。\n這個模式被稱為 同步單一執行緒（synchronous single-threading）。這裡「同步」的意思是：所有步驟都必須依序完成，一步接著一步。關鍵問題出在「等待」：當廚師把披薩放進烤箱後，他哪兒也去不了，只能站在原地盯著烤箱，直到計時器響起。在這段時間裡，他完全無法處理新訂單，也不能先準備下一個披薩。\n\n\n\n\n\n光用文字描述，可能不太有感。下面這段程式會把流程具體跑一遍，讓你直接看見單一廚師（單一執行緒）的工作方式：\n// 模式一：同步的單一廚師 (Synchronous Single-Threading)\n// 負責展示單執行緒阻塞的現象\n\nusing System.Diagnostics;\n\nConsole.WriteLine(\"披薩店開始營業！模式一：只有一位廚師 (單執行緒)\");\nvar sw = Stopwatch.StartNew();\n\n// 模擬依序製作三個披薩\nMakePizza(1);\nMakePizza(2);\nMakePizza(3);\n\nsw.Stop();\nConsole.WriteLine($\"披薩全做好了，耗時: {sw.ElapsedMilliseconds} 毫秒\");\n\nvoid MakePizza(int id)\n{\n    Console.WriteLine($\"[單一廚師] 開始準備第 {id} 份披薩的餅皮...\");\n    Thread.Sleep(500); // 模擬切菜和揉麵的準備時間\n\n    Console.WriteLine($\"[單一廚師] 第 {id} 份披薩進烤箱，開始等候...\");\n\n    // 這裡使用 Thread.Sleep 來模擬「阻塞操作 (blocking operation)」\n    // 廚師只能乾等，無法準備下一份，也不能接聽電話\n    Thread.Sleep(2000);\n\n    Console.WriteLine($\"[單一廚師] 第 {id} 份披薩烤好了！取出披薩。\");\n}\n執行結果（輸出與耗時可能會依執行環境略有不同）：\n披薩店開始營業！模式一：只有一位廚師 (單執行緒)\n[單一廚師] 開始準備第 1 份披薩的餅皮...\n[單一廚師] 第 1 份披薩進烤箱，開始等候...\n[單一廚師] 第 1 份披薩烤好了！取出披薩。\n[單一廚師] 開始準備第 2 份披薩的餅皮...\n[單一廚師] 第 2 份披薩進烤箱，開始等候...\n[單一廚師] 第 2 份披薩烤好了！取出披薩。\n[單一廚師] 開始準備第 3 份披薩的餅皮...\n[單一廚師] 第 3 份披薩進烤箱，開始等候...\n[單一廚師] 第 3 份披薩烤好了！取出披薩。\n披薩全做好了，耗時: 7557 毫秒\n\n原始碼： DemoSingleThread\n\n\n核心概念\n在繼續之前，先整理前面出現的幾個核心概念：\n\n\n\n\n\n\n\n術語\n對應到披薩店的比喻\n\n\n\n\n執行緒（thread）\n我們的廚師。在基本的程式中，預設只有一位廚師，一次只能做一件事。可以把它理解成作業系統排程並執行程式碼的最小單位。\n\n\n處理序（process）\n整家披薩店。它是應用程式的總稱，包含了廚師（執行緒）、烤箱、食材等所有資源的集合。在作業系統中，處理序是隔離應用程式的基本單位，它擁有獨立的記憶體空間，確保各應用程式之間不會互相干擾。\n\n\n同步（synchronous）\n在這段流程中，廚師必須等目前這一步完成後，才能繼續下一步；也就是說，呼叫端會被目前的工作綁住，無法先往後推進。\n\n\n阻塞操作（blocking operation）\n將披薩放入烤箱烘烤。在這個過程中，廚師（執行緒）被「阻塞」了，無法去做其他任何事，只能等待。這在程式中相當於讀取檔案、請求網路資料等需要花時間等待外部資源的耗時操作。\n\n\n\n如果處理序（process）與執行緒（thread）這兩個術語對你來說還有點抽象，可以先用下面這種方式來理解：\n\n處理序 (process) 是應用程式的「容器」（或沙盒），它擁有獨立的記憶體空間和系統資源，確保應用程式之間不會互相干擾。\n執行緒 (thread) 則是容器中實際負責執行程式碼的「工人」。\n\n一個處理序至少會有一位工人，也就是主執行緒。但如果要同時處理多項工作，同一個處理序也可以擁有多位工人，也就是多執行緒。這些工人共享同一個容器內的資源，例如記憶體；也正因如此，多執行緒程式設計才需要特別注意資源競爭的問題。\n\n\n\n\n\n\n\n效率瓶頸：等待的代價\n模式一最大的問題是：等待會把執行緒綁住。在這個比喻裡，廚師代表的是執行緒，而真正執行運算的是背後的 CPU。當廚師只是站在烤箱前等待時，那條執行緒就無法去推進其他工作；烤箱雖然努力工作著，整體流程卻依然卡在原地。\n這個流程簡單、容易理解，但效率非常低。想像一下，尖峰時段顧客大排長龍，我們的廚師卻因為正在等一個披薩烘烤，完全無法接受新訂單。放到軟體世界裡，這就是單執行緒阻塞模型最典型的效能瓶頸。\n\n\n程式碼中的「阻塞」範例\n接著來看程式碼中的「阻塞」是什麼樣子。\n以桌面應用程式（如 WinForms、WPF）為例。這類程式通常只有一條「UI 執行緒」，負責處理所有使用者操作，例如點擊按鈕、移動視窗等等。一旦我們在這條執行緒上執行耗時操作，整個程式看起來就會像「當掉」一樣。下面這段常見的 Windows 桌面 UI 事件處理器，示範的就是這種情況：\nprivate void SaveButton_Click(object sender, EventArgs e)\n{\n    // Thread.Sleep() 用來模擬一個耗時 5 秒的儲存操作。\n    // 在這段時間內，UI 執行緒會被完全卡住，無法回應任何使用者操作。\n    // 使用者會發現視窗無法移動、按鈕沒有回應，甚至滑鼠游標變成轉圈圈。\n    Thread.Sleep(5000);\n\n    MessageBox.Show(\"檔案已儲存！\");\n}\n既然等待這麼浪費時間，一個自然的想法就是：能不能讓廚師在等待的期間去做點別的事？這就帶我們進入模式二。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#模式二引進更多人手",
+    "href": "ch01/introduction.html#模式二引進更多人手",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "模式二：引進更多人手",
+    "text": "模式二：引進更多人手\n關鍵概念： 多執行緒與併發（concurrency）\n為了處理這種等待造成的低效率，我們替廚房引進了新的運作模式：多執行緒（multithreading）。背後的想法很直觀：與其讓一位廚師乾等到整個廚房都卡住，不如安排更多廚師分工，讓某些工作在等待時，其他工作仍然有人可以繼續推進。\n這確實是很常見的思路。不過，這裡先記住一件事：如果等待的本質是檔案、網路或資料庫這類 I/O 操作，現代 .NET 通常更傾向使用非同步 I/O，而不是為每一個等待中的工作綁定一條額外執行緒。這一節先把多執行緒的基本觀念建立起來，下一節再來看更適合 I/O 等待的作法。\n先看最容易理解的情況。在只有單一 CPU 核心（core）的電腦上，這就像是我們請了多位廚師，但廚房裡只有一個工作台。這些廚師必須頻繁地輪流使用工作台來做事。從外部看起來像是在「同時」處理多張訂單，但實際上在任何一個瞬間，只有一位廚師佔用工作台，靠著快速切換形成同時進行的「錯覺」。\n如果換成擁有多個 CPU 核心的現代電腦，情況就更進一步了。這相當於廚房裡有多個工作台，因此多位廚師可以同時在各自的工作台上製作披薩，實現真正的平行處理（parallelism）。\n\n\n\n\n\n\n併發 vs. 平行\n在繼續往下看程式碼之前，有個很容易混在一起的觀念值得先釐清：「併發」和「平行」並不是同一件事。\n\n併發（concurrency）：指管理多個任務的能力。就像披薩店中只有一位廚師在多張訂單之間來回切換；前提是等待期間他能先去處理別的事，而不是被卡在原地。任務在時間上是重疊的，但不一定在同一時刻被執行。這主要跟結構的設計有關。\n平行（parallelism）：指同時執行多個任務。在電腦世界裡，這需要多個 CPU 核心來實現。在我們的披薩店裡，這相當於我們真的多請了幾位廚師（多個執行緒），每個人都在自己的工作台（多個 CPU 核心）上同時製作披薩。這主要是跟執行的方式有關。\n\n多執行緒既能實現單核心上的併發（concurrency），也能利用多核心實現平行（parallelism）。\n\n\n\n\n\n有了這個區別之後，再來看程式碼就會順很多。下面這個範例展示的，就是多位廚師（多執行緒）的工作流程：\n// 模式二：更靈活的多工廚師 (Multithreading)\n// 負責展示多執行緒併發處理的現象\n\nusing System.Diagnostics;\n\nConsole.WriteLine(\"披薩店開始營業！模式二：多位廚師 (多執行緒)\");\nvar sw = Stopwatch.StartNew();\n\n// 建立三個獨立的執行緒（分別代表三位不同的廚師）\nThread chef1 = new Thread(() =&gt; MakePizza(1));\nThread chef2 = new Thread(() =&gt; MakePizza(2));\nThread chef3 = new Thread(() =&gt; MakePizza(3));\n\n// 讓所有廚師同時開始工作\nchef1.Start();\nchef2.Start();\nchef3.Start();\n\n// 主執行緒（餐廳經理）等待所有廚師完成工作\nchef1.Join();\nchef2.Join();\nchef3.Join();\n\nsw.Stop();\nConsole.WriteLine($\"披薩全做好了，耗時: {sw.ElapsedMilliseconds} 毫秒\");\n\nvoid MakePizza(int id)\n{\n    int threadId = Environment.CurrentManagedThreadId;\n\n    Console.WriteLine($\"[廚師 {threadId}] 開始準備第 {id} 份披薩...\");\n    Thread.Sleep(500); // 模擬切菜和揉麵的準備時間\n\n    Console.WriteLine($\"[廚師 {threadId}] 披薩 {id} 進烤箱，開始等候...\");\n\n    // Thread.Sleep 是阻塞操作，但因為每個披薩都有專屬的廚師（執行緒），\n    // 某位廚師等待時，其他廚師仍可處理自己的披薩。\n    Thread.Sleep(2000);\n\n    Console.WriteLine($\"[廚師 {threadId}] 第 {id} 份披薩烤好了，取出。\");\n}\n\nNote\n這裡刻意用 new Thread(...) 來示範，是為了方便理解和對照前後兩個模式。實務上，現代 .NET 更常用的是 Task、Task Parallel Library（TPL）或框架提供的背景工作機制，而不是每次都手動建立 Thread。原因是每個 Thread 物件都會佔用一些記憶體（約 1MB ）；若需要執行成千上萬個短期任務，手動建立執行緒會迅速耗盡系統資源。Task 則是輕量化的包裝，搭配執行緒池可以重複使用執行緒，大幅降低記憶體開銷。\n\n執行結果（輸出順序、Thread ID 與耗時都可能會依執行環境與排程而略有不同）：\n披薩店開始營業！模式二：多位廚師 (多執行緒)\n[廚師 4] 開始準備第 2 份披薩...\n[廚師 5] 開始準備第 3 份披薩...\n[廚師 3] 開始準備第 1 份披薩...\n[廚師 4] 披薩 2 進烤箱，開始等候...\n[廚師 5] 披薩 3 進烤箱，開始等候...\n[廚師 3] 披薩 1 進烤箱，開始等候...\n[廚師 4] 第 2 份披薩烤好了，取出。\n[廚師 3] 第 1 份披薩烤好了，取出。\n[廚師 5] 第 3 份披薩烤好了，取出。\n披薩全做好了，耗時: 2548 毫秒\n\n原始碼： DemoMultiThread\n\n\n\n多執行緒的利與弊\n這種模式確實帶來了顯著改善，但也同時引入了新的複雜性。在這個範例裡，它最直接的優點是縮短整體完成時間。雖然每位廚師在 Thread.Sleep 期間仍然被阻塞，但因為我們同時派出多位廚師，所以三個披薩的等待可以重疊，總耗時因此下降。若工作本身是 CPU 密集型，而且機器也有多個 CPU 核心，多執行緒便可進一步提升 CPU 利用率與整體吞吐量（提升整體出餐效率）。\n缺點則有：\n\ncontext switch 的開銷：廚師在不同任務間切換並不是零成本。他得先放下處理 A 披薩的工具、洗手，再拿起處理 B 披薩的工具。這個「切換」本身就會消耗時間和精力。在程式中，作業系統切換執行緒也需要保存當前狀態、載入新狀態，這同樣會帶來效能開銷。\n資源同步問題（synchronization issues）：例如，多位廚師如果想同時使用唯一的一把醬料勺，就會發生衝突。這在程式中會引發 競爭狀況（race conditions）。更麻煩的是，還可能發生 死結（deadlocks）。想像一下，廚師 A 拿了唯一的醬料勺，正在等待廚師 B 用完唯一的起司刨絲器；但同時，廚師 B 卻拿著刨絲器，正在等待廚師 A 交出醬料勺。兩位廚師都卡住了，互相等著對方，程式也就跟著完全卡死。\n\n\n\n\n\n\n\n執行緒的隱性成本\n在 .NET 的記憶體回收過程中，某些階段會需要暫停受控執行緒（managed threads）；執行緒越多，協調與恢復的成本通常也越高。不過，這並不表示每一次 GC 都會從頭到尾完全停住所有執行緒：現代 .NET 的 background GC 會讓應用程式執行緒在大部分時間繼續執行，只在特定階段短暫暫停。同樣地，除錯器在命中中斷點時，也往往會暫停該應用程式的其他執行緒，直到你繼續執行。\n參閱微軟文件：Garbage collection and performance、Background garbage collection\n\n多執行緒雖然提升了效率，但管理也更複雜。接著來看另一種更適合等待場景的方式：讓廚師不用這麼手忙腳亂，同時又能充分利用等待的時間。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#模式三超級高效的廚師",
+    "href": "ch01/introduction.html#模式三超級高效的廚師",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "模式三：超級高效的廚師",
+    "text": "模式三：超級高效的廚師\n關鍵概念： 非同步程式設計\n現在，披薩店迎來了一位更聰明的「超級廚師」，而他的工作模式就和 非同步程式設計（asynchronous programming） 極為相似。\n當這位廚師把披薩放進烤箱後，他既不是原地等待，也不是立刻轉身去做另一個披薩。他做了另一種選擇：把「烤披薩」這件耗時的工作完全委託給烤箱，然後徹底釋放自己，去做不同類型的事情，例如到前台接聽電話訂單或服務顧客。他之所以能這麼做，是因為烤箱被設定成烤好後會自動發出「叮」的一聲，也就是 回呼通知（callback）。等他聽到通知聲，再暫停手邊的工作，回來處理烤好的披薩就行了。\n\n\n\n\n\n下面的範例會展示這位超級廚師（非同步）的工作方式。\n\nNote\n在以下範例中，你會先看見 async、await 和 Task 這些陌生的關鍵字。先別擔心，也不用急著弄懂每個細節。這一輪請先專注觀察：等待期間，執行緒（廚師）是不是真的被釋放了。也先記住一點：async/await 擅長的是在「等待 I/O」時不阻塞執行緒，而不是把 CPU 工作自動變快。\n另外，呼叫 async 方法時，方法本體會先在目前執行緒上一路跑到第一個尚未完成的 await。所以它不等於「一呼叫就自動開新執行緒」；真正的重點是遇到等待時，先把執行緒還回去，等之後再接著執行。\n\n// 模式三：超級高效的智慧廚師 (Asynchronous Programming)\n// 負責展示使用 async/await 釋放執行緒，達成非阻塞的等待\n\nusing System.Diagnostics;\n\nvar msg = \"披薩店開始營業！模式三：超級廚師搭配智慧烤箱 (非同步程式設計)\";\nConsole.WriteLine(msg);\nvar sw = Stopwatch.StartNew();\n\n// 啟動三個非同步的披薩製作任務（它們會併發執行非同步邏輯）\n// 注意：呼叫 async 方法時，會先在目前執行緒上執行，\n// 直到遇到第一個尚未完成的 await。\n// 它不會一開始就自動切到新的背景執行緒。\nvar p1 = MakePizzaAsync(1);\nvar p2 = MakePizzaAsync(2);\nvar p3 = MakePizzaAsync(3);\n\n// 非同步等待所有披薩任務完成\nawait Task.WhenAll(p1, p2, p3);\n\nsw.Stop();\nmsg = $\"披薩全做好了，耗時: {sw.ElapsedMilliseconds} 毫秒\";\nConsole.WriteLine(msg);\n\nasync Task MakePizzaAsync(int id)\n{\n    // 獲取目前執行緒的 ID，觀察非同步的執行緒變化\n    int threadId = Environment.CurrentManagedThreadId;\n    var str = $\"[廚師 {threadId}] 開始處理第 {id} 份披薩，\" +\n               \"先等麵糰醒發...\";\n    Console.WriteLine(str);\n\n    // 模擬可非同步等待的前置時間，例如等麵糰醒發\n    // 或配料送達；這不會阻塞執行緒。\n    await Task.Delay(500);\n\n    threadId = Environment.CurrentManagedThreadId;\n    str = $\"[廚師 {threadId}] 麵糰好了，第 {id} 份進烤箱；\" +\n           \"設好計時器後先去忙別的！\";\n    Console.WriteLine(str);\n\n    // 模擬需要等待外部回應的耗時操作：烤箱烘烤。\n    // await 期間，執行緒不會被阻塞，系統可以將該執行緒派去處理\n    // 其他任務，直到烤箱時間到了再由系統安排繼續執行下一行程式。\n    await Task.Delay(2000);\n\n    threadId = Environment.CurrentManagedThreadId;\n    str = $\"[廚師 {threadId}] 「叮！」第 {id} 份披薩烤好了，回來取出。\";\n    Console.WriteLine(str);\n}\n這裡有一點值得留意：我們用 Task.Delay 來模擬需要等待外部回應的耗時操作，例如烤箱烘烤。在電腦世界裡，你可以把它想成網路連線、讀寫檔案等 I/O 操作。不過，Task.Delay 本身是計時器延遲，並未涉及 I/O 工作；這裡只是用它來模擬非同步等待的情形，不等同真實 I/O。\n\n原始碼： DemoAsyncAwait\n\n底下是此範例的執行結果（輸出順序、Thread ID 與耗時都可能會依執行環境與排程而略有不同）：\n披薩店開始營業！模式三：超級廚師搭配智慧烤箱 (非同步程式設計)\n[廚師 2] 開始處理第 1 份披薩，先等麵糰醒發...\n[廚師 2] 開始處理第 2 份披薩，先等麵糰醒發...\n[廚師 2] 開始處理第 3 份披薩，先等麵糰醒發...\n[廚師 5] 麵糰好了，第 3 份進烤箱；設好計時器後先去忙別的！\n[廚師 7] 麵糰好了，第 1 份進烤箱；設好計時器後先去忙別的！\n[廚師 8] 麵糰好了，第 2 份進烤箱；設好計時器後先去忙別的！\n[廚師 7] 「叮！」第 1 份披薩烤好了，回來取出。\n[廚師 5] 「叮！」第 2 份披薩烤好了，回來取出。\n[廚師 8] 「叮！」第 3 份披薩烤好了，回來取出。\n披薩全做好了，耗時: 2530 毫秒\n為什麼廚師編號會變來變去？\n仔細觀察上面的執行結果，你會發現同一個披薩在不同階段，負責處理的廚師編號（執行緒 ID）改變了！例如第 1 份披薩原本是 2 號廚師開始處理，等待麵糰醒發後，卻變成 7 號廚師接手將它放進烤箱。\n反過來也一樣：同一位廚師在不同 await 之後，接手的披薩也可能不同。例如範例中廚師 5 負責把第 3 份披薩送入烤箱，等烤箱響起「叮！」時，接手取出披薩的卻是第 2 份，兩者對調了。這是因為每一段等待之後要接著執行的工作，都會被視為獨立的排程單位。執行緒池只看「誰有空、哪段後續工作已就緒」，並不會記得「這條執行緒剛才做的是哪一份披薩」。\n進一步說，在主控台應用程式（Console App） 中，方法執行到 await 處（例如等待麵糰或烤箱時）會先暫停，並把控制權交還出去，不再佔用目前那條執行緒。等到等待結束後，後續步驟通常會由執行緒池（ThreadPool）中 任何一條有空的執行緒 接手，也可能剛好仍是同一條。所以你有時會看到執行緒 ID 改變，有時則不會。這正是非同步有彈性的地方：工作不會綁死在特定一條執行緒上。如果是具有 UI 執行緒的桌面應用程式，其後續步驟通常會回到原本的 UI 同步環境（SynchronizationContext），因此看起來往往像是由同一位專屬廚師接手到底，這點我們會在後面的章節詳細探討。\n\n非同步的關鍵：不阻塞執行緒\n非同步與多執行緒最根本的區別，在於它們如何對待 執行緒（廚師）：\n\n多執行緒（模式二）：在這個範例裡，每個披薩各自綁定一位廚師（執行緒）。即使等待烤箱時，那位廚師也仍被佔住；其他廚師可以繼續處理其他披薩，因此總時間縮短，但執行緒成本也跟著增加。\n非同步（模式三）：廚師（執行緒）把披薩烘烤的任務交給烤箱後，就可以自由活動了。他可以先去處理別的工作；等烤箱發出「叮！」通知披薩烤好，再由執行階段（runtime）安排接續工作繼續往下跑。\n\n換句話說，非同步模式是在更有效地利用廚師（執行緒）的時間。當執行緒遇到需要等待的 I/O 操作，例如檔案讀寫或網路請求時，它不會被「阻塞」在原地，而是可以被系統調度去處理其他任務。這樣一來，應用程式的吞吐量（throughput）和反應速度通常都會更好。\n不過，這裡有一個很重要的界線要先記住：所謂「釋放執行緒」，是指在等待 I/O 或計時器期間，不把執行緒佔住。若工作本身是實際的 CPU 計算，例如影像處理、加密或資料轉換，async/await 並不會憑空把它變成非阻塞。那類工作仍然需要佔用 CPU，只是通常會搭配 Task.Run、Parallel 或其他平行化工具來處理。\n\n\n傳統非同步的挑戰：混亂的筆記本\n關鍵概念： 回呼地獄（callback hell）\n故事還沒結束。在 C# 的 async/await 語法出現之前，要實現這種高效的非同步模式其實非常困難。那就像要求我們的超級廚師隨身攜帶一本極其複雜的筆記本，上面寫滿各種「if … then …」的指令：\n\n「如果電話響了，就記錄下訂單資訊，然後去看筆記本的第 5 頁。」 「如果烤箱響了，就放下電話，去取出披薩，然後去看筆記本的第 8 頁。」 「如果送餐員回來了，就……」\n\n這種基於回呼（callback）的程式碼，邏輯流程會被分割得支離破碎，形成所謂的「回呼地獄（callback hell）」，導致程式碼難以閱讀、除錯和維護。\n\n\n\n\n\nC# 後來提供了一本「魔法食譜」，讓這位超級廚師的工作流程終於能以清楚的方式呈現。接著就來看看這本食譜究竟有何魔法。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#sec-magic-recipe-async-await",
+    "href": "ch01/introduction.html#sec-magic-recipe-async-await",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "魔法食譜：async 與 await 的威力",
+    "text": "魔法食譜：async 與 await 的威力\n為了解決「回呼地獄」帶來的混亂，C# 引入了 async 和 await 這兩個關鍵字。我們可以把它們想像成一本「魔法食譜」。有了這本食譜，廚師就能用看似簡單、線性的同步方式，去閱讀和執行複雜的非同步流程，等於正式告別了那本混亂的筆記本。\n\nasync 與 await 如何運作\n接下來，我們把鏡頭拉近一點，看看這本魔法食譜最核心的兩個關鍵字：\n\nasync 關鍵字\n\n比喻：這就像是在食譜的封面上標註「魔法食譜」。這個標記本身不會改變任何事，但它至關重要。\n作用：它有兩個核心目的。第一，允許在方法內使用 await 關鍵字。第二，它會指示編譯器將整個方法轉換為一個精密的狀態機（state machine），以便在幕後管理複雜的非同步流程。這涉及較底層的編譯器魔法，我們會在後續章節逐漸揭露相關細節。現階段只要先把它想像成一個會自動幫我們記住「目前做到哪一個步驟了」的機制即可。\n\nawait 關鍵字\n\n比喻：這是魔法食譜中最關鍵的指令。當廚師讀到 await oven.BakeAsync() 這一行時，他會先看看烤箱工作是否已完成。如果還沒完成，他就把控制權交還，先去做其他完全無關的工作，例如服務其他顧客，而不是站在原地傻等；如果工作其實已經完成，就能直接進入下一步。\n作用：await 會先檢查它等待的工作是否已完成。若尚未完成，await 不會阻塞目前執行緒，而是先暫停方法執行，並把方法剩餘的部分註冊為接續工作（continuation）。之後當工作完成時，編譯器為 async 方法產生的狀態機便能在適當時機恢復執行。若 await 等待的工作一開始就已完成，則會立即取得結果並繼續往下執行（不會暫停方法）。正因如此，非同步程式碼雖然看起來像同步寫法，卻能在等待非阻塞作業完成的期間避免卡住執行緒。\n\n\n\n\n\n\n\n\n\n幕後功臣：Task 物件\n在披薩店的比喻裡，await 等待的不是結果本身，而是一個代表未來會完成工作的 Task 物件：\n\nTask 的比喻：當廚師執行一個非同步操作時（如 BakeAsync()），他不會立刻得到一個披薩，而是會得到一張「訂單收據」。這張收據就是 Task 物件，它代表一個「未來會完成的工作」（正式的術語叫做 future 或 promise）。\nTask&lt;T&gt; 的比喻：如果這個工作完成後會返回一個結果（例如一個烤好的披薩），那麼廚師得到的就是一張可以兌換披薩的收據，這就是 Task&lt;Pizza&gt;。\nawait 的作用：await 的核心作用，就是非阻塞地等待這張「收據」被兌現。你可以把它想像成廚師把收據交給系統，然後轉身去做別的事。系統的「魔法」在於，當訂單完成時，它會輕拍廚師的肩膀，提醒他回到原本離開的地方繼續工作。如果等待的是一張 Task&lt;Pizza&gt; 收據，那麼 await 的過程，就是最終從收據中「拆開」並取出那個熱騰騰的 Pizza。\n\n\n\n\n\n\n現在，async/await 的輪廓應該比較清晰了。它讓我們能用同步、線性的方式來寫程式碼，同時享有非同步的好處：不阻塞執行緒、保持回應靈敏。這也是為什麼它在現代 C# 開發中幾乎無所不在。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#sec-summary-choosing-mode",
+    "href": "ch01/introduction.html#sec-summary-choosing-mode",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "總結：選擇最適合的模式",
+    "text": "總結：選擇最適合的模式\n從只有一位廚師的簡陋小店，到運用智慧科技的高效餐廳，我們一路看見了一間披薩店，也就是應用程式，如何逐步演進。這裡用一張表格把這三種營運模式整理一下：\n\n\n\n\n\n\n\n\n\n模式\n廚師（執行緒）行為\n複雜度\n最佳應用場景\n\n\n\n\n同步單執行緒\n一次做一件事，死等烤箱。\n極低\n適合簡單任務。\n\n\n多執行緒\n多位廚師輪流使用工作台（單核心），或多位廚師同時在各自的工作台工作（多核心）。\n高\n適合 CPU 密集型計算 場景，需要利用多核心同時進行大量運算。\n\n\n非同步（async/await）\n將烤披薩等耗時工作交給烤箱，自己去做別的事，等待通知。\n低\n適合 I/O 密集型操作，如網路請求、資料庫查詢、檔案讀寫等。\n\n\n\n要提醒的是，這張表描述的是常見傾向，而不是放諸四海皆準的絕對規則。實務上，判斷的關鍵在於瓶頸是 CPU 密集還是 I/O 密集，以及是否需要避免占用目前的執行緒。事實上，CPU 密集型工作也可以在 async/await 框架中搭配 Task.Run 卸載到背景執行緒，這部分會在第 3 章進一步說明。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch01/introduction.html#sec-next-steps",
+    "href": "ch01/introduction.html#sec-next-steps",
+    "title": "第 1 章：理解執行緒與非同步",
+    "section": "下一步",
+    "text": "下一步\n透過經營一家披薩店，我們逐步認識了最基本的阻塞模型，以及更高效的非同步模型。這一章最想先建立的觀念是：async/await 是現代 C# 開發者處理耗時操作，特別是 I/O 操作時重要且常用的工具。它通常不會讓 CPU 密集型工作憑空變快，但往往能在 I/O 等待期間提升應用程式的回應性與延展性，讓你的應用程式像那位「超級廚師」一樣，更自然、順暢地處理各種任務。\n如果這個披薩店的類比有幫你把基礎觀念建立起來，那麼這一章的任務就達成了一大半。接下來，就能以此為起點，繼續探索更進階的主題，例如 Parallel 類別、PLINQ，以及更複雜的同步機制，逐步打造出真正高效、可靠的現代化應用程式。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html",
+    "href": "ch02/threads-and-tasks.html",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "",
+    "text": "傳統方式的挑戰：直接管理執行緒的複雜性\n在第一章，我們透過披薩店的比喻，理解了應用程式為什麼需要同時處理多件事，也大致看見了多執行緒和非同步程式設計如何提升效率。然而，我們也看見了這樣做的另一面：多執行緒帶來的管理複雜性，例如 context switch 的開銷和資源同步問題。\n本章正式進入 .NET 的世界，看看這些概念在程式裡是怎麼落實的。目標是帶你理解 .NET 中實現非同步與多工的兩個核心概念：執行緒 (thread) 與 工作 (task)，並學習如何利用現代工具避開傳統執行緒管理的陷阱。\n許多初學者會把執行緒與工作混為一談，但若想寫出高效、穩定的非同步程式碼，先釐清它們的區別會很有幫助。簡單來說：\n本章會依序走過下面幾個重點：\n在早期版本的 .NET，開發者需要更直接地與執行緒打交道。這種作法雖然提供了很大的控制權，卻也伴隨著顯著的複雜性與潛在問題。先看清楚這些挑戰，後面再理解現代非同步程式設計帶來的簡化，就會更有感。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-traditional-challenges",
+    "href": "ch02/threads-and-tasks.html#sec-traditional-challenges",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "",
+    "text": "先備知識：主執行緒與工作執行緒\n在接下來的範例中，你會頻繁看到兩個名詞：\n\n主執行緒 (main thread)：當應用程式啟動時，作業系統配給這支程式的第一個（也是預設的）執行緒。如果主執行緒被卡住（阻塞），整個程式可能就會沒有反應。\n工作執行緒 (worker thread)：除了主執行緒以外，其他用來執行工作的執行緒都可以先這樣泛稱。它們可能是我們額外建立的執行緒，也可能是向 ThreadPool 借來的執行緒。至於它在 .NET 生命週期上究竟屬於「前景執行緒」還是「背景執行緒」，我們會在本章後段再精確說明。\n\n\n\n直接建立執行緒：Thread.Start\n先看最傳統的作法：手動建立 System.Threading.Thread 物件，然後呼叫 Start 方法，讓新的執行緒開始執行指定的工作。範例如下：\nvar msg = $\"主執行緒 ID: {Environment.CurrentManagedThreadId}\";\nConsole.WriteLine(msg);\n\n// 建立一條新的執行緒來執行 DoWork\nvar newThread = new Thread(DoWork);\nnewThread.Start();\n\nConsole.WriteLine(\"主執行緒繼續執行...\");\n\nvoid DoWork()\n{\n    var msg = $\"工作執行緒 ID: {Environment.CurrentManagedThreadId}\";\n    Console.WriteLine(msg);\n    Console.WriteLine(\"工作正在進行中...\");\n    Thread.Sleep(2000); // 模擬耗時 2 秒的工作\n    Console.WriteLine(\"工作完成。\");\n}\n程式執行結果：\n主執行緒 ID: 2\n主執行緒繼續執行...\n工作執行緒 ID: 10\n工作正在進行中...\n工作完成。\n\n原始碼： DemoThreadStart\n\n光看寫法，好像不算太麻煩。但只要把它放到真實應用場景，就會很快看見這種作法的問題：\n\n成本高昂：每建立一條執行緒，系統都必須替它保留一塊不小的記憶體空間作為執行緒堆疊（thread stack），並耗費額外資源進行作業系統核心（kernel）層級的設定。實際堆疊大小會依作業系統與預設組態而異；以 Windows 為例，預設的保留大小常見是約 1MB。如果頻繁地為小工作建立新執行緒，就像是為了送一份外賣而專門聘請一位新員工，效率很差。\n管理複雜：你需要手動管理執行緒的生命週期，而且難以取得回傳值或處理例外。\n\nNote: 上述有關 Windows 預設約 1MB 執行緒堆疊保留大小的陳述，係根據微軟文件：Thread Stack Size。\n\n關於 Thread.Sleep\n本書的許多範例都會用到 Thread.Sleep()。它在範例程式中的主要用途，是刻意製造一段容易觀察的延遲或阻塞效果，好讓你更清楚看見執行緒切換、等待與程式流程。\nThread.Sleep 本身並不是非同步程式設計的一環；恰恰相反，它正是我們想透過非同步技巧避免的那種「阻塞等待」。明確地說，Thread.Sleep 會阻塞執行緒，讓它無法去做其他工作；它也不代表真正的 CPU 密集型運算，因為執行緒在 Sleep 期間其實沒有做計算，只是單純停住不動。在真實的 I/O 操作中，我們追求的是在等待期間不要阻塞執行緒；而在真實的 CPU 密集型場景中，通常是執行複雜計算，而不是呼叫 Sleep。\n\n\n\n執行緒的重複利用：ThreadPool\n為了解決 new Thread() 帶來的效能問題，.NET 引入了執行緒集區 (thread pool)。你可以把它想像成 .NET 先替你的應用程式聘好一群「駐點工人」（Thread）。當有工作項目需要執行時，就從這個「工人集區」中指派一位閒置的工人來處理。工作結束後，工人會回到集區待命，而不是被解僱。這樣一來，資源利用效率就能大幅提升。\n\n\n\n\n\n下面這個範例，基本邏輯和前一個 DemoThreadStart 完全相同；差別只在於，這次不再手動建立執行緒，而是改由「執行緒集區」指派現有的工人來處理工作：\nvar msg = $\"主執行緒 ID: {Environment.CurrentManagedThreadId}\";\nConsole.WriteLine(msg);\n\n// 將工作項目排入執行緒集區\nThreadPool.QueueUserWorkItem(_ =&gt; DoWork());\n\nConsole.WriteLine(\"主執行緒繼續執行...\");\nThread.Sleep(3000); // 等待背景工作完成，否則主程式可能先結束\n\nvoid DoWork()\n{\n    var msg = $\"背景執行緒 ID: {Environment.CurrentManagedThreadId}\";\n    Console.WriteLine(msg);\n    Console.WriteLine(\"背景工作正在進行中...\");\n    Thread.Sleep(2000); // 模擬耗時 2 秒的工作\n    Console.WriteLine(\"背景工作完成。\");\n}\n\n原始碼： DemoThreadPool\n\n既然 ThreadPool 能重複利用執行緒，問題是不是都解決了？不完全是。ThreadPool 雖然大幅改善了效能，但仍有兩個主要缺點：\n\n射後不理： 這裡示範的 ThreadPool.QueueUserWorkItem(...) 是一種「射後不理 (fire-and-forget)」的模式，所以你很難知道工作何時完成，也無法輕易取得回傳值。\n例外黑洞： 如果背景工作發生錯誤，由於「主執行緒」無法直接捕捉背景執行緒拋出的例外，處理起來也會相對麻煩且危險。\n\n\nNote\n當你透過 ThreadPool.QueueUserWorkItem(...) 把工作排進 ThreadPool 之後，主執行緒就繼續往下走了。如果背景工作在執行過程中拋出例外，這個例外會直接在「背景執行緒」的頂層引爆，而原呼叫者（主執行緒）是無法用 try-catch 捕捉到它的。在現今的 .NET 環境下，這通常會導致整個處理序（process）崩潰。\n若要安全處理，開發者就得在這類透過 ThreadPool.QueueUserWorkItem(...) 排入的工作內部，自己手動包好 try-catch，然後再想辦法把錯誤狀態傳回主程式。這通常會牽涉到更複雜的狀態共用與同步機制。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-task-as-solution",
+    "href": "ch02/threads-and-tasks.html#sec-task-as-solution",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "核心觀念：Task - 解決執行緒管理複雜性的高階抽象",
+    "text": "核心觀念：Task - 解決執行緒管理複雜性的高階抽象\n這樣看下來，現代 .NET 想解決的方向就很清楚了：我們需要一個比直接管理執行緒更高階的抽象。在 C# 中，System.Threading.Tasks.Task 物件正是現代非同步程式設計的核心。當你看到一個方法的回傳型別是 Task 或 Task&lt;T&gt;，可以先把它理解為一個「承諾 (promise)」或「未來憑證 (future)」：\n\nTask：代表一個沒有回傳值的非同步操作。它承諾「我會在未來某個時間點完成這項工作」。\nTask&lt;T&gt;：代表一個有回傳值的非同步操作。它承諾「我會在未來某個時間點完成工作，並且給你一個 T 型別的結果」。\n\n這個「承諾」最有價值的地方，在於它把「要執行的工作」與「執行工作的工人」解耦合了。你只要拿到這個 Task 物件，就能追蹤它的狀態，例如是否已完成、是否發生錯誤，並在它完成時取得結果，而不必一直關心它到底是在哪一條執行緒上執行的。\n\n\n\n\n\n這種抽象化帶來了很大的好處。.NET 的執行環境（runtime）可以根據當下的系統負載、CPU 核心數量等因素，用更有效率的方式來排程並執行這些 Task。例如，它可以重複利用現有執行緒，避免頻繁建立與銷毀執行緒的效能開銷。也因此，Task 能改善傳統 Thread 和 ThreadPool 在生命週期管理、回傳值取得，以及例外處理上的痛點，讓開發者能專注在「要做什麼工作」，而不是「該叫哪個工人去做，以及如何監督他」。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-the-modern-approach-task-run",
+    "href": "ch02/threads-and-tasks.html#sec-the-modern-approach-task-run",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "現代起手式：Task.Run",
+    "text": "現代起手式：Task.Run\n回想第一章的披薩店，我們的廚師主要是被「等待烤箱」這件事耽擱住，那屬於 I/O 密集型 (I/O-bound) 操作。但如果今天廚師接到的是一張複雜的手工訂單，需要他連續揉十分鐘麵糰呢？這種需要 CPU 全力運算的工作，就稱為 CPU 密集型 (CPU-bound) 操作。\n面對這種 CPU 密集型工作，我們同樣不希望它一直佔住主廚；在程式裡，這個「主廚」可能就是 UI 執行緒或主執行緒。一個很自然的作法，是把它交給廚房裡的另一位幫手去處理。這正是 Task.Run 的核心使命：把 ThreadPool 的高效能和 Task 抽象化帶來的優點結合在一起。\nTask.Run 的作用是：將一個工作交給執行緒集區去執行，並立即回傳一個代表該工作的 Task 物件。\n\n\n\n\n\n先用一個基本例子看它怎麼用。下面這段程式會用 Task.Run 把一段耗時工作推派到背景執行緒，然後透過回傳的 Task 物件來等待它完成：\nvar msg = $\"主執行緒 ID: {Environment.CurrentManagedThreadId}\";\nConsole.WriteLine(msg);\n\nConsole.WriteLine(\"準備使用 Task.Run 執行背景工作...\");\n\n// 將工作交給執行緒集區，並取得 Task 物件\nTask task = Task.Run(() =&gt;\n{\n    var msg = $\"背景執行緒 ID: {Environment.CurrentManagedThreadId}\";\n    Console.WriteLine(msg);\n    Console.WriteLine(\"背景工作正在進行中...\");\n    Thread.Sleep(2000); // 用來簡化模擬一段耗時的同步工作\n    Console.WriteLine(\"背景工作完成。\");\n});\n\nConsole.WriteLine(\"主執行緒已呼叫 Task.Run，繼續執行其他事情...\");\n\n// 等待 Task 完成\ntask.Wait();\n\nConsole.WriteLine(\"確認 Task 已完成，主程式即將結束。\");\n執行結果：\n主執行緒 ID: 2\n準備使用 Task.Run 執行背景工作...\n主執行緒已呼叫 Task.Run，繼續執行其他事情...\n背景執行緒 ID: 9\n背景工作正在進行中...\n背景工作完成。\n確認 Task 已完成，主程式即將結束。\n這裡使用 task.Wait()，只是為了在 Console 應用程式中確保背景工作能執行完畢。在真實的非同步程式碼中，特別是 UI 或伺服器端應用，我們通常應該使用 await 來非同步地等待 Task，而不是用 Wait() 阻塞當前執行緒。這部分我們會在下一章深入探討。\n\n原始碼： DemoTaskRun\n\n如果背景工作還需要回傳結果，Task.Run 同樣能處理：\nConsole.WriteLine(\"準備使用 Task.Run 執行有回傳值的背景工作...\");\n\n// Task&lt;string&gt; 代表此工作未來會回傳一個 string\nTask&lt;string&gt; taskWithResult = Task.Run(() =&gt;\n{\n    Thread.Sleep(2000);\n    return \"這是背景工作的計算結果\";\n});\n\nConsole.WriteLine(\"主執行緒繼續執行...\");\n\n// 使用 .Result 屬性會阻塞當前執行緒，直到 Task 完成並取得結果\nstring result = taskWithResult.Result;\n\nConsole.WriteLine($\"從背景工作取得的結果: {result}\");\n不過，這裡要再提醒一次：如前面提過的，呼叫 Task 的 .Wait() 方法會阻塞當前執行緒；這個範例使用 .Result 屬性取得非同步工作的結果，也同樣會阻塞執行緒，因而失去非同步原本該有的優勢。所以在撰寫非同步程式時，應盡量避免呼叫 .Wait() 或讀取 .Result 屬性。\n更自然、也更符合現代寫法的作法，是直接使用 await 關鍵字：\n// (假設在一個 async Main 方法中)\nConsole.WriteLine(\"準備使用 async/await 非阻塞地等待背景工作...\");\n\n// ✓ 正確示範：以非阻塞方式等待 Task 完成\nstring resultAsync = await Task.Run(() =&gt;\n{\n    Thread.Sleep(2000);\n    return \"這是使用 await 得到的結果\";\n});\n\nConsole.WriteLine($\"從背景工作取得的結果: {resultAsync}\");\n如你所見，使用 await 之後，程式碼在保持非同步優勢的同時，讀起來仍然像同步程式碼一樣直觀、簡潔。至於這背後的魔法，我們會在下一章再深入探討。\n\nNote: 此範例中，交給 Task.Run 執行的程式碼在實際執行時會佔住一條背景執行緒。\n\n這裡可以先記住一個重點：Task.Run 最適合拿來處理 CPU 密集型工作。 例如複雜計算，就很適合從 UI 執行緒或主執行緒移開，改交給背景執行緒處理。\n判斷何時「必須」用 Task.Run 的準則很簡單：如果 async 方法內有純運算（例如加密、格式轉換），執行它會在 UI 執行緒上卡住 UI，那就應該改用 Task.Run 卸載到背景執行緒。但如果只是等待 I/O（下載檔案、資料庫查詢），async/await 本身就能避免阻塞，不需要 Task.Run。判斷的關鍵是：工作本質上是 CPU 密集型，還是 I/O 密集型。\n\n\n\n\n\n\n如何讓 Console 應用程式支援 await？\n為了讓 await 關鍵字能在程式的進入點（Main 方法）中使用，你需要確保專案設定正確。\n\n現代 .NET 的預設 Console 專案範本： 當你建立新的主控台應用程式時，專案預設會使用「頂層陳述式 (top-level statements)」，你不需要定義 Main 方法，可以直接在 Program.cs 檔案的最上層使用 await。（.NET 6+）\n舊版 C#: 你需要手動將 Main 方法的簽章修改為 public static async Task Main(string[] args)。（備註：C# 7.1+ 才有支援 async Main）\n\n\n\n不要用 Task.Run 呼叫非同步 I/O 方法\nTask.Run 的核心使命，是把同步的、CPU 密集型工作卸載到背景執行緒，以避免阻塞上層呼叫者。然而，很多人會把一個本身已經是非同步的 I/O 方法，再用 Task.Run 包裝一次。\n✘ 反模式 (anti-pattern)：\nvar json = await Task.Run(\n    async () =&gt; await httpClient.GetStringAsync(url));\n✔ 正確作法：\nvar json = await httpClient.GetStringAsync(url);\nhttpClient.GetStringAsync 本身就是非同步方法。當它被 await 時，它已經會在等待網路 I/O 完成的期間避免阻塞當前執行緒。這時再用 Task.Run 把它包起來，不但沒有任何額外好處，反而只會多增加一次不必要的 ThreadPool 排程與委派包裝成本。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-task-lifecycle-and-status",
+    "href": "ch02/threads-and-tasks.html#sec-task-lifecycle-and-status",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "Task 的生命週期與狀態",
+    "text": "Task 的生命週期與狀態\n當我們透過 Task.Run 或其他方式取得一個 Task 物件後，就可以透過它的 Status 屬性，也就是 TaskStatus 列舉，來了解工作目前進行到哪裡。一個 Task 的典型生命週期，大致會出現以下幾種重要狀態：\n\nCreated：工作已建立，但尚未被排程執行。\nWaitingForActivation：工作正在等待被啟用。這在依賴基礎架構發出完成通知的非同步操作（如 Task.Delay 或 I/O 工作）中非常常見。\nWaitingToRun：工作已排程，正在等待執行緒集區分配執行緒。\nRunning：工作正在執行中。\nRanToCompletion：工作已順利執行完畢。\nFaulted：工作因為發生未處理的例外（exception）而失敗。\nCanceled：工作已被取消。\n\n除了 Status 屬性，Task 還提供了幾個方便的布林屬性：IsCompleted、IsFaulted 與 IsCanceled。值得留意的是，只要工作處於上列最後三種狀態之一：RanToCompletion、Faulted、或 Canceled，那麼 IsCompleted 就會是 true。\n\n\n\n\n\n這些狀態名稱光看有點抽象，所以我們直接用一個簡短範例來觀察變化：\nConsole.WriteLine(\"建立並啟動一個會故意失敗的任務...\");\n\nTask myTask = Task.Run(() =&gt;\n{\n    Console.WriteLine(\"任務開始執行，即將拋出例外...\");\n    Thread.Sleep(500);\n    throw new InvalidOperationException(\"哎呀，任務失敗了！\");\n});\n\ntry\n{\n    // 故意等待任務完成，以觀察它的最終狀態\n    myTask.Wait();\n}\ncatch (AggregateException)\n{\n    // 使用 Wait() 等待失敗的 Task 時，\n    // 例外會被包裹在 AggregateException 中。\n    // 在此先捕獲並忽略，以觀察任務的最終狀態。\n}\n\nConsole.WriteLine($\"任務最終狀態: {myTask.Status}\");\nConsole.WriteLine($\"IsFaulted: {myTask.IsFaulted}\");\nConsole.WriteLine($\"IsCompleted: {myTask.IsCompleted}\");\n執行結果：\n建立並啟動一個會故意失敗的任務...\n任務開始執行，即將拋出例外...\n任務最終狀態: Faulted\nIsFaulted: True\nIsCompleted: True\n這段程式碼也同時展示了前面提過的例外處理機制：當你使用傳統的阻塞方式，例如 .Wait() 或 .Result，去等待一個發生錯誤的 Task 時，原始例外會被包裹在 AggregateException 當中。至於這個機制，以及現代 await 的解包魔法，會在第 4 章詳細介紹。\n\n原始碼： DemoTaskStatus",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-task-is-not-thread",
+    "href": "ch02/threads-and-tasks.html#sec-task-is-not-thread",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "工作不等於執行緒：從 CPU-bound 走向 I/O-bound",
+    "text": "工作不等於執行緒：從 CPU-bound 走向 I/O-bound\n這是一個常見的疑問：「是不是每個 Task 背後，都代表有一條背景執行緒在跑？」\n答案：「不是。」\nTask 是一個非常抽象的概念，它只代表一個「未來的承諾（promise）」。這個承諾 可以 是由一條正在 CPU 上執行同步工作的背景執行緒來實現（例如 Task.Run）；但它 也可能在等待期間不需要專門佔住任何一條執行緒。\n為了打破這個迷思，我們來看兩個很常見的例子：Task.Delay 和 Task.FromResult。它們都能建立 Task，但不需要額外消耗一條執行緒去傻等。\n\nTask.Delay：不阻塞執行緒的等待\n還記得 Thread.Sleep 嗎？它會讓當前的工人，也就是執行緒，呆站在原地睡覺，什麼事都不做。如果你在主執行緒使用它，整個應用程式就會卡在那裡。\n面對「需要等一段時間，但不想卡住執行緒」的需求，.NET 提供了非同步版本的替代方案：Task.Delay。它代表一個「在指定時間後會完成的工作」。在這段等待期間內，通常不會有一條執行緒被專門卡住等它完成；它的底層依賴的是系統內建的計時器（timer），時間一到，再由執行環境安排後續的接續工作（continuation）。\n// 模擬一個非同步的等待，期間不會阻塞執行緒\nTask delayTask = Task.Delay(2000);\n這也是為什麼 Task.Delay 很常被拿來模擬 I/O 密集型的等待操作，例如等待網路封包或等待資料庫回應。\n\n\nTask.FromResult：已經完成的承諾\n如果你手上其實已經有現成結果，但某個方法的介面又要求你必須回傳一個 Task&lt;T&gt;，該怎麼辦？這時候，你不需要動用 Task.Run 去叫一個背景執行緒來回傳結果，直接使用 Task.FromResult 就可以了：\n// 建立一個 \"剛出生就已經完成\" 且帶著結果 42 的 Task\nTask&lt;int&gt; completedTask = Task.FromResult(42);\n\n// 狀態會直接是 RanToCompletion\nConsole.WriteLine($\"狀態: {completedTask.Status}\");\n\n// 立刻取得 42，不需要等待\nConsole.WriteLine($\"結果: {completedTask.Result}\");\nTask.FromResult 的存在，再次證明了一件事：Task 代表的主要是狀態與承諾。它甚至可以代表一個在建立瞬間就已經完成的工作，連排程都不需要。\n理解「Task 不等於 Thread」，是往更高階非同步思維前進的一個關鍵轉折。當我們面對 I/O 密集型工作時，拿到的 Task 往往只是在等待一個硬體或作業系統層級的完成通知，此時通常不會有任何一條執行緒在背景「專門」傻等這個結果。\n\n底層運作\n從作業系統與硬體的底層原理來說，當你發起一個真正的非同步 I/O 操作（例如：發送網路請求、要求儲存裝置讀取檔案），在等待資料傳輸的這段期間，通常不會有一條 CPU 執行緒被專門阻塞在原地傻等結果。\n這背後的機制是依賴硬體中斷（hardware interrupts）與作業系統的 I/O completion 機制（例如 Windows 的 IOCP、Linux 的 epoll、或 macOS 的 kqueue）：\n\n你的程式發出 I/O 請求給作業系統。\n作業系統把請求交給硬體設備（網卡、磁碟控制器），然後 CPU 就可以立刻去執行別的執行緒了。\n當硬體設備完成傳輸時，會發出一個硬體中斷。\n作業系統收到中斷，將結果放進一個佇列（queue）裡面。\n.NET 執行環境接收到完成通知後，才會安排適當的執行緒去把結果接回來，然後將你程式中的 Task 標記為完成，並接續執行後面的 await 程式碼。\n\n參閱微軟文件：同步與非同步 I/O",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#sec-foreground-vs-background-threads",
+    "href": "ch02/threads-and-tasks.html#sec-foreground-vs-background-threads",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "前景執行緒 vs. 背景執行緒",
+    "text": "前景執行緒 vs. 背景執行緒\n接著，我們再把視角拉回執行緒本身。在 .NET 中，執行緒分為兩種模式：前景 (foreground) 與背景 (background)。這個區別會直接影響應用程式的生命週期。\n\n前景執行緒：只要還有任何一條前景執行緒在執行，應用程式的處理序（process）就會保持存活。\n背景執行緒：一旦所有的前景執行緒都結束了，.NET 執行環境就會自動終止所有仍在執行的背景執行緒，並關閉應用程式。\n\n這樣設計的邏輯是：前景執行緒執行的是應用程式的核心工作；而背景執行緒執行的，則是輔助性、可以隨時被中斷的工作，例如定時存檔、記錄日誌等等。\n因此，建立執行緒時要留意它的來源：\n\n使用 new Thread() 建立的執行緒，預設是前景執行緒。如果要改為背景執行緒，可將 IsBackground 屬性設定為 true。\n從 ThreadPool 取得的執行緒（因此也包括 Task.Run 所使用的執行緒），永遠都是背景執行緒。\n\n以下範例可用來觀察這兩種執行緒的行為差異：\n// 範例一：使用 Thread (前景執行緒)\nvar foregroundThread = new Thread(() =&gt;\n{\n    Thread.Sleep(3000);\n    Console.WriteLine(\"前景執行緒完成。\");\n});\n\nforegroundThread.Start();\nConsole.WriteLine(\n    \"Main 函式 (前景) 即將結束，但程式會等待前景執行緒完成。\");\n\n// 範例二：使用 Task.Run (背景執行緒)\n_ = Task.Run(() =&gt;\n{\n    Thread.Sleep(5000);\n    \n    // 底下這行可能永遠不會被執行\n    Console.WriteLine(\"背景執行緒完成。\");\n});\nConsole.WriteLine(\"Main 函式 (前景) 即將結束，程式不會等待背景執行緒。\");\n\n原始碼： DemoForegroundBackgroundThreads\n\n執行此範例時，你會先在主控台看到 Main 函式結束的訊息，然後等待約 3 秒，再印出「前景執行緒完成。」，程式才真正關閉。至於那條由 Task.Run 啟動的背景執行緒（也就是「範例二」），因為故意睡得更久，通常會在主程式結束時被強制終止，來不及印出完成訊息。\n另外要注意，這個範例刻意採用 fire-and-forget 的寫法，只是為了觀察「前景 / 背景執行緒」對處理序生命週期的影響；在一般應用程式中，除非你非常確定後果，否則不應把重要工作寫成這種不等待完成的形式。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch02/threads-and-tasks.html#結語",
+    "href": "ch02/threads-and-tasks.html#結語",
+    "title": "第 2 章：.NET 中的執行緒與工作",
+    "section": "結語",
+    "text": "結語\n本章先從傳統執行緒管理的挑戰談起，讓我們看見直接使用 Thread 和 ThreadPool 所帶來的複雜性與侷限。接著，我們引入了 Task 這個高階抽象，讓開發者能把注意力放回「工作本身」，而把底層執行緒管理交給 .NET 執行環境處理。\n讀完本章，你已經掌握了建立與管理非同步操作的基本工具，也知道如何使用 Task.Run 把 CPU 密集型工作交給背景執行緒處理。不過，本章範例中用到的 task.Wait() 和 task.Result，其實都會「阻塞」程式，這正是下一章要處理的問題。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html",
+    "href": "ch03/async-await-essentials.html",
+    "title": "第 3 章：async 與 await",
+    "section": "",
+    "text": "async 與 await 如何簡化非同步流程\n在上一章，我們學會了使用 Task.Run 來建立背景工作，並透過 Task 物件追蹤它的狀態。不過，我們也同時發現，若用 .Wait() 或 .Result 來取得結果，就會阻塞（block）當前執行緒，這等於又把我們帶回最初想解決的「卡頓」問題。\n那麼，有沒有一種方法可以「非同步地等待」一個 Task 完成呢？\n這正是 C# 提供的 async 與 await 關鍵字要解決的事。它們是 C# 編譯器提供的語法糖（syntactic sugar），能讓我們用近乎同步程式碼的寫法，實現複雜的非同步控制流程。可以說，async/await 是現代 .NET 非同步程式設計的基石。\n本章會帶你進一步理解 async/await。讀完之後，你將能夠：\n要看出 async 與 await 解決了什麼問題，可以先想像一個沒有它們的世界。假設現在要寫一個方法，非同步地從網路下載一個網頁，並回傳它的字數。\n在 async/await 出現之前，我們主要依賴 Task 物件的 ContinueWith 方法來串接非同步工作。它的作用是註冊一個「前一個工作完成後，接著執行……」的回呼（callback）。這種方式雖然解決了阻塞問題，但寫法相當繁瑣：\n這種寫法裡滿是 lambda 運算式。如果流程再複雜一點，例如下載完還要解析、再存入資料庫，很快就會形成所謂的「回呼地獄（callback hell）」，程式碼會變得難讀，也不好維護。\n接著看同一件事用 async 與 await 會怎麼寫：\n程式碼看起來幾乎和同步版本一模一樣。這就是 async/await 最巧妙的地方。下面分別拆解這對關鍵字到底做了什麼。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-how-async-await-simplifies-flow",
+    "href": "ch03/async-await-essentials.html#sec-how-async-await-simplifies-flow",
+    "title": "第 3 章：async 與 await",
+    "section": "",
+    "text": "static readonly HttpClient httpClient = new HttpClient();\n\n// 使用 ContinueWith 的傳統寫法 (複雜且難以閱讀)\nstatic Task&lt;int&gt; DownloadPageAndCountCharsLegacy(string url)\n{\n    // 1. 開始非同步下載\n    return httpClient.GetStringAsync(url).ContinueWith(downloadTask =&gt;\n    {\n        // 2. 下載完成後，這個區塊才會被執行\n        string content = downloadTask.Result;\n        return content.Length;\n    });\n}\n\n\nNote\n本書範例會使用可重複使用、生命週期較長的 HttpClient 物件來共用連線，因為每次都建立新的 HttpClient 物件可能造成 socket 耗盡。不過，單純重複使用一個靜態 HttpClient 物件僅稱得上「堪用」。更好的做法是使用 IHttpClientFactory。細節可參閱微軟文件：使用 IHttpClientFactory 實作韌性的 HTTP 請求。\n\n\n// 使用 async/await 的現代寫法 (簡潔且直觀)\nstatic async Task&lt;int&gt; DownloadPageAndCountCharsAsync(string url)\n{\n    // 1. 非同步地等待下載完成，期間不會阻塞執行緒\n    string content = await httpClient.GetStringAsync(url);\n    // 2. 下載完成後，程式碼會從這裡繼續執行\n    return content.Length;\n}\n\n原始碼： DemoDownloadPage\n\n\n\nasync 關鍵字\n先從 async 開始。async 是一個方法修飾詞。當你把一個方法標記為 async，其實是在告訴編譯器兩件事：\n\n這個方法內部會使用 await 關鍵字。\n編譯器需要將這個方法轉換成一個「狀態機（state machine）」。稍後會進一步說明這個狀態機是怎麼運作的。\n\nasync 方法常見的回傳型別包括 Task、Task&lt;T&gt;、ValueTask 與 ValueTask&lt;T&gt;。這也呼應了我們在第二章學到的觀念：非同步操作的回傳值，本質上是一個「承諾」（promise）或「未來憑證」（future）。\n當然，也有少數特殊情況，例如事件處理常式會使用 void，非同步迭代器會使用 IAsyncEnumerable&lt;T&gt;。\n\n\n\n\n\n\n\nawait 關鍵字\n接著看 await。await 是一個運算子，用來等待可等待物件（awaitable）完成。它通常出現在 async 方法內，但也可以用於 async lambda、async 匿名方法、async 區域函式等支援 await 的語境中；在現代 C# 的頂層敘述（top-level statements）裡也可以使用。\n當程式執行到「await 一個 Task」時，會依序發生以下事情：\n\n檢查 Task 狀態：await 會先檢查它所等待的 Task 是否已經完成了。如果已經完成，程式就繼續往下執行，就像沒有 await 一樣。\n暫停與返回：如果 Task 尚未完成，await 會在此處設定一個「恢復點」（continuation），然後立即將控制權返回給呼叫此 async 方法的程式碼或目前的執行環境。這一步很關鍵：它意味著當前的執行緒沒有被阻塞，可以去做其他事情。\n恢復執行：當被 await 的 Task 終於完成後，.NET 執行環境（runtime）會回到先前設定的「恢復點」，繼續執行 async 方法中剩下的程式碼。如果 Task 有回傳值 (Task&lt;T&gt;)，await 運算式本身就會交出那個 T 型別的結果。\n\n這個「暫停與恢復」的過程，就是由編譯器產生的狀態機在背後管理。你寫的是看似循序的程式碼，但編譯器會幫你把它 拆解 成多個區塊，並在適當的時機點恢復執行。\n如果剛才的解釋還有點抽象，可以用廚師的畫面再想一次。有位廚師（執行緒）正在照著食譜（程式碼）做菜。當他遇到需要把牛排「送進烤箱烤 30 分鐘」的步驟時，也就是遇到 await I/O 操作，他不會站在烤箱前空等。\n相反地，他會先在食譜上夾個書籤，記下目前做到哪裡，也就是編譯器建立的狀態機紀錄。接著，他可以先去忙別的事，或把控制權交還給目前的工作環境。等烤箱發出完成提示，也就是 Task 完成時，他再翻回那個書籤，接續下一個步驟，例如把牛排端出來擺盤。這就是恢復執行。\n\n\n\n\n\n\n\n底層運作：狀態機\n接著從編譯器的角度，看看 await 如何暫停並恢復執行。\n\nNote\n本節作為補充知識，會進一步解釋 async 方法背後的運作原理。你可以選擇略過；但多了解一點編譯器如何轉換你的 async 方法，對日後除錯或效能調校多少會有些幫助。\n\n當 C# 編譯器遇到 async 方法時，它會在幕後做不少工作。它會為這個方法產生一個實作了 IAsyncStateMachine 介面的隱藏類別，也就是所謂的「狀態機」。\n在這個類別中，編譯器會根據你程式碼裡的每一個 await，將整個方法切割成不同的狀態（state）。\n\n一開始狀態為 -1。當執行到第一個 await 且發現等待的工作尚未完成時，狀態機會將當前的狀態設定為 0，儲存當下區域變數的值，並將自己的實例註冊到該 Task 的接續工作（continuation）中。接著它會直接 return，將執行緒還給呼叫者。\n當背景的 Task 完成時，它會觸發並呼叫狀態機內的 MoveNext() 方法。\nMoveNext() 會根據之前記錄的狀態，利用 goto 指令精準跳躍到當初暫停的地方，把變數的值都還原，然後繼續往下執行。\n\n換句話說，你之所以能用「同步的寫法」寫出「非同步的行為」，就是因為那些原本得手動處理的複雜狀態追蹤與回呼註冊，都已經交給編譯器產生的狀態機代勞了。\n如果光靠文字描述仍然覺得抽象，下面用一段大幅簡化過的虛擬碼，來模擬前面的 DownloadPageAndCountCharsAsync 方法被編譯後所產生的狀態機。你可以搭配程式碼中的註解，試著理解它的內部運作邏輯：\n// 編譯器產生的狀態機 (簡化過的概念虛擬碼)\nclass DownloadStateMachine : IAsyncStateMachine\n{\n    int _state = -1; // 初始狀態為 -1\n    string _url;     // 本來方法的傳入參數\n    string _content; // 本來的區域變數被提升為類別層級的欄位\n    TaskAwaiter&lt;string&gt; _awaiter;\n\n    public void MoveNext()\n    {\n        // 根據當前狀態，跳轉到對應的程式區塊\n        if (_state == 0) goto state_0;\n\n        // --- 狀態 -1 (執行到第一個 await 之前) ---\n        _awaiter = httpClient.GetStringAsync(_url).GetAwaiter();\n\n        // 如果工作沒有瞬間做完，就準備暫停\n        if (!_awaiter.IsCompleted)\n        {\n            _state = 0; // 改變狀態，記錄我們停在這裡\n\n            // 告訴 awaiter：「等你下載完，請再次呼叫我的 MoveNext()」\n            _awaiter.OnCompleted(this.MoveNext);\n            return; // 關鍵：立刻返回，把執行緒還給呼叫者！\n        }\n\n    state_0:\n        // --- 狀態 0 (從 await 之後恢復執行) ---\n        // 注意：goto 跳轉前，編譯器已確保所有欄位值（如 _content）都\n        //      已正確恢復，因此這裡的跳轉是安全的，不會造成堆疊混亂。\n        _state = -1; // 恢復預設狀態\n        _content = _awaiter.GetResult(); // 取得下載結果\n\n        int result = _content.Length;\n        // 將結果放入 Task 中，狀態機執行完畢\n        SetResult(result);\n    }\n}\n從這段虛擬碼中，你可以更清楚看到 await 邊界是如何把一個原本循序漸進的方法，切開並轉換成透過 _state 與 goto 控制執行跳轉的狀態機。這也是 async/await 能夠不阻塞執行緒的關鍵原因。\n\n編譯器產生的非同步狀態機可能即將走入歷史\n寫作當下，微軟已經在 2026 年 3 月發布 .NET 11 的第二個預覽版（preview2）。在此預覽版的發行說明文件中提到，新增的 runtime async 功能會把非同步機制的管理從 C# 編譯器產生狀態機的模式，轉移到 .NET runtime。換言之，以 C# 撰寫的非同步程式，將來若使用 .NET 11 來編譯，其效能將會立刻提升：編譯出來的 IL code 更小（因為編譯器不再需要產生動輒上百行的非同步狀態機），而且執行時的記憶體配置也更有效率，除錯體驗也可望更為直觀。不過，這項功能目前仍在預覽階段，可能還有變動。\n更多資訊可參閱官方發布的 .NET 11 Preview 2 Release Notes",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-waiting-multiple-tasks",
+    "href": "ch03/async-await-essentials.html#sec-waiting-multiple-tasks",
+    "title": "第 3 章：async 與 await",
+    "section": "同時等待多個工作：Task.WhenAll 與 Task.WhenEach",
+    "text": "同時等待多個工作：Task.WhenAll 與 Task.WhenEach\n前面我們學會了如何 await 單一個非同步工作。但在真實應用中，一次只等一件事往往不夠用。我們常常需要同時執行多個非同步操作，例如同時下載多個網頁、同時查詢兩個不同的資料庫，或者同時呼叫多個 Web API。\n這時候，如果我們還是一個接一個地 await，就會變成依序執行（sequential execution），等於失去非同步帶來的併發優勢。為了更充分利用系統資源，我們應該讓這些工作「同時」進行。本節會介紹 .NET 提供的幾個工具。\n\n齊頭並進：Task.WhenAll\nTask.WhenAll 是最常用的方法，它接受一群 Task，並回傳一個新的 Task。這個新 Task 會在所有傳入的工作都完成後才算完成。如果傳入的是 Task&lt;TResult&gt;，await Task.WhenAll 會回傳一個陣列 TResult[]，包含所有工作的執行結果。\n\nNote\n使用 Task.WhenAll 時，若其中一個或多個工作拋出例外，await 只會重新拋出 第一個 捕捉到的例外。如果你需要處理所有發生的例外，請檢查 Task.WhenAll 回傳之 Task 的 Exception 屬性（它是一個 AggregateException）。詳見第 4 章。\n\n先來比較「依序等待」與「同時等待」的差別。下面的範例假設下載每一個網頁都需要 1 秒鐘：\n// ✘ 錯誤示範：依序執行並取得結果，效率低。\nasync Task SequentialDownloadAsync()\n{\n  // 這會花費 1秒 + 1秒 + 1秒 = 3秒\n  string page1 = await httpClient.GetStringAsync(\"https://demo.com/1\");\n  string page2 = await httpClient.GetStringAsync(\"https://demo.com/2\");\n  string page3 = await httpClient.GetStringAsync(\"https://demo.com/3\");\n}\n\n// ✔ 正確示範：併發執行，等全部工作完成後一次取出結果，效率高。\nasync Task ConcurrentDownloadAsync()\n{\n  // 1. 啟動所有工作\n  // 注意：這裡都沒有 await，讓各項工作先各自分頭進行！\n  Task&lt;string&gt; task1 = httpClient.GetStringAsync(\"https://demo.com/1\");\n  Task&lt;string&gt; task2 = httpClient.GetStringAsync(\"https://demo.com/2\");\n  Task&lt;string&gt; task3 = httpClient.GetStringAsync(\"https://demo.com/3\");\n\n  // 2. 等待全部完成 (Await all)\n  // 這只會花費大約 1秒 (取決於最慢的那個請求)\n  string[] results = await Task.WhenAll(task1, task2, task3);\n}\n\n原始碼： DemoTaskWhenAll\n\n\n\n\n\n\n\n\n只取其一：Task.WhenAny\n有時候，我們不需要等全部完成，只要其中一個先完成就夠了。Task.WhenAny 就是為此而生。它接受一群 Task，並在任何一個工作完成時，無論是成功、失敗還是取消，立即回傳那個已完成的 Task。\n常見的使用情境包括：\n\n備援機制（redundancy）：同時呼叫三個提供相同服務的伺服器，誰先回應就用誰的資料。\n逾時控制（timeout）：同時等待「主要工作」與「計時工作 (Task.Delay)」，看誰先完成。如果計時工作先完成，就代表逾時了。\n\n以下範例示範如何利用 Task.WhenAny 搭配 Task.Delay 實作逾時控制：\nasync Task&lt;string&gt; DownloadWithTimeoutAsync(string url)\n{\n    using var cts = new CancellationTokenSource();\n\n    Task&lt;string&gt; downloadTask = httpClient.GetStringAsync(url, cts.Token);\n    Task timeoutTask = Task.Delay(3000, cts.Token); // 3秒逾時\n\n    // 等待兩者之一完成\n    Task completedTask = await Task.WhenAny(downloadTask, timeoutTask);\n\n    if (completedTask == timeoutTask)\n    {\n        // 逾時了！取消下載工作並拋出例外\n        cts.Cancel();\n        throw new TimeoutException(\"下載作業逾時。\");\n    }\n\n    // 下載先完成，順便取消 timeoutTask，避免它繼續無意義地計時\n    cts.Cancel();\n\n    // 下載先完成，取得結果\n    return await downloadTask;\n}\n這段程式的重點在於：Task.WhenAny 回傳的是「先完成的那個工作」，而不是下載結果本身。因此，確認先完成的是 downloadTask 之後，仍然要再 await downloadTask 一次，才能取得下載內容或讓下載過程中的例外正常拋出。\n\n原始碼： DemoTaskWhenAny\n\n\n\n依序處理完成的工作：Task.WhenEach (.NET 9)\n除了「等全部完成」和「搶第一個完成」，還有另一個很常見的需求：先發動多個非同步工作，然後每當有一個完成時，就立刻處理它，例如更新 UI 進度條，而不是等到全部都做完才一次處理。\n在 .NET 9 之前，要實現這個模式，通常得搭配 Task.WhenAny 寫一個 while 迴圈，並不斷從任務清單中移除已完成的工作。那樣的程式碼既冗長又容易出錯，時間複雜度也會變成 \\(O(N^2)\\)。\n\n為何 Task.WhenAny 搭配迴圈是 O(N^2)？\n假設你有 N 個任務。每次呼叫 Task.WhenAny(tasks) 時，它內部需要為清單中每一個任務逐一註冊回呼（花費 \\(O(N)\\) 時間）。接著，從 List&lt;Task&gt; 中 Remove 完成的任務，又是一個需要挪動陣列元素的 \\(O(N)\\) 操作。\n第一圈花費 \\(O(N)\\)，第二圈花費 \\(O(N-1)\\)，以此類推直到最後一個。根據等差級數公式，總成本會落在 \\(O(N^2)\\)。以具體數字來說：若有 1,000 個任務，WhenAny 迴圈方式需要大約 500,000 次操作（1000 * 999 / 2），而 WhenEach 只需 1,000 次。這代表當任務數量一多（例如伺服器同時處理數千個請求），使用 WhenAny 的效能就會急遽惡化。\n\n.NET 9 引入了 Task.WhenEach。如果傳入的是 Task&lt;TResult&gt;，它會回傳 IAsyncEnumerable&lt;Task&lt;TResult&gt;&gt;；如果傳入的是非泛型 Task，則會回傳 IAsyncEnumerable&lt;Task&gt;。因此，我們可以直接用 await foreach 逐一處理每一個完成的工作。這不僅語法更乾淨，底層的時間複雜度也被大幅優化至 \\(O(N)\\)。\n來看看實際的用法：\n// .NET 9+ 的新寫法：乾淨、直觀\nasync Task ProcessTasksAsTheyCompleteAsync()\n{\n    var tasks = new List&lt;Task&lt;int&gt;&gt;();\n    for (int i = 1; i &lt;= 5; i++)\n    {\n        tasks.Add(DoWorkAsync(i)); // 假設 DoWorkAsync 回傳 Task&lt;int&gt;\n    }\n\n    // 這裡的 t 代表一個「已經完成」的工作\n    // 迴圈會依照「完成的順序」迭代，而不是原本串列的順序！\n    await foreach (Task&lt;int&gt; t in Task.WhenEach(tasks))\n    {\n        try\n        {\n            // 這裡 await 只是為了取得結果或例外，不會阻塞\n            int result = await t;\n            Console.WriteLine($\"完成了一個工作，結果是：{result}\");\n        }\n        catch (Exception ex)\n        {\n            Console.WriteLine($\"有個工作失敗了：{ex.Message}\");\n        }\n    }\n}\n這裡特別留意一下 await foreach (... in Task.WhenEach(tasks)) 這個迴圈。它會依照「工作完成的順序」迭代，而不是 tasks 串列原本的順序。換句話說，每完成一個工作，就會立刻跑一次迴圈去處理那個剛完成的工作。\n\n原始碼： DemoTaskWhenEach\n\nTask.WhenEach 大幅簡化了這類「一有結果就處理」的模式，是 .NET 9 很實用的新功能。如果你的目標框架是 .NET 9 或更新版本，遇到這類需求時，它應該是首選的工具。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-control-flow-and-synchronization-context",
+    "href": "ch03/async-await-essentials.html#sec-control-flow-and-synchronization-context",
+    "title": "第 3 章：async 與 await",
+    "section": "控制流的走向：SynchronizationContext 的角色",
+    "text": "控制流的走向：SynchronizationContext 的角色\n了解 await 的暫停與恢復之後，接著要看另一個關鍵細節：當 Task 完成後，await 後面的程式碼究竟會在哪一條執行緒上恢復執行？\n答案不是固定的，它取決於當時是否存在一個 SynchronizationContext。\nSynchronizationContext 是一個抽象類別，你可以把它想像成一個「排程器」，它知道如何把一段程式碼排入特定執行緒去執行。在 await 執行暫停並將控制權交還給呼叫端之前，它會先捕捉當前的 SynchronizationContext，留著備用。\n打個比方，在 UI 應用程式中，UI 執行緒就像餐廳裡唯一能操作收銀機和接待客人的前台經理。他去交代廚房備料，也就是發動非同步操作後，後續仍然要回到櫃台。\n而 SynchronizationContext 就像一個盡責的「傳令兵」：它確保廚房把料備好後，後續動作，例如在收銀機上結帳或更新 UI 畫面，會被排程交還給這位前台經理來完成，而不是讓廚房裡的人直接碰收銀機。\n\n\n\n\n\n不同類型的應用程式，其 SynchronizationContext 的行為也不同：\n\nUI 應用程式（WPF, MAUI, WinForms）：主 UI 執行緒上有一個專屬的 SynchronizationContext。它的工作就是確保任何排程給它的程式碼，都會回到原始的 UI 執行緒上執行。這非常方便，因為所有更新 UI 元件的操作都必須在 UI 執行緒上進行。await 會自動幫我們處理這個切換。\n傳統 ASP.NET（ASP.NET 4.x）：每個 HTTP 請求都有一個專屬的 SynchronizationContext（也就是 AspNetSynchronizationContext）。它的作用與 UI 應用程式類似，會試圖將 await 之後的程式碼帶回該請求原本的 request context，以確保像是 HttpContext.Current 這種存取請求狀態的操作能夠正常運作。\n主控台應用程式（Console App） / ASP.NET Core：預設情況下，沒有 SynchronizationContext。在這些環境中，當 await 的工作完成後，後續程式碼不保證回到原本的執行緒；它可能就在完成工作的那條執行緒上接著跑，也可能由 執行緒集區（thread pool） 排程到其他可用執行緒上繼續執行。\n\n\nNote\nASP.NET Core 在設計之初，微軟團隊就刻意移除了 SynchronizationContext。這個架構上的重大改變，消除了 ASP.NET 4.x 中常見的 context switch 成本與死結問題，也是 ASP.NET Core 效能大幅躍升的關鍵原因之一。因此，在 ASP.NET Core 專案中，ConfigureAwait(false) 技術上不再必要（因為根本沒有 context 需要切換）；但許多函式庫仍保留這個寫法，以確保在各種環境下都能正常運作。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-async-or-task-run",
+    "href": "ch03/async-await-essentials.html#sec-async-or-task-run",
+    "title": "第 3 章：async 與 await",
+    "section": "該用 async/await 還是 Task.Run？",
+    "text": "該用 async/await 還是 Task.Run？\n初步認識 async/await 之後，往往會冒出一個困惑：「既然 await 這麼好用，那是不是所有背景工作，包括複雜運算，都應該用 await 去處理？」\n這個問題的關鍵，在於第 2 章討論過的 I/O-bound（輸入/輸出密集型）與 CPU-bound（運算密集型）的差異：\n\nI/O-bound 作業的核心精神是「釋放執行緒」。這是 async/await 的主戰場。使用 await（有時搭配 ConfigureAwait(false)）能以極低的成本達成非阻塞等待。在等待網路或資料庫回應的期間，我們不需要犧牲一條執行緒在原地空等。\nCPU-bound 作業的核心精神是「轉移工作」。這裡仍是 Task.Run 的主戰場。你必須明確地把繁重運算移交給執行緒集區（thread pool），以免佔用 UI 執行緒或主要的處理序。\n\n這兩者的邊界其實很清楚。如果混淆了它們，就很容易寫出有問題的程式碼。\n\n\n\n\n\n\nNote\n最常見的反模式（anti-pattern），就是用 Task.Run 來包裝一個純 I/O-bound 的 async 方法。 例如：Task.Run(() =&gt; httpClient.GetStringAsync(url))。\n這不僅多此一舉，而且通常有害。它會額外增加一次不必要的排程與執行緒切換成本；明明原本的 I/O 非同步 API 就已經能在等待期間釋放執行緒，卻還要先透過 Task.Run 把工作丟進執行緒集區。記住一個簡單的口訣：\n\nasync/await 的目標是非同步（asynchrony），追求 I/O 等待的高效能。\nTask.Run 的目標是平行（parallelism），發揮 CPU 的最大運算能力。\n\n\n另一種常見的誤用則是：在 UI 應用程式的 async 方法裡直接執行 CPU 密集計算，卻沒有用 Task.Run 卸載。這會導致 UI 執行緒在計算期間被佔住，造成介面凍結。以 WPF 為例，先看錯誤的做法：\n// 錯誤示範：CPU 密集計算直接在 async 方法中執行（佔住 UI 執行緒）\nasync void GenerateReportButton_Click(object sender, RoutedEventArgs e)\n{\n    // 這段 CPU 密集計算會一直佔用 UI 執行緒，\n    // 導致介面凍結，無法回應使用者操作。\n    var data = PerformHeavyCalculation();\n\n    await _repository.SaveAsync(data);\n    ResultTextBlock.Text = data.Summary;\n}\n此範例的 PerformHeavyCalculation() 會一直佔用 UI 執行緒，直到計算完成。在此期間，介面完全無法回應使用者的操作。\n正確的做法是用 await Task.Run(...) 把繁重的計算卸載到執行緒集區，讓 UI 執行緒能繼續處理使用者的操作：\n// 正確做法：用 Task.Run 卸載 CPU 密集計算，釋放 UI 執行緒\nasync void GenerateReportButton_Click(object sender, RoutedEventArgs e)\n{\n    // 將 CPU 密集計算移到執行緒集區，UI 執行緒可繼續回應使用者操作\n    var data = await Task.Run(() =&gt; PerformHeavyCalculation());\n\n    await _repository.SaveAsync(data);\n    ResultTextBlock.Text = data.Summary;\n}\n\nWarning\n上述 Task.Run 的技巧適用於 UI 應用程式，但不適用於 ASP.NET Core Web API。在 ASP.NET Core 中，處理 HTTP 請求的執行緒本身就是 thread pool 執行緒，使用 Task.Run 只是把 CPU 工作從一條 thread pool 執行緒搬到另一條，總共佔用的執行緒數量不會減少，反而還增加了排程與執行緒切換的開銷。如果伺服器端有 CPU 密集的需求，應考慮使用背景服務（background service）或訊息佇列等機制來處理。\n延伸閱讀： ASP.NET Core Best Practices\n\n釐清這條界線之後，就更容易理解為何 await 一個 I/O 操作可以不阻塞 UI 執行緒：因為在等待 I/O 完成的期間，根本不需要一條執行緒在原地阻塞等候。接著，我們要來探討 ConfigureAwait。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-ui-thread-and-configure-await-false",
+    "href": "ch03/async-await-essentials.html#sec-ui-thread-and-configure-await-false",
+    "title": "第 3 章：async 與 await",
+    "section": "UI 執行緒與 ConfigureAwait(false) 的重要性",
+    "text": "UI 執行緒與 ConfigureAwait(false) 的重要性\n在 UI 應用程式中，await 預設會把後續程式碼帶回原始的 UI 執行緒，這在需要更新 UI 時當然很好。但如果 await 後面的程式碼根本不需要碰 UI 元件呢？例如它只是做一些純計算，或把結果寫入檔案。\n在這種情況下，強制回到 UI 執行緒不但沒有必要，還可能形成效能瓶頸。而且，如果使用不當，甚至可能引發死結（deadlock）。\n\n為何會發生 UI 死結？\n想像一個常見的錯誤情境：你在 UI 執行緒（例如 Windows Forms 或 WPF 的按鈕點擊事件）中呼叫了一個非同步方法，但卻貪圖方便，直接呼叫了 .Result 或 .Wait() 來「同步」等待它完成。\n\nUI 執行緒呼叫了 .Result，於是 UI 執行緒被阻塞了，停在原地等待。\n背景的 Task 完成了工作，因為沒有加 ConfigureAwait(false)，它試圖把後續的程式碼（continuation）排程回原來的 UI 執行緒上執行。\n但此刻 UI 執行緒正被第一步的 .Result 阻塞著，根本無法處理這個背景任務傳回來的要求！\n於是，背景工作等 UI 執行緒空出來，UI 執行緒等背景工作完成——死結就這樣誕生了，整個應用程式完全卡死。\n\n\n為了解決這個問題，.NET 提供了 ConfigureAwait(false) 方法。當你在一個 Task 後面加上它，就等於是在告訴 await：\n\n「我不在乎你待會在哪條執行緒上恢復執行，請不要嘗試回到原本的 SynchronizationContext。」\n\n若沒有呼叫 ConfigureAwait，預設值是 true，也就是 await 會盡量回到原本的 SynchronizationContext。\n\n\n\n\n\n下面用一個範例來看如何在類別庫（class library）中正確使用 ConfigureAwait(false)，以避免不必要的執行緒切換與潛在死結：\n// 假設這是在一個通用類別庫中\npublic class MyApiClient\n{\n    static readonly HttpClient httpClient = new HttpClient();\n\n    public async Task&lt;JsonNode&gt; GetDataFromApiAsync(string url)\n    {\n        // 1. 開始非同步下載\n        string json =\n            await httpClient.GetStringAsync(url)\n                              .ConfigureAwait(false); // &lt;--- 關鍵！\n\n        // 2. 後續程式碼不會被強制帶回原本的 SynchronizationContext。\n        //    實際在哪條執行緒上恢復執行，則不一定。\n        return JsonNode.Parse(json);\n    }\n}\n使用 ConfigureAwait(false)，通常是撰寫通用類別庫（class library）時的建議作法。因為你在寫類別庫時，不會知道將來有哪些類型的應用程式會拿它來用；透過明確指定 ConfigureAwait(false)，通常可以避免不必要的 context switch，也能降低某些潛在的死結（deadlock）風險。\n\nNote\n如果你在撰寫不需要回到原本 context 的程式碼（特別是開發會被其他專案共用的類別庫時），就應該認真考慮使用 .ConfigureAwait(false)。但如果後續程式碼需要操作 UI、存取特定 request context，或依賴呼叫端環境，就不應盲目套用。\n\n延伸閱讀： ConfigureAwait FAQ by Stephen Toub",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#sec-avoiding-async-void",
+    "href": "ch03/async-await-essentials.html#sec-avoiding-async-void",
+    "title": "第 3 章：async 與 await",
+    "section": "避免 async void",
+    "text": "避免 async void\n在掌握了 async 搭配 Task 的標準用法後，你可能會注意到，C# 語法其實也允許我們寫出回傳型別為 void 的 async 方法。然而，這往往是一個危險的陷阱。\n先說結論：在一般方法中，async 最常見的回傳型別是 Task、Task&lt;T&gt;，以及為了效能優化而生的 ValueTask 及其泛型版本 ValueTask&lt;T&gt;；此外還有像事件處理常式這類特殊情況使用的 void。在決定回傳型別時，你應該永遠優先使用 Task 家族，並極力避免 async void。\n為什麼 async void 如此危險？它主要有兩大問題：\n\n例外無法被捕捉：從 async void 方法中拋出的例外，無法被呼叫端的 try-catch 區塊捕捉到。這樣的例外會被重新拋出到方法啟動當下所捕捉的 SynchronizationContext 所在的執行緒上（例如 UI 執行緒）；若當時沒有 SynchronizationContext，則會在執行緒集區的執行緒上拋出。在大多數情況下，這會導致你的應用程式直接崩潰。\n無法被等待：呼叫端無法 await 一個 async void 方法，因此完全不知道這個非同步操作何時完成。這讓程式的流程變得難以追蹤與測試。\n\n既然如此，async void 還有存在的理由嗎？有，但只有一個合法的使用情境，就是事件處理常式（event handler），例如按鈕點擊事件。原因在於，.NET 標準的事件委派，例如 EventHandler，回傳型別本來就是 void。如果你把事件處理常式宣告成 async Task，方法簽章就會和委派不符，進而導致編譯錯誤。也正因如此，C# 才特別允許 async void 這種寫法作為特例，讓開發者能在事件處理常式中順利使用 await。\n下面這個範例展示的就是這個「唯一」的合法情境。請特別留意：既然外層捕捉不到 async void 丟出的例外，你就必須像下面示範的那樣，在方法內部用 try-catch 把所有可能的錯誤攔下來並妥善處理：\n// 這是 async void 的「唯一」建議使用情境\nprivate async void OnMyButtonClick(object sender, RoutedEventArgs e)\n{\n    try\n    {\n        // ... await some async operations ...\n    }\n    catch (Exception ex)\n    {\n        // 必須在這裡處理所有例外！\n        ShowErrorMessage(ex.Message);\n    }\n}\n\n重點\n除非你在寫事件處理常式，否則請一律使用 async Task 或 async Task&lt;T&gt;。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch03/async-await-essentials.html#結語",
+    "href": "ch03/async-await-essentials.html#結語",
+    "title": "第 3 章：async 與 await",
+    "section": "結語",
+    "text": "結語\n本章介紹了 async 與 await 的核心概念。這對關鍵字透過編譯器產生的狀態機，讓我們能以近乎同步的語法，寫出易於理解、而且不會阻塞執行緒的非同步程式碼。\n我們也學到了，await 如何在 SynchronizationContext 的幫助下，決定後續程式碼該在哪裡恢復執行，以及如何使用 ConfigureAwait(false) 來優化這個行為。同時，我們也理解了 async void 帶來的風險，並知道它只該出現在什麼場合。\n掌握了 async/await 的基礎後，我們已經具備了撰寫現代非同步程式碼的核心能力。不過，真實世界的應用程式還會面臨更多挑戰，例如：如何處理非同步操作中發生的錯誤？又該如何取消一個已經開始、但後來不再需要的非同步任務？\n這些問題，將是我們下一章要探討的主題。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html",
+    "href": "ch04/exceptions-and-cancellation.html",
+    "title": "第 4 章：例外處理與取消",
+    "section": "",
+    "text": "await 如何處理例外\n在理想的世界裡，每一次網路請求都會成功，每一個檔案都能順利讀取。但在現實世界中，網路會中斷，檔案會遺失，資料庫也可能逾時。一個穩健的應用程式，必須能妥善處理這些非預期的狀況。除此之外，由於非同步操作通常不會立刻完成，如果使用者在資料下載完成前回到上一頁，或者直接關閉了應用程式，我們也必須能取消那些仍在背景進行的任務，以免白白浪費系統資源。\n為了處理各種不完美的情況，你會需要了解本章的兩大主題：例外處理（exception handling）與任務取消（cancellation）。\n本章的學習目標包括：\nasync/await 最令人讚賞的設計之一，就在於它讓非同步的例外處理寫起來幾乎和傳統的同步程式碼一樣直覺。這意味著，我們依然可以使用熟悉的 try-catch 區塊來捕捉非同步工作所拋出的錯誤。不過，它的底層運作方式，還是有幾個值得特別留意的細節。\n先看一個可能失敗的非同步操作，例如嘗試從一個不存在的網址下載內容：\n當 GetStringAsync 執行時，如果因為網路連線問題而引發 HttpRequestException，這個例外並不會立刻在當下爆發出來。相反地，它會先被捕捉並儲存在該方法回傳的 Task 物件中。此時，該 Task 的狀態就會被標記為 Faulted（出現故障）。\n換句話說，這個例外會一直待在 Task 裡面，直到你的程式碼真正去 await 它的時候，先前儲存的例外才會被重新拋出（re-thrown）。\n也正因為這個「延遲拋出」的機制，我們便能很自然地用標準的 try-catch 區塊來處理它。就像這樣：\n執行結果：\n你可以看到，這個行為非常直觀：只要用 try-catch 區塊包住那些你認為可能出錯的 await 呼叫，就像在撰寫同步程式碼一樣。至於背後那些把例外裝進 Task、再從 Task 裡拿出來拋出的細節，編譯器產生的狀態機會替我們妥善處理。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html#await-如何處理例外",
+    "href": "ch04/exceptions-and-cancellation.html#await-如何處理例外",
+    "title": "第 4 章：例外處理與取消",
+    "section": "",
+    "text": "static readonly HttpClient httpClient = new HttpClient();\n\nstatic async Task&lt;string&gt; DownloadPageAsync(string url)\n{\n    // HttpClient 在要求失敗或無法解析主機名稱時，\n    // 可能拋出 HttpRequestException\n    string content = await httpClient.GetStringAsync(url);\n    return content;\n}\n\n\n\nvar url = \"https://this-host-does-not-exist.invalid\";\ntry\n{\n    string content = await DownloadPageAsync(url);\n    Console.WriteLine(\"下載成功！\");\n}\ncatch (HttpRequestException ex)\n{\n    Console.WriteLine(\"發生網路錯誤：\");\n    Console.WriteLine(ex.Message);\n}\n\n發生網路錯誤：\nNo such host is known. (this-host-does-not-exist.invalid:443)\n\n\n原始碼： DemoExceptionHandling\n\n\n小心「射後不理」的陷阱\n了解了 await 重新拋出例外的機制後，接著來看一個很常見的陷阱：如果你啟動了一個非同步方法，卻既沒有 await 它，也沒有在稍後去觀察那個回傳的 Task，也就是所謂的「射後不理」（fire-and-forget）模式，那麼該方法所拋出的例外就很容易被吞噬，最後演變成難以除錯的「靜默失敗」。\n\n這裡所謂「觀察」一個 Task，通常指的是 await 它、呼叫 Wait() 或讀取 Exception 屬性，讓執行環境知道你已經看過它的失敗結果。\n\n底下是個錯誤示範：\npublic void Button_Click(object sender, EventArgs e)\n{\n    // ✘ 錯誤示範：沒有 await！\n    // 若 SaveDataAsync 回傳 Task 並拋出例外，這裡完全捕捉不到，\n    // 程式通常也不會崩潰。使用者會以為儲存成功了，但其實失敗了。\n    _ = SaveDataAsync();\n}\n正如先前所說，當一個 Task 發生錯誤卻沒有被等待時，例外就會一直「躲」在那個 Task 物件裡。雖然使用 discard 運算子 (_) 可以消除編譯器的「未等待」警告，但它無法解決例外被吞掉的根本問題。日後，當 Garbage Collector（GC）回收這個死掉的 Task 時，可能會觸發 TaskScheduler.UnobservedTaskException 事件，但在預設情況下，這不會導致程式崩潰，因此這類錯誤往往就變成了難以察覺的「靜默失敗」。\n換言之，「先啟動任務，稍後再 await」這種作法本身沒有問題；真正危險的是把 Task 直接丟掉不管。這會導致呼叫端再也無從得知該任務最後到底是成功、失敗，還是被取消。\n此外，還有一點需要特別釐清：這裡討論的靜默失敗，僅限於回傳 Task 或 Task&lt;T&gt; 的非同步方法。如果該非同步方法的回傳型別是 async void（例如常見的 UI 事件處理器），情況就完全不同了。在 async void 方法中發生的例外不會被包進任何 Task 裡。它會直接被拋給當時的 SynchronizationContext（如果有的話），或是拋到 ThreadPool。這通常會成為「未處理的例外」（unhandled exception），進而導致整支程式崩潰（crash）。因此，除了 UI 事件處理器等必要情境外，我們應該盡量避免使用 async void。\n\n關於 SynchronizationContext 的說明，請參閱第 3 章。\n\n最佳實務：\n\n盡量避免 fire-and-forget：除非你有非常明確的理由，否則至少要在某個時間點 await 它，或以其他方式明確觀察它的完成結果。\n如果必須 fire-and-forget：請使用 SafeFireAndForget 擴充方法（需自行實作或使用第三方套件）來記錄錯誤，或者在該非同步方法內部最外層包上 try-catch 確保例外不會外洩。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html#aggregateexception-的角色",
+    "href": "ch04/exceptions-and-cancellation.html#aggregateexception-的角色",
+    "title": "第 4 章：例外處理與取消",
+    "section": "AggregateException 的角色",
+    "text": "AggregateException 的角色\n除了前面介紹的基本例外拋出機制，在探索 .NET 非同步 API 的過程中，你遲早會遇到一個名為 AggregateException 的特殊例外類型。聽到「Aggregate（聚合）」，你大概可以猜到，它的設計目的就是作為一個可以包裹一個或多個例外的容器。\n為了理解它什麼時候會出現，先來看看不使用 await 的情況。當你使用 Task.Wait() 或 Task.Result 這種阻塞式的方法去等待一個故障的 Task 時，任務裡的原始例外（例如 HttpRequestException）不會直接被拋出；它會先被包進一個 AggregateException 裡面，然後才一起拋出。參考以下範例：\nvar faultyTask = DownloadPageAsync(\"https://host-not-exist.invalid\");\n\ntry\n{\n    // 使用 .Wait() 會拋出 AggregateException\n    faultyTask.Wait();\n}\ncatch (AggregateException ex)\n{\n    // 我們需要從 .InnerExceptions 集合中解開真正的例外\n    var realException = ex.InnerExceptions.First();\n    Console.WriteLine(\n        \"捕捉到 AggregateException，真正的錯誤是：\"\n        + realException.GetType().Name);\n}\n執行結果：\n捕捉到 AggregateException，真正的錯誤是：HttpRequestException\n這裡故意使用同步阻塞的 Wait() 方法，就是為了示範這件事：出錯的 Task 在「非 await」的情境下，會把多個原始例外包裝成 AggregateException。然而在實務上，我們當然還是應該優先使用 await。\nWait() 之所以用 AggregateException 來包裹，是因為同步等待的情境下，多個並行任務有可能同時失敗，必須有辦法把多個例外一口氣帶出來；而 await 是逐一非同步地等待，所以編譯器可以直接幫我們解開（unwrap） AggregateException，並拋出其中一個原始例外，而不是把一整個 AggregateException 包裹丟給我們自行拆解。\n這也正好解釋了，為什麼在本章最前面那個下載頁面的範例中，我們可以直接 catch (HttpRequestException ex)。有了 await 的幫忙，例外處理的程式碼變得更加專注且簡潔。\n既然 await 這麼聰明，那我們是不是就不需要理會 AggregateException 了呢？其實不然。在某些進階情境下，它還是會派上用場。例如，當我們使用 Task.WhenAll 來等待多個可能同時失敗的任務時，就需要費點工夫來處理。\n\nTask.WhenAll 與多重例外\n當我們使用 Task.WhenAll 同時等待多個任務時，事情就稍微複雜了一些。想像一下，如果這多個任務不幸地都失敗了，那麼 Task.WhenAll 所回傳的那個代表整體進度的任務，就會一口氣包含所有發生的例外。\n當你對這個整體任務使用 await 時，剛才提過 await 會自動解開包裹，但它在面對多重例外時有個限制：它只會傳播其中一個例外。究竟是哪一個，並不保證固定；至於其他例外，則會繼續留在該 Task 的 Exception 屬性裡。請看以下範例：\ntry\n{\n    var task1 = ThrowAsync(\"Error 1\");\n    var task2 = ThrowAsync(\"Error 2\");\n    await Task.WhenAll(task1, task2);\n}\ncatch (Exception ex)\n{\n    // 這裡只會捕捉到其中一個錯誤\n    Console.WriteLine($\"捕捉到：{ex.Message}\");\n}\n執行結果：\n捕捉到：Error 1\n如你所見，第二個任務的錯誤並沒有被捕捉到。為了解決這個問題，如果你真的需要確保捕捉並處理所有發生的錯誤，就不能單靠 await 拋出的例外；你必須回過頭去檢查 Task 物件本身的 Exception 屬性（因為它的型別正是 AggregateException）。\n修改後的程式碼如下：\nvar task1 = ThrowAsync(\"Error 1\");\nvar task2 = ThrowAsync(\"Error 2\");\nvar allTasks = Task.WhenAll(task1, task2);\ntry\n{\n    await allTasks;\n}\ncatch\n{\n    // 檢查 allTasks.Exception 來取得所有錯誤\n    foreach (var innerEx in allTasks.Exception!.InnerExceptions)\n    {\n        Console.WriteLine($\"錯誤：{innerEx.Message}\");\n    }\n}\n執行結果：\n錯誤：Error 1\n錯誤：Error 2\n\n原始碼： DemoAggregateException\n\n這個範例在 catch 區塊中的 foreach 陳述式，使用了 null 寬容運算子（null-forgiving operator）!，用意是告訴編譯器：「這裡我確定不會是 null，不用出警告。」若想進一步了解 null 寬容運算子，可參考微軟文件或 《現代 C#：AI 時代的開發者修煉》 第 3 章：空值安全。\n\nTip\n在防禦性程式設計中，如果你真的很在意多筆併發操作（例如多筆資料庫寫入）中「每一次」的失敗原因，建議不要只看 await 拋出的第一個例外。你可以像上面的範例一樣，把 AggregateException 裡面的所有 InnerExceptions 都記錄（log）下來，這樣就不會漏掉其他連帶的錯誤資訊了。\n\n延伸閱讀： 微軟文件 Consuming the Task-based Asynchronous Pattern 有更完整的 Task.WhenAll、例外聚合與 await 行為說明。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html#sec-graceful-task-cancellation",
+    "href": "ch04/exceptions-and-cancellation.html#sec-graceful-task-cancellation",
+    "title": "第 4 章：例外處理與取消",
+    "section": "妥善取消任務",
+    "text": "妥善取消任務\n看完如何捕捉與處理非預期的例外之後，接著把焦點轉向另一個同樣重要的主題：任務的取消。\n為了處理「取消」的情境，.NET 提供了一套標準且清楚的「協同式取消（cooperative cancellation）」模式。所謂的「協同」，顧名思義，就是指取消操作並非粗暴地直接砍掉執行緒；相對地，它是採取溝通的方式：由發起方負責「發出取消的請求」，而正在執行任務的一方則負責「主動監聽該請求，並在適當時機自行中止任務」。這也意味著，如果工作端根本沒有監聽 CancellationToken，取消訊號就會被忽視，工作會繼續跑到自然結束為止。\n這個模式是由兩個核心類別所組成：\n\nSystem.Threading.CancellationTokenSource（CTS）：負責建立與發出取消訊號的物件。可以把它想像成一個「取消按鈕」。\nSystem.Threading.CancellationToken：負責傳遞與監聽取消訊號的物件。它是一個輕量的結構，代表一份可傳遞的取消訊號，會被傳遞給需要被取消的非同步方法。\n\n\n\n\n\n\n要掌握這個模式，可以先把它簡化成三個步驟：建立 CTS → 傳遞 Token → 在工作端監聽取消訊號，並且在呼叫端妥善處理取消例外。\n接著分別來看如何發出取消請求，以及工作端要如何監聽這個訊號。\n\n發出取消請求\n整個取消流程的起點，是先建立一個 CancellationTokenSource 物件（簡稱 CTS）：\n// 1. 建立 CancellationTokenSource\nusing var cts = new CancellationTokenSource();\n\n// 2. 從 CTS 取得 CancellationToken\nvar token = cts.Token;\n\n// 3. 將 token 傳遞給你的非同步方法\n// （此處僅展示「傳遞 token」，完整等待與例外處理見後續範例）\nTask workTask = DoSomeLongRunningWorkAsync(token);\n\n// 4. 在未來的某個時間點，當你決定要取消時...\nConsole.WriteLine(\"使用者決定取消操作！\");\ncts.Cancel(); // 按下「取消按鈕」\n當你呼叫 cts.Cancel() 之後，取消訊號就會立刻發送出去，而所有從這個 CTS 所取得的 CancellationToken 都會同步收到這個取消的通知。不過，這個通知並不等於強制終止執行緒；它只是把 Token 的狀態切換為「已要求取消」，並執行已註冊的取消回呼。真正的停止時機，仍取決於工作端何時檢查 Token，或底層支援取消的 API 何時觀察到這個訊號。\n\nNote:\n從 .NET 8 開始，CancellationTokenSource 也提供了 CancelAsync()。如果你需要「等待」所有註冊在 CancellationToken 上的回呼（callbacks）或相關取消通知流程都執行完畢，再繼續往下做其他事，就可以使用 await cts.CancelAsync()。本章這裡先使用 cts.Cancel()，是因為範例要聚焦在「發出取消請求」這個基本概念，而且這個範例本身也不需要等到取消回呼全部完成後，才能繼續往下處理。\n\n\n\n監聽並向下傳遞取消訊號\n看完發起方的動作，現在把視角切換到另一端。負責執行任務的非同步方法，必須把這個 CancellationToken 當作參數接收進來，接著承擔起兩項責任：\n\n週期性地檢查它：如果你的方法包含迴圈或是多個費時的步驟，就必須在過程中不斷檢查是否有收到取消請求。\n一路向下傳遞（pass-through）它：把你手上的這個 Token 繼續傳遞給底下所有支援取消的呼叫（例如資料庫查詢、HTTP 請求，或是其他的非同步方法）。\n\n這也是在撰寫 C# 非同步程式時很重要的最佳實務：「讓 Token 一路傳下去」。\n\n\n\n\n\n以下範例同時展示了「持續檢查」和「向下傳遞」。在閱讀程式碼時請特別留意：這個方法不但會在迴圈中主動檢查是否需要取消，同時在呼叫底層的 Task.Delay 時，也沒有忘記把同一個 token 傳遞下去。\nstatic async Task DoSomeLongRunningWorkAsync(CancellationToken token)\n{\n    Console.WriteLine(\"背景工作已開始...\");\n    try\n    {\n        for (int i = 0; i &lt; 10; i++)\n        {\n            // 檢查是否已經收到取消請求 (例如在運算密集的迴圈內)\n            token.ThrowIfCancellationRequested();\n\n            Console.WriteLine($\"正在執行第 {i + 1}/10 部分的工作...\");\n\n            // 重要：將 token 繼續向下傳遞給任何支援的底層 API！\n            await Task.Delay(1000, token);\n        }\n        Console.WriteLine(\"背景工作順利完成。\");\n    }\n    catch (OperationCanceledException)\n    {\n        Console.WriteLine(\"背景工作已被取消。\");\n        throw; // 通常需要繼續往外拋\n    }\n}\n正如上面程式碼所展示的，在非同步工作的內部，我們通常會在迴圈或是某些關鍵步驟的開頭，呼叫 token.ThrowIfCancellationRequested() 來檢查 token 是否已經被取消了。如果真的被取消，這個方法就會拋出 OperationCanceledException 中斷任務。\n\nThrowIfCancellationRequested 會拋出 OperationCanceledException，而 Task.Delay 亦有可能拋出 OperationCanceledException 或其衍生型別 TaskCanceledException。\n\n那麼，當工作端拋出中斷例外後，呼叫端會發生什麼事呢？當我們 await 一個已經被取消的 Task 時，剛才提到的 OperationCanceledException（或者是它的衍生型別，像是 TaskCanceledException）就會被重新拋出。因此，我們只要在呼叫端的 catch 區塊中捕捉這個特定型別的例外，就能清楚分辨：原來任務是因為被取消而停止，而不是遭遇了什麼嚴重的系統錯誤。\n換句話說，取消例外（canceled exception）通常屬於預期流程，並不代表程式一定有 bug 或出錯了；如果捕捉到其他類型的例外，才需要另行處理。下面的範例把呼叫端和工作端的行為串在一起：\n// 1. 建立 CancellationTokenSource\nusing var cts = new CancellationTokenSource();\n\n// 2. 從 CTS 取得 CancellationToken\nvar token = cts.Token;\n\n// 3. 將 token 傳遞給你的非同步方法 (先不要立刻 await，讓它在背景跑)\nTask workTask = DoSomeLongRunningWorkAsync(token);\n\n// 模擬使用者操作了一段時間後決定取消\nawait Task.Delay(2500);\n\n// 4. 在未來的某個時間點，當你決定要取消時...\nConsole.WriteLine(\"\\n[呼叫端] 使用者決定取消操作！\");\ncts.Cancel(); // 按下「取消按鈕」\n\ntry\n{\n    await workTask; // 等待背景工作結束\n}\ncatch (OperationCanceledException)\n{\n    // 這是預期的\n    Console.WriteLine(\"呼叫端捕捉到 OperationCanceledException。\");\n}\ncatch (Exception ex)\n{\n    // 這才是真正的錯誤\n    Console.WriteLine($\"工作發生異常：{ex.Message}\");\n}\n執行結果：\n背景工作已開始...\n正在執行第 1/10 部分的工作...\n正在執行第 2/10 部分的工作...\n正在執行第 3/10 部分的工作...\n\n[呼叫端] 使用者決定取消操作！\n背景工作已被取消。\n呼叫端捕捉到 OperationCanceledException。\n\n原始碼： DemoCancellationToken\n\n\n\n\n\n\n\nNote: 許多 .NET 內建的非同步 API（例如 HttpClient 的諸多方法，還有前面看過的 Task.Delay 等）都有提供接收 CancellationToken 的多載版本。請盡可能地使用它們，因為這些 API 在底層往往已經為你提供了最有效率的取消監聽邏輯。也就是說，取消訊號可以直接接到等待、計時器或 I/O 流程中，而不是只能等你的程式下一次手動輪詢 Token 時才反應。\n\n任務取消的原因可能不只一個。例如：\n\n情況 A： 最外層的呼叫端反悔了，直接把傳入的 token 取消。\n情況 B： 內層引用的某個套件或元件，因為自己等太久（逾時）而自行取消，並拋出了 OperationCanceledException。\n\n遇到這種狀況時，C# 的 when 子句就能派上用場。它可以用來限縮 catch 捕捉例外的範圍，讓你的程式碼只處理自己關心的取消情境。例如，如果你只想確認「是不是呼叫端傳入的那個 token 觸發了取消」，可以這樣寫：\ncatch (OperationCanceledException oce)\n    when (oce.CancellationToken == token)\n{\n    Console.WriteLine(\"呼叫端已要求取消。\");\n}\n不過要注意，這種比對方式並不是放諸四海皆準。若中途使用了 CreateLinkedTokenSource，或是底層 API 拋出的 OperationCanceledException 攜帶的是另一個 token，oce.CancellationToken 就不一定等於你原本傳入的那個 token。碰到多個取消來源時，通常更可靠的做法，是用稍後的逾時範例那樣檢查你自己持有的來源 token 是否已經 IsCancellationRequested。\n\n\n註冊取消回呼（cancellation callbacks）\n到目前為止，我們看到的都是如何主動檢查 Token。但有些時候，你手上使用的舊版或第三方 API 可能並不直接支援傳入 CancellationToken；又或者，你需要在任務被取消的那一瞬間，順手做一些額外的清理工作，例如關閉一個已經開啟的 socket 連線、或是刪掉剛才寫到一半的暫存檔。這時可以利用 CancellationToken.Register 方法來註冊取消時的回呼動作：\nusing var registration = token.Register(() =&gt;\n{\n    Console.WriteLine(\"收到取消通知，開始清理資源...\");\n    // 例如：關閉自訂連線、刪除暫存檔，或通知其他元件停止工作\n});\n\n// ... 執行操作 ...\n呼叫 Register 方法後，它會回傳一個實作了 IDisposable 介面的 CancellationTokenRegistration 物件。因此，只要把這個註冊動作寫在 using 宣告或 using 區塊裡，就能確保在操作完成、或者取消回呼（cancellation callbacks）執行完畢後，相關資源都能被正確釋放回收。這個動作看似微不足道，對於避免記憶體洩漏（memory leak）卻很重要。\n實務上，取消回呼（callbacks）的程式碼應該盡量保持短小精悍，並且要設計成可重入（reentrant）。因為 callback 可能在取消流程中被執行，如果它做了過度耗時的工作，就會拖慢或嚴重干擾整個取消流程。所謂可重入，指的是即使同一段清理邏輯被重複進入，或和其他清理流程交錯執行，也不應破壞物件狀態。\n\nImportant: 註冊回呼的記憶體洩漏陷阱\n這裡有個容易被忽略的細節：如果傳入的 CancellationToken 是來自一個長壽命（long-lived） 的來源（例如 ASP.NET Core 的 ApplicationStopping，或是存活於整個應用程式生命週期的全域 CTS），而我們在每個短暫的操作中呼叫 token.Register(...) 卻沒有把它 Dispose 掉，會發生什麼事呢？\n答案是：你的 callback 委派（以及它所參照到的變數與物件）會被那個長壽命的 CTS 持續保留。久而久之，這就會造成記憶體洩漏（memory leak）。所以，請務必養成好習慣，像範例中那樣使用 using 區塊，或是明確呼叫 .Dispose() 來註銷（unregister）回呼。\n\n延伸閱讀： 微軟文件 Cancellation in Managed Threads 整理了 CancellationToken、Register、linked token，以及取消回呼與 Dispose 的注意事項。\n\n\n不可取消的 Token\n有時候，雖然你呼叫的方法在其簽章中要求你必須傳入 CancellationToken，但你其實不打算提供任何取消機制。遇到這種情況，標準的作法就是傳入 CancellationToken.None。就像這樣：\n// 明確表示：對此操作，我不打算提供取消機制\nawait DoSomethingAsync(CancellationToken.None);\n這比傳入 default(CancellationToken) 更具可讀性，因為它清楚表達了你的意圖。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html#sec-implementing-timeouts",
+    "href": "ch04/exceptions-and-cancellation.html#sec-implementing-timeouts",
+    "title": "第 4 章：例外處理與取消",
+    "section": "實作逾時機制",
+    "text": "實作逾時機制\n學會這套取消模式後，實作「逾時（timeout）」就很自然了。所謂的「逾時」，本質上只是「當指定的時間一到，便自動發出取消請求」。\nCancellationTokenSource 的建構函式提供了一個方便的多載版本。你只要在建立它時傳入一個時間長度，它就會在該段時間過後，自動幫你呼叫 Cancel()。\n先來看一個簡單的範例：\n// 建立一個 3 秒後會自動取消的 CTS\nusing var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));\n\ntry\n{\n    Console.WriteLine(\"開始執行一個最多只能跑 3 秒的工作...\");\n    // 假設這個工作內部需要跑 10 秒以上\n    await DoSomeLongRunningWorkAsync(cts.Token);\n}\ncatch (OperationCanceledException)\n{\n    Console.WriteLine(\"工作因為逾時而被取消了！\");\n}\n這個範例的重點在於，負責執行任務的 DoSomeLongRunningWorkAsync 方法本身完全不用知道「逾時」這個概念；它只要監聽傳入的 CancellationToken 就好。做為呼叫端，我們只要建立一個會自動取消的 CTS，就能為任何支援 Token 的非同步操作加上逾時限制。這是一個高度可組合（composable）的模式。\n不過，在上例中，我們之所以能直接把捕捉到的 OperationCanceledException 解讀為發生了「逾時」，是因為該範例裡只有一個取消來源（也就是我們所建立的那個會自動取消的 CTS）。實務上，你的 API 往往同時還會接收從外部傳入的 CancellationToken，而面對這種雙重來源的情況，你就不能直接把 OperationCanceledException 認定為發生逾時；你需要像下一節介紹的那樣，寫一些邏輯來進一步分辨某次取消究竟是因為跑太久引發的「逾時」，還是呼叫端主動取消了任務。\n\n原始碼： DemoTimeouts\n\n底下是範例程式 DemoTimeouts 的執行結果：\n開始執行一個最多只能跑 3 秒的工作...\n背景工作已開始...\n正在執行第 1/10 部分的工作...\n正在執行第 2/10 部分的工作...\n正在執行第 3/10 部分的工作...\n背景工作已被取消。\n工作因為逾時而被取消了！\n\n可測試的逾時機制：TimeProvider (.NET 8+)\n本節要說明如何利用 .NET 的 TimeProvider 把「逾時」從真實的系統時間中解耦出來，讓你的 timeout 邏輯可以快速且穩定地在單元測試中驗證。\n回顧上一節介紹的逾時機制，雖然它寫起來簡單又好用，但一到了單元測試就會碰到一個痛點：我們很難去控制系統時間。試想，如果你需要驗證某個「等待 30 秒後逾時」的邏輯，難道真的要在測試執行時，讓它空轉跑滿 30 秒嗎？這種作法會讓整個測試套件變得又慢又不穩定。\n.NET 8 引入了 System.TimeProvider 抽象類別，用來處理這個問題。它允許我們在測試中「快轉」時間，還能對時間的流逝進行精確的控制。\n此模式需要 .NET 8+；在測試端可搭配 Microsoft.Extensions.TimeProvider.Testing 套件（命名空間為 Microsoft.Extensions.Time.Testing）中的 FakeTimeProvider。使用時，第一步通常是透過依賴注入（dependency injection）或方法參數，把 TimeProvider 傳入服務中。在正式環境下，我們會注入 TimeProvider.System；而在測試時，則改注入 FakeTimeProvider。\n範例：\npublic class MyService(TimeProvider timeProvider)\n{\n   public async Task DoWorkWithTimeoutAsync(CancellationToken token)\n   {\n      // 使用 CancellationTokenSource 的建構函式來傳入 TimeProvider\n      // 這與 new CancellationTokenSource(delay) 類似，但它是可測試的！\n      var seconds = TimeSpan.FromSeconds(30);\n      using var cts = new CancellationTokenSource(seconds, timeProvider);\n      // 連結外部傳入的 token (如果外部取消，我們也要取消)\n      using var linkedCts =\n         CancellationTokenSource.CreateLinkedTokenSource(\n            token, cts.Token);\n      try\n      {\n         await DoActualWorkAsync(linkedCts.Token);\n      }\n      catch (OperationCanceledException)\n         when (cts.Token.IsCancellationRequested\n              && !token.IsCancellationRequested)\n      {\n         // 只有在 timeout token 已取消、\n         // 且外部 token 尚未取消時，才視為逾時\n         throw new TimeoutException(\"操作已逾時。\");\n      }\n   }\n}\n這裡先用 CancellationTokenSource 的 CreateLinkedTokenSource 方法，把兩個本來獨立的取消訊號連結（合併）在一起：一端是外部傳進來的主動取消（token），另一端則是靠時間驅動的逾時取消（cts.Token）。這是為了確保：只要這兩端的任何一方觸發了取消訊號，都能順利停止後續的工作。\n另外值得注意的是，CreateLinkedTokenSource 方法會回傳一個全新的 CancellationTokenSource 實體，我們將它妥善保存在 linkedCts 變數裡備用。也因此，範例使用 using var linkedCts 來確保它會被釋放：linked CTS 會向來源 Token 註冊取消通知，用完後釋放它，才能解除這些註冊，避免短生命週期的操作被長生命週期的 Token 間接保留。\n前置作業準備好後，程式隨即進入 try 區塊，開始執行非同步工作。若有取消例外發生，關鍵就在於 catch 捕捉時搭配的例外篩選條件：我們藉由判斷當下狀態，限定只有在「timeout token 已經被觸發取消、同時外部 token 卻還沒有被取消」的條件下，才改為拋出更具語意的 TimeoutException。如果是呼叫端主動取消（外部 token 觸發），我們就什麼都不做，讓系統保留原始 OperationCanceledException 的取消語意。\n\n註：為了聚焦逾時與取消流程，上例省略了 DoActualWorkAsync 的實作細節；完整可編譯版本請參考本節附的範例專案。\n\n了解服務端的實作方式後，接著來看測試。\n撰寫單元測試時，只要改用 Microsoft.Extensions.Time.Testing 裡面的 FakeTimeProvider 來當替身，傳入一個模擬用的 TimeProvider，就能自由操控時間。\nFakeTimeProvider 並不會真的更改系統時間，它只是攔截程式碼對 TimeProvider API（例如 GetUtcNow()）的呼叫，並回傳人為設定的假時間，因此不會影響系統或其他執行緒的時間感知。參考以下範例：\n[Fact]\npublic async Task Should_Throw_TimeoutException_When_Time_Passes()\n{\n    // Arrange\n    var fakeTime = new FakeTimeProvider();\n    var service = new MyService(fakeTime);\n\n    // Act\n    var task = service.DoWorkWithTimeoutAsync(CancellationToken.None);\n\n    // Assert: 此時任務應該還沒完成\n    Assert.False(task.IsCompleted);\n\n    // Act: 讓時間快轉 30 秒 + 1 tick\n    fakeTime.Advance(TimeSpan.FromSeconds(30) + TimeSpan.FromTicks(1));\n\n    // Assert: 任務應該因為逾時而拋出 TimeoutException\n    await Assert.ThrowsAsync&lt;TimeoutException&gt;(() =&gt; task);\n}\n在上面的測試程式中，最後一個 assert 陳述句的意思是：「測試走到這裡時，我預期這個任務一定會拋出 TimeoutException」。以下進一步拆解說明：\n\nAssert.ThrowsAsync&lt;TimeoutException&gt;(...) 是 xUnit 測試框架所提供的非同步斷言方法。它的功用就是在宣告：「我預期傳入括號裡的那個動作，最後必定會因為拋出 TimeoutException 而失敗。」\n括號裡的 () =&gt; task 則是一個 Func&lt;Task&gt; 委派。它等於是把那個「要被驗證的 task」交給 ThrowsAsync 去檢驗。\n最外層的 await 會等待斷言動作本身執行完成。一旦執行過程中真的出現 TimeoutException，則斷言成立，測試順利通過。\n反過來說，如果在執行期間沒有拋出任何例外，或者拋出的是其他例外型別（例如 OperationCanceledException），那麼測試便會失敗。\n\n透過 TimeProvider，我們不僅能寫出更穩健的逾時邏輯，也能讓那些動輒需要等待數十秒的測試，在幾毫秒內執行完畢，而不必真的去等待那些時間。這是 .NET 8 為需要處理時間的 API 帶來的重要改進。\n\n原始碼： DemoTimeProviderTest\n\n延伸閱讀： 微軟文件 What is TimeProvider?",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch04/exceptions-and-cancellation.html#結語",
+    "href": "ch04/exceptions-and-cancellation.html#結語",
+    "title": "第 4 章：例外處理與取消",
+    "section": "結語",
+    "text": "結語\n本章聚焦在非同步程式設計裡最常見的「非理想情境」。我們學會了如何用熟悉的 try-catch 處理非同步例外，也理解了 await 如何幫我們免去手動拆解 AggregateException 的負擔。\n更重要的是，我們掌握了 .NET 標準的協同式取消模式。透過 CancellationTokenSource 與 CancellationToken，我們不但能讓使用者主動取消長時間任務，也能替非同步操作加入逾時保護。\n現在，你已經具備撰寫穩健非同步程式碼的重要基礎：不只會處理成功路徑，也知道如何妥善因應失敗與取消。下一個挑戰則是，當多個非同步任務同時執行並共享資源時，該如何確保資料的完整性與一致性；這正是下一章「執行緒同步與經典問題」要探討的主題。",
+    "crumbs": [
+      "Part 1：基礎觀念和語法",
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
+    ]
+  },
+  {
+    "objectID": "ch05/thread-synchronization.html",
+    "href": "ch05/thread-synchronization.html",
+    "title": "第 5 章：執行緒同步與經典問題",
+    "section": "",
+    "text": "本章說明多個執行緒共享資料時為何會產生競爭條件，並以經典併發問題建立判斷同步需求的基礎。\n主要內容\n\n共享資料、非原子操作與競爭條件。\ndeadlock、livelock 與 starvation 等經典問題。\nlock、Monitor、mutex、semaphore 及其他同步機制的適用情境。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 2：併發挑戰與平行加速",
+      "第 5 章：執行緒同步與經典問題"
+    ]
+  },
+  {
+    "objectID": "ch06/thread-safety-and-immutable-collections.html",
+    "href": "ch06/thread-safety-and-immutable-collections.html",
+    "title": "第 6 章：執行緒安全與不可變集合",
+    "section": "",
+    "text": "本章從資料結構與狀態管理的角度處理 thread safety，並比較 concurrent、immutable 與 frozen collections。\n主要內容\n\n.NET concurrent collections 的設計目的與使用方式。\n不可變設計如何減少共享可變狀態。\nconcurrent、immutable 與 frozen collections 的選擇準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 2：併發挑戰與平行加速",
+      "第 6 章：執行緒安全與不可變集合"
+    ]
+  },
+  {
+    "objectID": "ch07/parallel-programming-and-plinq.html",
+    "href": "ch07/parallel-programming-and-plinq.html",
+    "title": "第 7 章：平行處理與 PLINQ",
+    "section": "",
+    "text": "本章聚焦 CPU 密集型工作，說明如何使用 .NET 的平行處理工具縮短可分割工作負載的執行時間。\n主要內容\n\n分辨適合平行化的 CPU-bound 工作。\nParallel 類別的使用方式與成本。\nPLINQ 的執行模型、排序與效能取捨。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 2：併發挑戰與平行加速",
+      "第 7 章：平行處理與 PLINQ"
+    ]
+  },
+  {
+    "objectID": "ch08/async-streams.html",
+    "href": "ch08/async-streams.html",
+    "title": "第 8 章：非同步資料流與資源管理",
+    "section": "",
+    "text": "本章把非同步處理延伸到連續資料流與資源生命週期，讓程式能逐筆處理資料並正確釋放非同步資源。\n主要內容\n\nSystem.Threading.Channels 與生產者／消費者模式。\nIAsyncEnumerable&lt;T&gt;、await foreach 與非同步 iterator。\n資料流取消、IAsyncDisposable 與 await using。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 3：進階模式與實戰應用",
+      "第 8 章：非同步資料流與資源管理"
+    ]
+  },
+  {
+    "objectID": "ch09/advanced-task-programming.html",
+    "href": "ch09/advanced-task-programming.html",
+    "title": "第 9 章：Task 進階用法",
+    "section": "",
+    "text": "本章深入 Task-based Asynchronous Pattern 的進階工具與執行環境，協助讀者處理橋接、效能與排程問題。\n主要內容\n\n使用 TaskCompletionSource 橋接舊式非同步模式。\nValueTask、Task.Yield 與效能取捨。\nExecutionContext、TaskScheduler 與 thread pool starvation。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 3：進階模式與實戰應用",
+      "第 9 章：Task 進階用法"
+    ]
+  },
+  {
+    "objectID": "ch10/async-patterns-and-practices.html",
+    "href": "ch10/async-patterns-and-practices.html",
+    "title": "第 10 章：實戰案例與最佳實務",
+    "section": "",
+    "text": "本章把前面建立的觀念套用到 I/O、streaming、伺服器端與桌面 UI 情境，並整理常見非同步最佳實務。\n主要內容\n\nI/O 與 streaming 的實務設計。\n非同步程式設計最佳實務回顧。\nASP.NET Core 與 WinForms、WPF、MAUI 的應用情境。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 3：進階模式與實戰應用",
+      "第 10 章：實戰案例與最佳實務"
+    ]
+  },
+  {
+    "objectID": "ch11/async-api-design.html",
+    "href": "ch11/async-api-design.html",
+    "title": "第 11 章：非同步 API 設計指南",
+    "section": "",
+    "text": "本章從函式庫與應用程式介面的角度，整理能讓呼叫端正確理解與組合的非同步 API 設計原則。\n主要內容\n\nAsync 後綴、簽名與取消慣例。\n例外、取消、逾時與同步／非同步 API 的語意。\nValueTask、ConfigureAwait(false) 與 IAsyncDisposable 的設計準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊",
+    "crumbs": [
+      "Part 3：進階模式與實戰應用",
+      "第 11 章：非同步 API 設計指南"
+    ]
+  }
+]

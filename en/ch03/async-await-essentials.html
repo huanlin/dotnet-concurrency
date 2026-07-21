@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+
+<title>Chapter 3: async and await – Demystifying .NET 10 Asynchronous Programming</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../ch04/exceptions-and-cancellation.html" rel="next">
+<link href="../ch02/threads-and-tasks.html" rel="prev">
+<link href="../images/cover-en.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../styles-html.css">
+<meta property="og:title" content="Chapter 3: async and await – Demystifying .NET 10 Asynchronous Programming">
+<meta property="og:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/en/ch03/images/async-syntax-en.png">
+<meta property="og:site_name" content="Demystifying .NET 10 Asynchronous Programming">
+<meta property="og:image:height" content="602">
+<meta property="og:image:width" content="1180">
+<meta name="twitter:title" content="Chapter 3: async and await – Demystifying .NET 10 Asynchronous Programming">
+<meta name="twitter:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/en/ch03/images/async-syntax-en.png">
+<meta name="twitter:image-height" content="602">
+<meta name="twitter:image-width" content="1180">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/en/ch03/async-await-essentials.html">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1: Fundamentals</a></li><li class="breadcrumb-item"><a href="../ch03/async-await-essentials.html"><span class="chapter-title">3 async and await</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Demystifying .NET 10 Asynchronous Programming</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/huanlin/dotnet-concurrency" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-book.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About this book</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-author.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the author</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1: Fundamentals</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch01/introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">1 Understanding threads and asynchrony</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch02/threads-and-tasks.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">2 Threads and tasks in .NET</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch03/async-await-essentials.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">3 async and await</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch04/exceptions-and-cancellation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">4 Exception handling and cancellation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2: Concurrency and parallelism</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Thread synchronization and classic problems</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch06/thread-safety-and-immutable-collections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Thread safety and immutable collections</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch07/parallel-programming-and-plinq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Parallel processing and PLINQ</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3: Advanced topics</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch08/async-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Asynchronous streams and resource management</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch09/advanced-task-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Advanced Task programming</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch10/async-patterns-and-practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Practical scenarios and best practices</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch11/async-api-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Guidelines for designing asynchronous APIs</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-how-async-await-simplifies-flow" id="toc-sec-how-async-await-simplifies-flow" class="nav-link active" data-scroll-target="#sec-how-async-await-simplifies-flow">How <code>async</code> and <code>await</code> simplify asynchronous flow</a>
+  <ul class="collapse">
+  <li><a href="#sec-the-async-keyword" id="toc-sec-the-async-keyword" class="nav-link" data-scroll-target="#sec-the-async-keyword">The <code>async</code> keyword</a></li>
+  <li><a href="#sec-the-await-keyword" id="toc-sec-the-await-keyword" class="nav-link" data-scroll-target="#sec-the-await-keyword">The <code>await</code> keyword</a></li>
+  <li><a href="#what-happens-underneath-the-state-machine" id="toc-what-happens-underneath-the-state-machine" class="nav-link" data-scroll-target="#what-happens-underneath-the-state-machine">What happens underneath: the state machine</a></li>
+  </ul></li>
+  <li><a href="#sec-waiting-multiple-tasks" id="toc-sec-waiting-multiple-tasks" class="nav-link" data-scroll-target="#sec-waiting-multiple-tasks">Waiting for multiple tasks at the same time: <code>Task.WhenAll</code> and <code>Task.WhenEach</code></a>
+  <ul class="collapse">
+  <li><a href="#sec-task-whenall" id="toc-sec-task-whenall" class="nav-link" data-scroll-target="#sec-task-whenall">Marching together: <code>Task.WhenAll</code></a></li>
+  <li><a href="#sec-task-whenany" id="toc-sec-task-whenany" class="nav-link" data-scroll-target="#sec-task-whenany">Taking whichever finishes first: <code>Task.WhenAny</code></a></li>
+  <li><a href="#sec-task-wheneach" id="toc-sec-task-wheneach" class="nav-link" data-scroll-target="#sec-task-wheneach">Processing tasks as they complete: <code>Task.WhenEach</code> (.NET 9)</a></li>
+  </ul></li>
+  <li><a href="#sec-control-flow-and-synchronization-context" id="toc-sec-control-flow-and-synchronization-context" class="nav-link" data-scroll-target="#sec-control-flow-and-synchronization-context">Where control flow resumes: the role of <code>SynchronizationContext</code></a></li>
+  <li><a href="#sec-async-or-task-run" id="toc-sec-async-or-task-run" class="nav-link" data-scroll-target="#sec-async-or-task-run">Should you use <code>async/await</code> or <code>Task.Run</code>?</a></li>
+  <li><a href="#sec-ui-thread-and-configure-await-false" id="toc-sec-ui-thread-and-configure-await-false" class="nav-link" data-scroll-target="#sec-ui-thread-and-configure-await-false">The importance of the UI thread and <code>ConfigureAwait(false)</code></a></li>
+  <li><a href="#sec-avoiding-async-void" id="toc-sec-avoiding-async-void" class="nav-link" data-scroll-target="#sec-avoiding-async-void">Avoid <code>async void</code></a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1: Fundamentals</a></li><li class="breadcrumb-item"><a href="../ch03/async-await-essentials.html"><span class="chapter-title">3 async and await</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="chapter-03" class="quarto-section-identifier"><span class="chapter-title">Chapter 3: <code>async</code> and <code>await</code></span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">July 21, 2026</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In the previous chapter, we learned how to create background work with <code>Task.Run</code> and how to track that work through a <code>Task</code> object. However, we also discovered a significant issue: if we use <code>.Wait()</code> or <code>.Result</code> to retrieve the result, we block the current thread. This takes us right back to the original “freezing” problem we were trying to solve.</p>
+<p>So, is there a way to wait for a <code>Task</code> to complete <strong>asynchronously</strong>?</p>
+<p>This is exactly what C#’s <code>async</code> and <code>await</code> keywords are designed to solve. They are syntactic sugar provided by the C# compiler, allowing us to express complex asynchronous control flow in a style that looks almost like synchronous code. You could say that <code>async/await</code> is the foundation of modern asynchronous programming in .NET.</p>
+<p>This chapter will help you understand <code>async/await</code> more deeply. By the end, you will be able to:</p>
+<ul>
+<li>Write concise and readable asynchronous code with <code>async</code> and <code>await</code>.</li>
+<li>Understand how the control flow of an asynchronous method pauses and resumes at <code>await</code>.</li>
+<li>Use <code>Task.WhenAll</code>, <code>Task.WhenAny</code>, and <code>Task.WhenEach</code> to run multiple asynchronous operations concurrently.</li>
+<li>Understand how <code>SynchronizationContext</code> affects which thread your code runs on.</li>
+<li>Know when and why <code>ConfigureAwait(false)</code> matters.</li>
+<li>Understand why <code>async void</code> should almost always be avoided.</li>
+</ul>
+<hr>
+<section id="sec-how-async-await-simplifies-flow" class="level2">
+<h2 class="anchored" data-anchor-id="sec-how-async-await-simplifies-flow">How <code>async</code> and <code>await</code> simplify asynchronous flow</h2>
+<p>To see what problem <code>async</code> and <code>await</code> solve, let’s first imagine a world without them. Suppose we want to write a method that downloads a web page asynchronously and returns its character count.</p>
+<p>Before <code>async/await</code> existed, we primarily relied on the <code>ContinueWith</code> method on <code>Task</code> objects to chain asynchronous work together. It registers a callback that says, “When the previous task completes, do this next…” Although this approach avoided blocking, the resulting code was quite verbose:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">// The traditional ContinueWith style (complex and harder to read)</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">static</span> Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsLegacy</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// 1. Start the asynchronous download</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="kw">return</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">).</span><span class="fu">ContinueWith</span><span class="op">(</span>downloadTask <span class="op">=&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>        <span class="co">// 2. This block runs only after the download has completed</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>        <span class="dt">string</span> content <span class="op">=</span> downloadTask<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>        <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="op">});</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This style relies heavily on lambda expressions. If the workflow becomes even slightly more complicated, for example by parsing the content after downloading it and then saving it to a database, it quickly turns into <strong>callback hell</strong>. The code becomes harder to read and maintain.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>The examples in this book use a reusable, longer-lived <code>HttpClient</code> object so that connections can be shared. This is because creating a new <code>HttpClient</code> for every request can lead to socket exhaustion. That said, reusing one static <code>HttpClient</code> is only a workable baseline, not the ideal solution. A better approach is to use <code>IHttpClientFactory</code>. For details, see Microsoft documentation: <a href="https://learn.microsoft.com/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests">Use IHttpClientFactory to implement resilient HTTP requests</a>.</p>
+</blockquote>
+<p>Next, let’s see how the same thing looks with <code>async</code> and <code>await</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">// The modern async/await style (concise and intuitive)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co">// 1. Wait asynchronously for the download to complete,</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="co">//    without blocking the thread.</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">// 2. Once the download is done, execution continues from here</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoDownloadPage">DemoDownloadPage</a></p>
+</blockquote>
+<p>The code looks almost identical to a synchronous version. That is the beauty of <code>async/await</code>. Below, we will break down what these two keywords are actually doing.</p>
+<section id="sec-the-async-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-async-keyword">The <code>async</code> keyword</h3>
+<p>Let’s start with <code>async</code>. It is a method modifier. When you mark a method with <code>async</code>, you are essentially telling the compiler two things:</p>
+<ol type="1">
+<li>This method will use the <code>await</code> keyword internally.</li>
+<li>The compiler needs to transform this method into a <strong>state machine</strong>. We will see shortly how that state machine works.</li>
+</ol>
+<p>Common return types for <code>async</code> methods include <code>Task</code>, <code>Task&lt;T&gt;</code>, <code>ValueTask</code>, and <code>ValueTask&lt;T&gt;</code>. This echoes what we learned in Chapter 2: the return value of an asynchronous operation is essentially a <strong>promise</strong> or a <strong>future</strong>.</p>
+<p>Of course, there are a few exceptions, such as event handlers returning <code>void</code> and asynchronous iterators returning <code>IAsyncEnumerable&lt;T&gt;</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/async-syntax-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-the-await-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-await-keyword">The <code>await</code> keyword</h3>
+<p>Now let’s look at <code>await</code>. It is an operator used to wait for an awaitable object to complete. It usually appears inside an <code>async</code> method, but it can also be used in other contexts that support <code>await</code>, such as <code>async</code> lambdas, <code>async</code> anonymous methods, and <code>async</code> local functions. It can also be used in modern C# top-level statements.</p>
+<p>When execution reaches an <code>await</code> expression for a <code>Task</code>, the following steps take place:</p>
+<ol type="1">
+<li><strong>Check the <code>Task</code> state</strong>: <code>await</code> first checks whether the <code>Task</code> it is waiting for has already completed. If it has, execution simply continues as if the <code>await</code> were not there.</li>
+<li><strong>Pause and return</strong>: If the <code>Task</code> has not completed yet, <code>await</code> sets up a continuation point and then <strong>immediately returns control to the code that called this <code>async</code> method, or to the current execution environment</strong>. This step is important: it means the current thread is not blocked and can perform other work.</li>
+<li><strong>Resume execution</strong>: Once the awaited <code>Task</code> eventually completes, the .NET runtime returns to that continuation point and continues executing the rest of the <code>async</code> method. If the awaited operation produces a result, that is, if it is a <code>Task&lt;T&gt;</code>, then the <code>await</code> expression itself yields a value of type <code>T</code>.</li>
+</ol>
+<p>This “pause and resume” process is managed behind the scenes by the compiler-generated state machine. You write code that looks sequential, but the compiler helps you <strong>split it apart</strong> into multiple blocks and resume them at the right time.</p>
+<p>If that explanation still feels a little abstract, picture the chef analogy again. Imagine a chef (representing our thread) following a recipe (our code). When he reaches the step that says, “put the steak into the oven for 30 minutes” (similar to <code>await</code> on an I/O operation), he does not stand in front of the oven doing nothing.</p>
+<p>Instead, he puts a bookmark in the recipe (the compiler-generated state record), notes where he left off, and then performs other tasks or hands control back to the current environment. When the oven finishes, meaning the <code>Task</code> completes, he flips back to that bookmark and resumes the next step, such as plating the steak. That is the resume part of <code>await</code>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/state-machine-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="what-happens-underneath-the-state-machine" class="level3">
+<h3 class="anchored" data-anchor-id="what-happens-underneath-the-state-machine">What happens underneath: the state machine</h3>
+<p>Next, let’s look at how <code>await</code> pauses and resumes execution from the compiler’s point of view.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>This section is supplementary. It explains what happens under the hood of an <code>async</code> method. You can skip it if you want, but understanding a little more about how the compiler transforms your <code>async</code> methods will help later when you debug code or tune performance.</p>
+</blockquote>
+<p>When the C# compiler encounters an <code>async</code> method, it does a fair amount of work behind the scenes. It generates a hidden type that implements <code>IAsyncStateMachine</code>. This hidden type is the <strong>state machine</strong>.</p>
+<p>Inside that type, the compiler splits the whole method into different states based on each <code>await</code> in your code.</p>
+<ol type="1">
+<li>The initial state is <code>-1</code>. When execution reaches the first <code>await</code> and sees that the awaited work has not finished yet, the state machine changes the current state to <code>0</code>, stores the current local variables, and registers itself as a continuation on that <code>Task</code>. Then it returns immediately, giving the thread back to the caller.</li>
+<li>When the background <code>Task</code> completes, it triggers a call to the state machine’s <code>MoveNext()</code> method.</li>
+<li><code>MoveNext()</code> looks at the previously recorded state and uses <code>goto</code> to jump precisely to the place where execution had paused, restores the variable values, and continues running.</li>
+</ol>
+<p>In other words, the reason you can write “synchronous-looking code” that behaves asynchronously is that all the complicated state tracking and callback registration, which used to be done by hand, has been taken over by the compiler-generated state machine.</p>
+<p>If this still feels abstract, the following heavily simplified pseudocode simulates the state machine the compiler might generate for the earlier <code>DownloadPageAndCountCharsAsync</code> method. Read it together with the comments to follow the internal flow:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">// Compiler-generated state machine</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">// (greatly simplified conceptual pseudocode)</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">class</span> DownloadStateMachine <span class="op">:</span> IAsyncStateMachine</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="dt">int</span> _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Initial state is -1</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="dt">string</span> _url<span class="op">;</span>     <span class="co">// Original method parameter</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    <span class="dt">string</span> _content<span class="op">;</span> <span class="co">// Original local variable lifted to a field</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>    TaskAwaiter<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> _awaiter<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a></span>
+<span id="cb3-10"><a href="#cb3-10"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">MoveNext</span><span class="op">()</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>    <span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a>        <span class="co">// Jump to the correct block based on the current state</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>        <span class="kw">if</span> <span class="op">(</span>_state <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="kw">goto</span> state_0<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a>        <span class="co">// --- State -1 (before the first await) ---</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>        _awaiter <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>_url<span class="op">).</span><span class="fu">GetAwaiter</span><span class="op">();</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a></span>
+<span id="cb3-18"><a href="#cb3-18"></a>        <span class="co">// If the work is not already complete, prepare to pause</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>        <span class="kw">if</span> <span class="op">(!</span>_awaiter<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">)</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>        <span class="op">{</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a>            _state <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// Change state and record that we paused here</span></span>
+<span id="cb3-22"><a href="#cb3-22"></a></span>
+<span id="cb3-23"><a href="#cb3-23"></a>            <span class="co">// Tell the awaiter:</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a>            <span class="co">// "When the download is done, call my MoveNext() again"</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>            _awaiter<span class="op">.</span><span class="fu">OnCompleted</span><span class="op">(</span><span class="kw">this</span><span class="op">.</span><span class="fu">MoveNext</span><span class="op">);</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a></span>
+<span id="cb3-27"><a href="#cb3-27"></a>            <span class="co">// Key point: return immediately</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>            <span class="co">// and give the thread back to the caller.</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>            <span class="kw">return</span><span class="op">;</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a>        <span class="op">}</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a></span>
+<span id="cb3-32"><a href="#cb3-32"></a>    state_0<span class="op">:</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a>        <span class="co">// --- State 0 (resuming after await) ---</span></span>
+<span id="cb3-34"><a href="#cb3-34"></a>        <span class="co">// Note: before jumping here,</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a>        <span class="co">// the compiler has already ensured that all</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a>        <span class="co">// field values, such as _content, have been restored correctly.</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>        _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Restore the default state</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a>        _content <span class="op">=</span> _awaiter<span class="op">.</span><span class="fu">GetResult</span><span class="op">();</span> <span class="co">// Get the download result</span></span>
+<span id="cb3-39"><a href="#cb3-39"></a></span>
+<span id="cb3-40"><a href="#cb3-40"></a>        <span class="dt">int</span> result <span class="op">=</span> _content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb3-41"><a href="#cb3-41"></a>        <span class="co">// Put the result into the Task and finish the state machine</span></span>
+<span id="cb3-42"><a href="#cb3-42"></a>        <span class="fu">SetResult</span><span class="op">(</span>result<span class="op">);</span></span>
+<span id="cb3-43"><a href="#cb3-43"></a>    <span class="op">}</span></span>
+<span id="cb3-44"><a href="#cb3-44"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>From this pseudocode, you can see more clearly how an <code>await</code> boundary takes what originally looked like a single sequential method and transforms it into a state machine controlled through <code>_state</code> and <code>goto</code>. This is one key reason <code>async/await</code> can avoid blocking the thread.</p>
+<blockquote class="blockquote">
+<p><strong>Compiler-generated async state machines may eventually become history</strong></p>
+<p>As of this writing, Microsoft released .NET 11 Preview 2 in March 2026. In the release notes for that preview, Microsoft introduced <strong>runtime async</strong>, which moves async machinery management away from compiler-generated state machines and into the .NET runtime itself. Asynchronous code written in C# may eventually benefit in several ways when targeting .NET 11: smaller IL output because the compiler no longer needs to generate huge async state machines, more efficient memory use at runtime, and potentially a more straightforward debugging experience. However, this feature is still in preview and may change.</p>
+<p>For more information, see the official <a href="https://github.com/dotnet/core/blob/main/release-notes/11.0/preview/preview2/runtime.md">.NET 11 Preview 2 Release Notes</a>.</p>
+</blockquote>
+</section>
+</section>
+<section id="sec-waiting-multiple-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="sec-waiting-multiple-tasks">Waiting for multiple tasks at the same time: <code>Task.WhenAll</code> and <code>Task.WhenEach</code></h2>
+<p>So far, we have learned how to <code>await</code> a single asynchronous operation. But in real applications, waiting for just one thing at a time is often not enough. We frequently need to run multiple asynchronous operations at once, such as downloading multiple web pages, querying two different databases, or calling several web APIs simultaneously.</p>
+<p>If we <code>await</code> them one after another, execution becomes <strong>sequential</strong>, and we lose the concurrency advantage that asynchrony offers. To make better use of system resources, we should let those operations run concurrently. This section introduces several .NET tools for that purpose.</p>
+<section id="sec-task-whenall" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-whenall">Marching together: <code>Task.WhenAll</code></h3>
+<p><code>Task.WhenAll</code> is the most commonly used method here. It takes a group of <code>Task</code> objects and returns a new <code>Task</code>. That new <code>Task</code> completes only when <strong>all</strong> of the supplied tasks have completed. If the inputs are <code>Task&lt;TResult&gt;</code>, then <code>await Task.WhenAll(...)</code> returns a <code>TResult[]</code> array containing all results.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>When you use <code>Task.WhenAll</code>, if one or more tasks throw exceptions, <code>await</code> will rethrow only the <strong>first</strong> captured exception. If you need to process every exception that occurred, inspect the <code>Exception</code> property of the <code>Task</code> returned by <code>Task.WhenAll</code> instead. It is an <code>AggregateException</code>. We will cover that in Chapter 4.</p>
+</blockquote>
+<p>Let’s first compare “waiting sequentially” with “waiting together.” Assume that downloading each page takes one second:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">// ✘ Incorrect example:</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">// execute sequentially and retrieve results one by one.</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">// Inefficient.</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>async Task <span class="fu">SequentialDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="co">// This takes 1 second + 1 second + 1 second = 3 seconds</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="dt">string</span> page1 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="dt">string</span> page2 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="dt">string</span> page3 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="op">}</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co">// ✔ Correct example:</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co">// run concurrently, then retrieve all results at once</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co">// after everything completes. Efficient.</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>async Task <span class="fu">ConcurrentDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="op">{</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>  <span class="co">// 1. Start all tasks</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>  <span class="co">// Notice: there is no await here yet,</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a>  <span class="co">// so each operation can begin independently.</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task1 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task2 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task3 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a>  <span class="co">// 2. Wait for all of them to complete</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a>  <span class="co">// This takes only about 1 second, depending on the slowest request.</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a>  <span class="dt">string</span><span class="op">[]</span> results <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">,</span> task3<span class="op">);</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenAll">DemoTaskWhenAll</a></p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/when-all-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-task-whenany" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-whenany">Taking whichever finishes first: <code>Task.WhenAny</code></h3>
+<p>Sometimes, we do not need to wait for everything to finish; we only need the first one to complete. This is exactly what <code>Task.WhenAny</code> is for. It accepts a group of <code>Task</code> objects and returns as soon as <strong>any one of them</strong> completes, whether it completed successfully, failed, or was canceled.</p>
+<p>Common use cases include:</p>
+<ul>
+<li><strong>Redundancy</strong>: call three servers that provide the same service and use whichever one responds first.</li>
+<li><strong>Timeout control</strong>: wait for both “the main operation” and “a timer task (<code>Task.Delay</code>)” and see which finishes first. If the timer task wins, the operation has timed out.</li>
+</ul>
+<p>The following example shows how to implement timeout control with <code>Task.WhenAny</code> and <code>Task.Delay</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1"></a>async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadWithTimeoutAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> downloadTask <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>    Task timeoutTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">3000</span><span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span> <span class="co">// 3-second timeout</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="co">// Wait until either one completes</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>    Task completedTask <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAny</span><span class="op">(</span>downloadTask<span class="op">,</span> timeoutTask<span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11"></a>    <span class="kw">if</span> <span class="op">(</span>completedTask <span class="op">==</span> timeoutTask<span class="op">)</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>    <span class="op">{</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a>        <span class="co">// Timed out. Cancel the download and throw an exception.</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>        cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"The download operation timed out."</span><span class="op">);</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a>    <span class="op">}</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a></span>
+<span id="cb5-18"><a href="#cb5-18"></a>    <span class="co">// The download finished first.</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a>    <span class="co">// Cancel timeoutTask so it does not keep running</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a>    <span class="co">// unnecessarily.</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a>    cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a></span>
+<span id="cb5-23"><a href="#cb5-23"></a>    <span class="co">// The download finished first, so return the result.</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a>    <span class="kw">return</span> await downloadTask<span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The key point is that <code>Task.WhenAny</code> returns the task that completed first, not the download result itself. After confirming that <code>downloadTask</code> completed first, we still need to <code>await downloadTask</code> to obtain the downloaded content or let any exception from the download surface normally.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenAny">DemoTaskWhenAny</a></p>
+</blockquote>
+</section>
+<section id="sec-task-wheneach" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-wheneach">Processing tasks as they complete: <code>Task.WhenEach</code> (.NET 9)</h3>
+<p>Besides “waiting for everything” and “taking the first one,” there is another common requirement: starting multiple asynchronous operations and then <strong>processing each one as soon as it completes</strong> (such as updating a UI progress indicator), instead of waiting for all of them to finish.</p>
+<p>Before .NET 9, implementing this pattern usually meant writing a <code>while</code> loop around <code>Task.WhenAny</code> and repeatedly removing completed tasks from a task list. This code was verbose, easy to get wrong, and had a time complexity of <span class="math inline">\(O(N^2)\)</span>.</p>
+<blockquote class="blockquote">
+<p><strong>Why is a <code>Task.WhenAny</code> loop <span class="math inline">\(O(N^2)\)</span>?</strong></p>
+<p>Suppose you have N tasks. Each time you call <code>Task.WhenAny(tasks)</code>, it internally needs to register callbacks for every task in the list, which costs <span class="math inline">\(O(N)\)</span> time. Then, when you remove the completed task from a <code>List&lt;Task&gt;</code>, that removal also costs <span class="math inline">\(O(N)\)</span> because array elements may need to be shifted.</p>
+<p>The first round costs <span class="math inline">\(O(N)\)</span>, the second costs <span class="math inline">\(O(N-1)\)</span>, and so on until the last one. By the arithmetic-series formula, the total cost lands at <span class="math inline">\(O(N^2)\)</span>. To make that concrete, if you have 1,000 tasks, the <code>WhenAny</code>-loop style takes roughly 500,000 operations (<code>1000 * 999 / 2</code>), while <code>WhenEach</code> needs only 1,000. Once the number of tasks gets large, for example when a server processes thousands of concurrent requests, the performance of the <code>WhenAny</code> loop can degrade sharply.</p>
+</blockquote>
+<p>.NET 9 introduced <code>Task.WhenEach</code>. If the input is <code>Task&lt;TResult&gt;</code>, it returns <code>IAsyncEnumerable&lt;Task&lt;TResult&gt;&gt;</code>. If the input is non-generic <code>Task</code>, it returns <code>IAsyncEnumerable&lt;Task&gt;</code>. That means we can directly use <code>await foreach</code> to process each completed task one by one. The syntax is cleaner, and the underlying time complexity is optimized down to <span class="math inline">\(O(N)\)</span>.</p>
+<p>Here is what it looks like in practice:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">// New in .NET 9+: clean and intuitive</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>async Task <span class="fu">ProcessTasksAsTheyCompleteAsync</span><span class="op">()</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="dt">var</span> tasks <span class="op">=</span> <span class="kw">new</span> List<span class="op">&lt;</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;&gt;();</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">5</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>    <span class="op">{</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>        tasks<span class="op">.</span><span class="fu">Add</span><span class="op">(</span><span class="fu">DoWorkAsync</span><span class="op">(</span>i<span class="op">));</span> <span class="co">// Assume DoWorkAsync returns Task&lt;int&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>    <span class="op">}</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a></span>
+<span id="cb6-10"><a href="#cb6-10"></a>    <span class="co">// Here, t represents a task that has already completed</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>    <span class="co">// The loop iterates in completion order,</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>    <span class="co">// not in the original list order.</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>    await <span class="kw">foreach</span> <span class="op">(</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> t <span class="kw">in</span> Task<span class="op">.</span><span class="fu">WhenEach</span><span class="op">(</span>tasks<span class="op">))</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>    <span class="op">{</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>        <span class="kw">try</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>        <span class="op">{</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>            <span class="co">// The await here is only to obtain</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>            <span class="co">// the result or exception.</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a>            <span class="co">// It does not block.</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a>            <span class="dt">int</span> result <span class="op">=</span> await t<span class="op">;</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a>                $<span class="st">"One task completed. "</span> <span class="op">+</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a>                $<span class="st">"Its result is: {result}"</span><span class="op">);</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a>        <span class="op">}</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a>        <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a>        <span class="op">{</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"One task failed: {ex.Message}"</span><span class="op">);</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a>        <span class="op">}</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a>    <span class="op">}</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>One detail is especially worth noting in <code>await foreach (... in Task.WhenEach(tasks))</code>: it iterates in the order that tasks finish, not in the original order of the <code>tasks</code> list. In other words, each time a task completes, the loop runs immediately to process that newly completed task.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenEach">DemoTaskWhenEach</a></p>
+</blockquote>
+<p><code>Task.WhenEach</code> greatly simplifies the pattern of “processing results as soon as they arrive.” It is a useful feature introduced in .NET 9. If your target framework is .NET 9 or later, it should generally be your first choice for this specific requirement.</p>
+</section>
+</section>
+<section id="sec-control-flow-and-synchronization-context" class="level2">
+<h2 class="anchored" data-anchor-id="sec-control-flow-and-synchronization-context">Where control flow resumes: the role of <code>SynchronizationContext</code></h2>
+<p>After understanding how <code>await</code> pauses and resumes execution, there is one more important detail to examine: after the <code>Task</code> completes, <strong>which thread</strong> will the code after <code>await</code> resume on?</p>
+<p>The answer is not fixed. It depends on whether a <strong><code>SynchronizationContext</code></strong> exists at that moment.</p>
+<p><code>SynchronizationContext</code> is an abstract class. You can think of it as a scheduler that knows how to queue code onto a particular thread for execution. Before <code>await</code> pauses execution and hands control back to the caller, it captures the current <code>SynchronizationContext</code> and stores it for later use.</p>
+<p>For an analogy, consider a UI application. The UI thread is like a restaurant’s front-desk manager, the only person allowed to operate the cash register and serve customers directly. After asking the kitchen to prepare an order (starting an asynchronous operation), the manager still needs to return to the front desk.</p>
+<p>The <code>SynchronizationContext</code> acts like a reliable messenger: it ensures that once the kitchen finishes the prep work, any follow-up action (such as ringing up a sale or updating the UI) is scheduled back to the front-desk manager instead of letting someone from the kitchen handle the register directly.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sync-context-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>Different types of applications behave differently with respect to <code>SynchronizationContext</code>:</p>
+<ul>
+<li><p><strong>UI applications (WPF, MAUI, WinForms)</strong>: the main UI thread has its own dedicated <code>SynchronizationContext</code>. Its job is to ensure that any code scheduled through it returns to the <strong>original UI thread</strong>. This is convenient, because all UI updates must happen on that UI thread. <code>await</code> handles this switch for us automatically.</p></li>
+<li><p><strong>Classic ASP.NET (ASP.NET 4.x)</strong>: each HTTP request has its own dedicated <code>SynchronizationContext</code>, specifically <code>AspNetSynchronizationContext</code>. Its role is similar to the UI case. It tries to bring the code after <code>await</code> back to the original request context so that operations involving request state, such as <code>HttpContext.Current</code>, continue to work correctly.</p></li>
+<li><p><strong>Console applications / ASP.NET Core</strong>: by default, there is <strong>no</strong> <code>SynchronizationContext</code>. In those environments, once the awaited work completes, the continuation code is <strong>not guaranteed</strong> to return to the original thread. It might continue on the thread that completed the operation, or it might be scheduled onto some other available thread pool thread.</p></li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>In ASP.NET Core, Microsoft intentionally did not include a <code>SynchronizationContext</code>. This architectural change eliminated the common <code>context switch</code> cost and many deadlock problems from ASP.NET 4.x. It is also one of the reasons ASP.NET Core achieved such a significant performance improvement. So in ASP.NET Core projects, <code>ConfigureAwait(false)</code> is no longer technically necessary, because there is no context to switch back to. Even so, many libraries still use it so they behave correctly across different environments.</p>
+</blockquote>
+</section>
+<section id="sec-async-or-task-run" class="level2">
+<h2 class="anchored" data-anchor-id="sec-async-or-task-run">Should you use <code>async/await</code> or <code>Task.Run</code>?</h2>
+<p>Once you become familiar with <code>async/await</code>, a common question arises: “If <code>await</code> is so convenient, should all background work, including heavy computation, be handled with <code>await</code>?”</p>
+<p>The key to this question is the distinction we discussed in Chapter 2 between <strong>I/O-bound</strong> and <strong>CPU-bound</strong> work:</p>
+<ul>
+<li>The core idea of <strong>I/O-bound work</strong> is to <strong>release the thread</strong>. This is where <code>async/await</code> shines. Using <code>await</code>, sometimes combined with <code>ConfigureAwait(false)</code>, gives you non-blocking waits at very low cost. While the code is waiting for the network or the database, there is no need to sacrifice a thread just to sit idly.</li>
+<li>The core idea of <strong>CPU-bound work</strong> is to <strong>move the work elsewhere</strong>. This is where <code>Task.Run</code> still shines. You need to explicitly offload heavy computation to the thread pool so it does not occupy the UI thread or the main execution flow.</li>
+</ul>
+<p>The boundary between the two is quite clear. If you blur that line, it becomes easy to write problematic code.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/io-cpu-bound-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>The most common anti-pattern here is to <strong>wrap a purely I/O-bound <code>async</code> method in <code>Task.Run</code></strong>. For example: <code>Task.Run(() =&gt; httpClient.GetStringAsync(url))</code>.</p>
+<p>This is not only unnecessary but usually harmful. It adds an extra scheduling step and an extra thread switch for no benefit. The original asynchronous I/O API already knows how to release the thread while waiting. There is no reason to offload it to the thread pool first. A simple rule of thumb is:</p>
+<ul>
+<li>The goal of <code>async/await</code> is <strong>asynchrony</strong>, which is about efficient waiting for I/O.</li>
+<li>The goal of <code>Task.Run</code> is <strong>parallelism</strong>, which is about making full use of CPU computation.</li>
+</ul>
+</blockquote>
+<p>Another common misuse is performing CPU-intensive work directly inside an <code>async</code> method in a UI application instead of offloading it to <code>Task.Run</code>. That causes the UI thread to stay occupied during the calculation, which freezes the interface. Here is the incorrect approach in a WPF-style example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">// Incorrect example:</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co">// CPU-bound calculation runs directly inside an async method</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">// and occupies the UI thread</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>    <span class="co">// This CPU-bound calculation occupies the UI thread,</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a>    <span class="co">// causing the interface to freeze and stop responding to the user.</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a>    <span class="dt">var</span> data <span class="op">=</span> <span class="fu">PerformHeavyCalculation</span><span class="op">();</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a></span>
+<span id="cb7-10"><a href="#cb7-10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>In this example, <code>PerformHeavyCalculation()</code> occupies the UI thread until the calculation finishes. During that time, the interface cannot respond to the user at all.</p>
+<p>The correct approach is to use <code>await Task.Run(...)</code> to offload the heavy computation to the thread pool, allowing the UI thread to keep responding:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">// Correct approach:</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">// offload CPU-bound calculation with Task.Run</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">// and free the UI thread</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    <span class="co">// Move the CPU-bound work onto the thread pool</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a>    <span class="co">// so the UI thread can keep responding.</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>    <span class="dt">var</span> data <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span> <span class="fu">PerformHeavyCalculation</span><span class="op">());</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a></span>
+<span id="cb8-10"><a href="#cb8-10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Warning</strong></p>
+<p>This <code>Task.Run</code> technique is appropriate for UI applications, but <strong>not for ASP.NET Core Web APIs</strong>. In ASP.NET Core, the thread handling an HTTP request is already a thread pool thread. Using <code>Task.Run</code> simply moves CPU work from one thread pool thread to another. The total number of occupied threads does not decrease, and you introduce extra scheduling and thread-switching overhead. If the server has CPU-heavy work to process, a better approach is to consider background services, message queues, or similar mechanisms instead.</p>
+<p><strong>Further reading:</strong> <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices">ASP.NET Core Best Practices</a></p>
+</blockquote>
+<p>Once that boundary is clear, it becomes much easier to understand why <code>await</code> on an I/O operation can avoid blocking the UI thread: during the wait, there simply does not need to be a thread blocked in place. With that in mind, let’s move on to <code>ConfigureAwait</code>.</p>
+</section>
+<section id="sec-ui-thread-and-configure-await-false" class="level2">
+<h2 class="anchored" data-anchor-id="sec-ui-thread-and-configure-await-false">The importance of the UI thread and <code>ConfigureAwait(false)</code></h2>
+<p>In UI applications, <code>await</code> returns the continuation to the original UI thread by default, and that is useful when the code afterward needs to update the UI. But what if the code after <code>await</code> does not need to touch UI controls and is just doing some computation or writing data to a file?</p>
+<p>In that case, forcing the continuation back onto the UI thread is unnecessary and can become a performance bottleneck. Worse, if used carelessly, it can even lead to a <strong>deadlock</strong>.</p>
+<blockquote class="blockquote">
+<p><strong>Why does a UI deadlock happen?</strong></p>
+<p>Imagine a very common mistake. On the UI thread, such as inside a Windows Forms or WPF button-click handler, you call an asynchronous method, but for convenience, you use <code>.Result</code> or <code>.Wait()</code> to “wait synchronously” for it to finish.</p>
+<ol type="1">
+<li>The UI thread calls <code>.Result</code>, so the UI thread becomes <strong>blocked</strong> and sits there waiting.</li>
+<li>The background <code>Task</code> completes, and because <code>ConfigureAwait(false)</code> was not used, it tries to schedule the continuation back onto the original UI thread.</li>
+<li>But that UI thread is still blocked by step 1 and cannot process the continuation request coming back from the background work.</li>
+<li>So the background continuation waits for the UI thread to become free, and the UI thread waits for the background work to finish. That is the deadlock, and the entire application freezes.</li>
+</ol>
+</blockquote>
+<p>To solve this problem, .NET provides <code>ConfigureAwait(false)</code>. When you add it after a <code>Task</code>, you are effectively telling <code>await</code>:</p>
+<blockquote class="blockquote">
+<p>“I do not care which thread you resume on later. Please <strong>do not</strong> try to get back to the original <code>SynchronizationContext</code>.”</p>
+</blockquote>
+<p>If you do not call <code>ConfigureAwait</code>, the default behavior is effectively <code>true</code>, which means <code>await</code> will try to return to the original <code>SynchronizationContext</code> whenever possible.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/configure-await-false-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>The following example shows how to use <code>ConfigureAwait(false)</code> in a class library to avoid unnecessary thread switching and reduce the risk of deadlocks:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">// Imagine this is inside a general-purpose class library</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">public</span> <span class="kw">class</span> MyApiClient</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="op">{</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>    <span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a>    <span class="kw">public</span> async Task<span class="op">&lt;</span>JsonNode<span class="op">&gt;</span> <span class="fu">GetDataFromApiAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>    <span class="op">{</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>        <span class="co">// 1. Start the asynchronous download</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>        <span class="dt">string</span> json <span class="op">=</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>            await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">)</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>                              <span class="op">.</span><span class="fu">ConfigureAwait</span><span class="op">(</span><span class="kw">false</span><span class="op">);</span> <span class="co">// &lt;--- Key point</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a></span>
+<span id="cb9-13"><a href="#cb9-13"></a>        <span class="co">// 2. The continuation is not forced back</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a>        <span class="co">//    onto the original SynchronizationContext.</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>        <span class="co">//    The actual thread it resumes on is not guaranteed.</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a>        <span class="kw">return</span> JsonNode<span class="op">.</span><span class="fu">Parse</span><span class="op">(</span>json<span class="op">);</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a>    <span class="op">}</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Using <code>ConfigureAwait(false)</code> is usually recommended when writing a reusable class library. When writing a library, you do not know what kinds of applications will eventually use it. By specifying <code>ConfigureAwait(false)</code> explicitly, you can often avoid unnecessary <code>context switch</code> overhead and reduce the risk of deadlock scenarios.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>If you are writing code that does not need to get back to the original context, especially in a class library that will be shared across projects, you should consider using <code>.ConfigureAwait(false)</code>. But if the continuation needs to interact with the UI, access a specific request context, or otherwise depend on the caller’s environment, then you should not apply it blindly.</p>
+</blockquote>
+<p><strong>Further reading:</strong> <a href="https://devblogs.microsoft.com/dotnet/configureawait-faq/">ConfigureAwait FAQ</a> by Stephen Toub</p>
+</section>
+<section id="sec-avoiding-async-void" class="level2">
+<h2 class="anchored" data-anchor-id="sec-avoiding-async-void">Avoid <code>async void</code></h2>
+<p>Once you are comfortable with the standard pattern of <code>async</code> together with <code>Task</code>, you may notice that C# also allows <code>async</code> methods whose return type is <code>void</code>. However, that is usually a dangerous trap.</p>
+<p>Here is the bottom line: in regular methods, the most common return types for <code>async</code> are <code>Task</code>, <code>Task&lt;T&gt;</code>, and, for performance-sensitive scenarios, <code>ValueTask</code> and <code>ValueTask&lt;T&gt;</code>. There are also special cases, such as event handlers, that use <code>void</code>. But when choosing a return type, you should <strong>always prefer</strong> the <code>Task</code> family and avoid <code>async void</code> as much as possible.</p>
+<p>Why is <code>async void</code> so dangerous? It has two main problems:</p>
+<ol type="1">
+<li><strong>Its exceptions cannot be caught by the caller</strong>. Exceptions thrown from an <code>async void</code> method cannot be caught by a <code>try-catch</code> block in the caller. Instead, they are rethrown on the thread associated with the <code>SynchronizationContext</code> that was captured when the method started, such as the UI thread. If no <code>SynchronizationContext</code> exists, the exception is thrown on a thread pool thread instead. In most cases, this causes the entire application to crash.</li>
+<li><strong>It cannot be awaited</strong>. The caller cannot <code>await</code> an <code>async void</code> method, so it has no idea when the asynchronous operation finishes. This makes the program flow much harder to track and test.</li>
+</ol>
+<p>So, does <code>async void</code> ever have a valid use? Yes, but only in one scenario: <strong>event handlers</strong>, such as button-click events. The reason is that standard .NET event delegates, such as <code>EventHandler</code>, already have a <code>void</code> return type. If you declare an event handler as <code>async Task</code>, its signature no longer matches the delegate, and you get a compile-time error. That is why C# allows <code>async void</code> as a special case, so developers can still use <code>await</code> naturally inside event handlers.</p>
+<p>The following example shows the only recommended use case. Because the caller cannot catch exceptions from <code>async void</code>, you must catch all possible errors <strong>inside</strong> the method, as shown here:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">// This is the only recommended use case for async void</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">private</span> async <span class="dt">void</span> <span class="fu">OnMyButtonClick</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>    <span class="kw">try</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>        <span class="co">// ... await some async operations ...</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="op">}</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>    <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a>    <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a>        <span class="co">// All exceptions must be handled here</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a>        <span class="fu">ShowErrorMessage</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>    <span class="op">}</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Key point</strong></p>
+<p>Unless you are writing an event handler, always use <code>async Task</code> or <code>async Task&lt;T&gt;</code>.</p>
+</blockquote>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>This chapter introduced the core ideas behind <code>async</code> and <code>await</code>. Through the compiler-generated state machine, these two keywords enable us to write asynchronous code that is easier to understand, looks almost synchronous, and does not block the thread while waiting.</p>
+<p>We also learned how <code>await</code>, with the help of <code>SynchronizationContext</code>, decides where the continuation should resume, and how <code>ConfigureAwait(false)</code> can be used to optimize that behavior. At the same time, we saw the risks of <code>async void</code> and learned the one situation where it truly belongs.</p>
+<p>Now that you have the foundation of <code>async/await</code>, you already have the core skills needed to write modern asynchronous code. But real-world applications bring more challenges. For example, how should we handle errors in asynchronous operations? And how can we cancel an asynchronous task that has already started but is no longer needed?</p>
+<p>Those questions are exactly what we will explore in the next chapter.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+(() => {
+  const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+  if (!match) {
+    return;
+  }
+
+  const current = match[1];
+  const target = current === "zh-tw" ? "en" : "zh-tw";
+  const link = document.createElement("a");
+
+  link.className = "language-switch";
+  link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+    + window.location.search
+    + window.location.hash;
+  link.textContent = current === "zh-tw" ? "English" : "繁體中文";
+  link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+  link.setAttribute(
+    "aria-label",
+    current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+  );
+
+  const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+  if (sidebarHeader) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "language-switch-wrapper";
+    wrapper.appendChild(link);
+    sidebarHeader.appendChild(wrapper);
+    return;
+  }
+
+  const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+  const searchButton = header?.querySelector(".quarto-search-button");
+  if (header && searchButton) {
+    header.insertBefore(link, searchButton);
+  } else {
+    document.body.appendChild(link);
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dotnetconcurrency\.huanlin\.cc\/en\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../ch02/threads-and-tasks.html" class="pagination-link" aria-label="2 Threads and tasks in .NET">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">2 Threads and tasks in .NET</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../ch04/exceptions-and-cancellation.html" class="pagination-link" aria-label="4 Exception handling and cancellation">
+        <span class="nav-page-text"><span class="chapter-title">4 Exception handling and cancellation</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Free preview edition: Chapters 1–4 in full</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://huanlin.cc/en/">Author website</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

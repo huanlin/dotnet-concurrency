@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW" xml:lang="zh-TW"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+
+<title>第 3 章：async 與 await – 深入淺出 .NET 10 併發程式設計</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../ch04/exceptions-and-cancellation.html" rel="next">
+<link href="../ch02/threads-and-tasks.html" rel="prev">
+<link href="../images/cover-tw.png" rel="icon" type="image/png">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "沒有結果",
+    "search-matching-documents-text": "符合的文件",
+    "search-copy-link-title": "複製搜尋連結",
+    "search-hide-matches-text": "隱藏其他符合的結果",
+    "search-more-match-text": "更多符合結果",
+    "search-more-matches-text": "更多符合結果",
+    "search-clear-button-title": "清除",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "取消",
+    "search-submit-button-title": "送出",
+    "search-label": "搜尋"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../styles-html.css">
+<meta property="og:title" content="第 3 章：async 與 await – 深入淺出 .NET 10 併發程式設計">
+<meta property="og:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch03/images/async-syntax-tw.png">
+<meta property="og:site_name" content="深入淺出 .NET 10 併發程式設計">
+<meta property="og:image:height" content="518">
+<meta property="og:image:width" content="1024">
+<meta name="twitter:title" content="第 3 章：async 與 await – 深入淺出 .NET 10 併發程式設計">
+<meta name="twitter:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch03/images/async-syntax-tw.png">
+<meta name="twitter:image-height" content="518">
+<meta name="twitter:image-width" content="1024">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/zh-tw/ch03/async-await-essentials.html">
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1：基礎觀念和語法</a></li><li class="breadcrumb-item"><a href="../ch03/async-await-essentials.html"><span class="chapter-title">第 3 章：async 與 await</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="搜尋" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">深入淺出 .NET 10 併發程式設計</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/huanlin/dotnet-concurrency" title="原始碼" class="quarto-navigation-tool px-1" aria-label="原始碼"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="搜尋"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">首頁</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/preface.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">作者序</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-book.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">關於本書</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch00/about-author.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">關於作者</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Part 1：基礎觀念和語法</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch01/introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 1 章：理解執行緒與非同步</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch02/threads-and-tasks.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 2 章：.NET 中的執行緒與工作</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch03/async-await-essentials.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 3 章：async 與 await</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch04/exceptions-and-cancellation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">第 4 章：例外處理與取消</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 2：併發挑戰與平行加速</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 5 章：執行緒同步與經典問題</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch06/thread-safety-and-immutable-collections.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 6 章：執行緒安全與不可變集合</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch07/parallel-programming-and-plinq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 7 章：平行處理與 PLINQ</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Part 3：進階模式與實戰應用</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="切換區段">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch08/async-streams.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 8 章：非同步資料流與資源管理</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch09/advanced-task-programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 9 章：Task 進階用法</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch10/async-patterns-and-practices.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 10 章：實戰案例與最佳實務</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../ch11/async-api-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">第 11 章：非同步 API 設計指南</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目錄</h2>
+   
+  <ul>
+  <li><a href="#sec-how-async-await-simplifies-flow" id="toc-sec-how-async-await-simplifies-flow" class="nav-link active" data-scroll-target="#sec-how-async-await-simplifies-flow"><code>async</code> 與 <code>await</code> 如何簡化非同步流程</a>
+  <ul class="collapse">
+  <li><a href="#sec-the-async-keyword" id="toc-sec-the-async-keyword" class="nav-link" data-scroll-target="#sec-the-async-keyword"><code>async</code> 關鍵字</a></li>
+  <li><a href="#sec-the-await-keyword" id="toc-sec-the-await-keyword" class="nav-link" data-scroll-target="#sec-the-await-keyword"><code>await</code> 關鍵字</a></li>
+  <li><a href="#底層運作狀態機" id="toc-底層運作狀態機" class="nav-link" data-scroll-target="#底層運作狀態機">底層運作：狀態機</a></li>
+  </ul></li>
+  <li><a href="#sec-waiting-multiple-tasks" id="toc-sec-waiting-multiple-tasks" class="nav-link" data-scroll-target="#sec-waiting-multiple-tasks">同時等待多個工作：<code>Task.WhenAll</code> 與 <code>Task.WhenEach</code></a>
+  <ul class="collapse">
+  <li><a href="#sec-task-whenall" id="toc-sec-task-whenall" class="nav-link" data-scroll-target="#sec-task-whenall">齊頭並進：<code>Task.WhenAll</code></a></li>
+  <li><a href="#sec-task-whenany" id="toc-sec-task-whenany" class="nav-link" data-scroll-target="#sec-task-whenany">只取其一：<code>Task.WhenAny</code></a></li>
+  <li><a href="#sec-task-wheneach" id="toc-sec-task-wheneach" class="nav-link" data-scroll-target="#sec-task-wheneach">依序處理完成的工作：<code>Task.WhenEach</code> (.NET 9)</a></li>
+  </ul></li>
+  <li><a href="#sec-control-flow-and-synchronization-context" id="toc-sec-control-flow-and-synchronization-context" class="nav-link" data-scroll-target="#sec-control-flow-and-synchronization-context">控制流的走向：<code>SynchronizationContext</code> 的角色</a></li>
+  <li><a href="#sec-async-or-task-run" id="toc-sec-async-or-task-run" class="nav-link" data-scroll-target="#sec-async-or-task-run">該用 async/await 還是 Task.Run？</a></li>
+  <li><a href="#sec-ui-thread-and-configure-await-false" id="toc-sec-ui-thread-and-configure-await-false" class="nav-link" data-scroll-target="#sec-ui-thread-and-configure-await-false">UI 執行緒與 <code>ConfigureAwait(false)</code> 的重要性</a></li>
+  <li><a href="#sec-avoiding-async-void" id="toc-sec-avoiding-async-void" class="nav-link" data-scroll-target="#sec-avoiding-async-void">避免 <code>async void</code></a></li>
+  <li><a href="#結語" id="toc-結語" class="nav-link" data-scroll-target="#結語">結語</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch01/introduction.html">Part 1：基礎觀念和語法</a></li><li class="breadcrumb-item"><a href="../ch03/async-await-essentials.html"><span class="chapter-title">第 3 章：async 與 await</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="chapter-03" class="quarto-section-identifier"><span class="chapter-title">第 3 章：<code>async</code> 與 <code>await</code></span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">修改於</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026年7月21日</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>在上一章，我們學會了使用 <code>Task.Run</code> 來建立背景工作，並透過 <code>Task</code> 物件追蹤它的狀態。不過，我們也同時發現，若用 <code>.Wait()</code> 或 <code>.Result</code> 來取得結果，就會阻塞（block）當前執行緒，這等於又把我們帶回最初想解決的「卡頓」問題。</p>
+<p>那麼，有沒有一種方法可以「非同步地等待」一個 <code>Task</code> 完成呢？</p>
+<p>這正是 C# 提供的 <code>async</code> 與 <code>await</code> 關鍵字要解決的事。它們是 C# 編譯器提供的語法糖（syntactic sugar），能讓我們用近乎同步程式碼的寫法，實現複雜的非同步控制流程。可以說，<code>async/await</code> 是現代 .NET 非同步程式設計的基石。</p>
+<p>本章會帶你進一步理解 <code>async/await</code>。讀完之後，你將能夠：</p>
+<ul>
+<li>使用 <code>async</code> 與 <code>await</code> 來撰寫簡潔、可讀性高的非同步程式碼。</li>
+<li>理解非同步方法的控制流是如何在 <code>await</code> 處暫停與恢復的。</li>
+<li>運用 <code>Task.WhenAll</code>、<code>Task.WhenAny</code> 與 <code>Task.WhenEach</code> 來併發執行多個非同步工作。</li>
+<li>了解 <code>SynchronizationContext</code> 如何影響程式碼的執行緒。</li>
+<li>掌握 <code>ConfigureAwait(false)</code> 的使用時機與重要性。</li>
+<li>知道為什麼應該極力避免使用 <code>async void</code>。</li>
+</ul>
+<hr>
+<section id="sec-how-async-await-simplifies-flow" class="level2">
+<h2 class="anchored" data-anchor-id="sec-how-async-await-simplifies-flow"><code>async</code> 與 <code>await</code> 如何簡化非同步流程</h2>
+<p>要看出 <code>async</code> 與 <code>await</code> 解決了什麼問題，可以先想像一個沒有它們的世界。假設現在要寫一個方法，非同步地從網路下載一個網頁，並回傳它的字數。</p>
+<p>在 <code>async/await</code> 出現之前，我們主要依賴 <code>Task</code> 物件的 <code>ContinueWith</code> 方法來串接非同步工作。它的作用是註冊一個「前一個工作完成後，接著執行……」的回呼（callback）。這種方式雖然解決了阻塞問題，但寫法相當繁瑣：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co">// 使用 ContinueWith 的傳統寫法 (複雜且難以閱讀)</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">static</span> Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsLegacy</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// 1. 開始非同步下載</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>    <span class="kw">return</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">).</span><span class="fu">ContinueWith</span><span class="op">(</span>downloadTask <span class="op">=&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>    <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>        <span class="co">// 2. 下載完成後，這個區塊才會被執行</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>        <span class="dt">string</span> content <span class="op">=</span> downloadTask<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>        <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="op">});</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這種寫法裡滿是 lambda 運算式。如果流程再複雜一點，例如下載完還要解析、再存入資料庫，很快就會形成所謂的「回呼地獄（callback hell）」，程式碼會變得難讀，也不好維護。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>本書範例會使用可重複使用、生命週期較長的 <code>HttpClient</code> 物件來共用連線，因為每次都建立新的 <code>HttpClient</code> 物件可能造成 socket 耗盡。不過，單純重複使用一個靜態 <code>HttpClient</code> 物件僅稱得上「堪用」。更好的做法是使用 <code>IHttpClientFactory</code>。細節可參閱微軟文件：<a href="https://learn.microsoft.com/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests">使用 IHttpClientFactory 實作韌性的 HTTP 請求</a>。</p>
+</blockquote>
+<p>接著看同一件事用 <code>async</code> 與 <code>await</code> 會怎麼寫：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">// 使用 async/await 的現代寫法 (簡潔且直觀)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co">// 1. 非同步地等待下載完成，期間不會阻塞執行緒</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="co">// 2. 下載完成後，程式碼會從這裡繼續執行</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch03/DemoDownloadPage">DemoDownloadPage</a></p>
+</blockquote>
+<p>程式碼看起來幾乎和同步版本一模一樣。這就是 <code>async/await</code> 最巧妙的地方。下面分別拆解這對關鍵字到底做了什麼。</p>
+<section id="sec-the-async-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-async-keyword"><code>async</code> 關鍵字</h3>
+<p>先從 <code>async</code> 開始。<code>async</code> 是一個方法修飾詞。當你把一個方法標記為 <code>async</code>，其實是在告訴編譯器兩件事：</p>
+<ol type="1">
+<li>這個方法內部會使用 <code>await</code> 關鍵字。</li>
+<li>編譯器需要將這個方法轉換成一個「狀態機（state machine）」。稍後會進一步說明這個狀態機是怎麼運作的。</li>
+</ol>
+<p><code>async</code> 方法常見的回傳型別包括 <code>Task</code>、<code>Task&lt;T&gt;</code>、<code>ValueTask</code> 與 <code>ValueTask&lt;T&gt;</code>。這也呼應了我們在第二章學到的觀念：非同步操作的回傳值，本質上是一個「承諾」（promise）或「未來憑證」（future）。</p>
+<p>當然，也有少數特殊情況，例如事件處理常式會使用 <code>void</code>，非同步迭代器會使用 <code>IAsyncEnumerable&lt;T&gt;</code>。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/async-syntax-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-the-await-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-await-keyword"><code>await</code> 關鍵字</h3>
+<p>接著看 <code>await</code>。<code>await</code> 是一個運算子，用來等待可等待物件（awaitable）完成。它通常出現在 <code>async</code> 方法內，但也可以用於 <code>async</code> lambda、<code>async</code> 匿名方法、<code>async</code> 區域函式等支援 <code>await</code> 的語境中；在現代 C# 的頂層敘述（top-level statements）裡也可以使用。</p>
+<p>當程式執行到「<code>await</code> 一個 <code>Task</code>」時，會依序發生以下事情：</p>
+<ol type="1">
+<li><strong>檢查 <code>Task</code> 狀態</strong>：<code>await</code> 會先檢查它所等待的 <code>Task</code> 是否已經完成了。如果已經完成，程式就繼續往下執行，就像沒有 <code>await</code> 一樣。</li>
+<li><strong>暫停與返回</strong>：如果 <code>Task</code> 尚未完成，<code>await</code> 會在此處設定一個「恢復點」（continuation），然後<strong>立即將控制權返回給呼叫此 <code>async</code> 方法的程式碼或目前的執行環境</strong>。這一步很關鍵：它意味著當前的執行緒沒有被阻塞，可以去做其他事情。</li>
+<li><strong>恢復執行</strong>：當被 <code>await</code> 的 <code>Task</code> 終於完成後，.NET 執行環境（runtime）會回到先前設定的「恢復點」，繼續執行 <code>async</code> 方法中剩下的程式碼。如果 <code>Task</code> 有回傳值 (<code>Task&lt;T&gt;</code>)，<code>await</code> 運算式本身就會交出那個 <code>T</code> 型別的結果。</li>
+</ol>
+<p>這個「暫停與恢復」的過程，就是由編譯器產生的狀態機在背後管理。你寫的是看似循序的程式碼，但編譯器會幫你把它 <strong>拆解</strong> 成多個區塊，並在適當的時機點恢復執行。</p>
+<p>如果剛才的解釋還有點抽象，可以用廚師的畫面再想一次。有位廚師（執行緒）正在照著食譜（程式碼）做菜。當他遇到需要把牛排「送進烤箱烤 30 分鐘」的步驟時，也就是遇到 <code>await</code> I/O 操作，他不會站在烤箱前空等。</p>
+<p>相反地，他會先在食譜上夾個書籤，記下目前做到哪裡，也就是編譯器建立的狀態機紀錄。接著，他可以先去忙別的事，或把控制權交還給目前的工作環境。等烤箱發出完成提示，也就是 <code>Task</code> 完成時，他再翻回那個書籤，接續下一個步驟，例如把牛排端出來擺盤。這就是恢復執行。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/state-machine-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="底層運作狀態機" class="level3">
+<h3 class="anchored" data-anchor-id="底層運作狀態機">底層運作：狀態機</h3>
+<p>接著從編譯器的角度，看看 <code>await</code> 如何暫停並恢復執行。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>本節作為補充知識，會進一步解釋 <code>async</code> 方法背後的運作原理。你可以選擇略過；但多了解一點編譯器如何轉換你的 <code>async</code> 方法，對日後除錯或效能調校多少會有些幫助。</p>
+</blockquote>
+<p>當 C# 編譯器遇到 <code>async</code> 方法時，它會在幕後做不少工作。它會為這個方法產生一個實作了 <code>IAsyncStateMachine</code> 介面的隱藏類別，也就是所謂的「狀態機」。</p>
+<p>在這個類別中，編譯器會根據你程式碼裡的每一個 <code>await</code>，將整個方法切割成不同的狀態（state）。</p>
+<ol type="1">
+<li>一開始狀態為 <code>-1</code>。當執行到第一個 <code>await</code> 且發現等待的工作尚未完成時，狀態機會將當前的狀態設定為 <code>0</code>，儲存當下區域變數的值，並將自己的實例註冊到該 <code>Task</code> 的接續工作（continuation）中。接著它會直接 <code>return</code>，將執行緒還給呼叫者。</li>
+<li>當背景的 <code>Task</code> 完成時，它會觸發並呼叫狀態機內的 <code>MoveNext()</code> 方法。</li>
+<li><code>MoveNext()</code> 會根據之前記錄的狀態，利用 <code>goto</code> 指令精準跳躍到當初暫停的地方，把變數的值都還原，然後繼續往下執行。</li>
+</ol>
+<p>換句話說，你之所以能用「同步的寫法」寫出「非同步的行為」，就是因為那些原本得手動處理的複雜狀態追蹤與回呼註冊，都已經交給編譯器產生的狀態機代勞了。</p>
+<p>如果光靠文字描述仍然覺得抽象，下面用一段大幅簡化過的虛擬碼，來模擬前面的 <code>DownloadPageAndCountCharsAsync</code> 方法被編譯後所產生的狀態機。你可以搭配程式碼中的註解，試著理解它的內部運作邏輯：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">// 編譯器產生的狀態機 (簡化過的概念虛擬碼)</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">class</span> DownloadStateMachine <span class="op">:</span> IAsyncStateMachine</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>    <span class="dt">int</span> _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// 初始狀態為 -1</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="dt">string</span> _url<span class="op">;</span>     <span class="co">// 本來方法的傳入參數</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="dt">string</span> _content<span class="op">;</span> <span class="co">// 本來的區域變數被提升為類別層級的欄位</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    TaskAwaiter<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> _awaiter<span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">MoveNext</span><span class="op">()</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>    <span class="op">{</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>        <span class="co">// 根據當前狀態，跳轉到對應的程式區塊</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a>        <span class="kw">if</span> <span class="op">(</span>_state <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="kw">goto</span> state_0<span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a></span>
+<span id="cb3-14"><a href="#cb3-14"></a>        <span class="co">// --- 狀態 -1 (執行到第一個 await 之前) ---</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>        _awaiter <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>_url<span class="op">).</span><span class="fu">GetAwaiter</span><span class="op">();</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a></span>
+<span id="cb3-17"><a href="#cb3-17"></a>        <span class="co">// 如果工作沒有瞬間做完，就準備暫停</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>        <span class="kw">if</span> <span class="op">(!</span>_awaiter<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">)</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a>        <span class="op">{</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a>            _state <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// 改變狀態，記錄我們停在這裡</span></span>
+<span id="cb3-21"><a href="#cb3-21"></a></span>
+<span id="cb3-22"><a href="#cb3-22"></a>            <span class="co">// 告訴 awaiter：「等你下載完，請再次呼叫我的 MoveNext()」</span></span>
+<span id="cb3-23"><a href="#cb3-23"></a>            _awaiter<span class="op">.</span><span class="fu">OnCompleted</span><span class="op">(</span><span class="kw">this</span><span class="op">.</span><span class="fu">MoveNext</span><span class="op">);</span></span>
+<span id="cb3-24"><a href="#cb3-24"></a>            <span class="kw">return</span><span class="op">;</span> <span class="co">// 關鍵：立刻返回，把執行緒還給呼叫者！</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a>        <span class="op">}</span></span>
+<span id="cb3-26"><a href="#cb3-26"></a></span>
+<span id="cb3-27"><a href="#cb3-27"></a>    state_0<span class="op">:</span></span>
+<span id="cb3-28"><a href="#cb3-28"></a>        <span class="co">// --- 狀態 0 (從 await 之後恢復執行) ---</span></span>
+<span id="cb3-29"><a href="#cb3-29"></a>        <span class="co">// 注意：goto 跳轉前，編譯器已確保所有欄位值（如 _content）都</span></span>
+<span id="cb3-30"><a href="#cb3-30"></a>        <span class="co">//      已正確恢復，因此這裡的跳轉是安全的，不會造成堆疊混亂。</span></span>
+<span id="cb3-31"><a href="#cb3-31"></a>        _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// 恢復預設狀態</span></span>
+<span id="cb3-32"><a href="#cb3-32"></a>        _content <span class="op">=</span> _awaiter<span class="op">.</span><span class="fu">GetResult</span><span class="op">();</span> <span class="co">// 取得下載結果</span></span>
+<span id="cb3-33"><a href="#cb3-33"></a></span>
+<span id="cb3-34"><a href="#cb3-34"></a>        <span class="dt">int</span> result <span class="op">=</span> _content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb3-35"><a href="#cb3-35"></a>        <span class="co">// 將結果放入 Task 中，狀態機執行完畢</span></span>
+<span id="cb3-36"><a href="#cb3-36"></a>        <span class="fu">SetResult</span><span class="op">(</span>result<span class="op">);</span></span>
+<span id="cb3-37"><a href="#cb3-37"></a>    <span class="op">}</span></span>
+<span id="cb3-38"><a href="#cb3-38"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>從這段虛擬碼中，你可以更清楚看到 <code>await</code> 邊界是如何把一個原本循序漸進的方法，切開並轉換成透過 <code>_state</code> 與 <code>goto</code> 控制執行跳轉的狀態機。這也是 <code>async/await</code> 能夠不阻塞執行緒的關鍵原因。</p>
+<blockquote class="blockquote">
+<p><strong>編譯器產生的非同步狀態機可能即將走入歷史</strong></p>
+<p>寫作當下，微軟已經在 2026 年 3 月發布 .NET 11 的第二個預覽版（preview2）。在此預覽版的發行說明文件中提到，新增的 <strong>runtime async</strong> 功能會把非同步機制的管理從 C# 編譯器產生狀態機的模式，轉移到 .NET runtime。換言之，以 C# 撰寫的非同步程式，將來若使用 .NET 11 來編譯，其效能將會立刻提升：編譯出來的 IL code 更小（因為編譯器不再需要產生動輒上百行的非同步狀態機），而且執行時的記憶體配置也更有效率，除錯體驗也可望更為直觀。不過，這項功能目前仍在預覽階段，可能還有變動。</p>
+<p>更多資訊可參閱官方發布的 <a href="https://github.com/dotnet/core/blob/main/release-notes/11.0/preview/preview2/runtime.md">.NET 11 Preview 2 Release Notes</a></p>
+</blockquote>
+</section>
+</section>
+<section id="sec-waiting-multiple-tasks" class="level2">
+<h2 class="anchored" data-anchor-id="sec-waiting-multiple-tasks">同時等待多個工作：<code>Task.WhenAll</code> 與 <code>Task.WhenEach</code></h2>
+<p>前面我們學會了如何 <code>await</code> 單一個非同步工作。但在真實應用中，一次只等一件事往往不夠用。我們常常需要同時執行多個非同步操作，例如同時下載多個網頁、同時查詢兩個不同的資料庫，或者同時呼叫多個 Web API。</p>
+<p>這時候，如果我們還是一個接一個地 <code>await</code>，就會變成依序執行（sequential execution），等於失去非同步帶來的併發優勢。為了更充分利用系統資源，我們應該讓這些工作「同時」進行。本節會介紹 .NET 提供的幾個工具。</p>
+<section id="sec-task-whenall" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-whenall">齊頭並進：<code>Task.WhenAll</code></h3>
+<p><code>Task.WhenAll</code> 是最常用的方法，它接受一群 <code>Task</code>，並回傳一個新的 <code>Task</code>。這個新 <code>Task</code> 會在<strong>所有</strong>傳入的工作都完成後才算完成。如果傳入的是 <code>Task&lt;TResult&gt;</code>，<code>await Task.WhenAll</code> 會回傳一個陣列 <code>TResult[]</code>，包含所有工作的執行結果。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>使用 <code>Task.WhenAll</code> 時，若其中一個或多個工作拋出例外，<code>await</code> 只會重新拋出 <strong>第一個</strong> 捕捉到的例外。如果你需要處理所有發生的例外，請檢查 <code>Task.WhenAll</code> 回傳之 <code>Task</code> 的 <code>Exception</code> 屬性（它是一個 <code>AggregateException</code>）。詳見第 4 章。</p>
+</blockquote>
+<p>先來比較「依序等待」與「同時等待」的差別。下面的範例假設下載每一個網頁都需要 1 秒鐘：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">// ✘ 錯誤示範：依序執行並取得結果，效率低。</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>async Task <span class="fu">SequentialDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="op">{</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="co">// 這會花費 1秒 + 1秒 + 1秒 = 3秒</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="dt">string</span> page1 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="dt">string</span> page2 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="dt">string</span> page3 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="op">}</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">// ✔ 正確示範：併發執行，等全部工作完成後一次取出結果，效率高。</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>async Task <span class="fu">ConcurrentDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="op">{</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>  <span class="co">// 1. 啟動所有工作</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>  <span class="co">// 注意：這裡都沒有 await，讓各項工作先各自分頭進行！</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task1 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task2 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task3 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a></span>
+<span id="cb4-19"><a href="#cb4-19"></a>  <span class="co">// 2. 等待全部完成 (Await all)</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>  <span class="co">// 這只會花費大約 1秒 (取決於最慢的那個請求)</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>  <span class="dt">string</span><span class="op">[]</span> results <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">,</span> task3<span class="op">);</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch03/DemoTaskWhenAll">DemoTaskWhenAll</a></p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/when-all-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-task-whenany" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-whenany">只取其一：<code>Task.WhenAny</code></h3>
+<p>有時候，我們不需要等全部完成，只要其中一個先完成就夠了。<code>Task.WhenAny</code> 就是為此而生。它接受一群 <code>Task</code>，並在<strong>任何一個</strong>工作完成時，無論是成功、失敗還是取消，立即回傳那個已完成的 <code>Task</code>。</p>
+<p>常見的使用情境包括：</p>
+<ul>
+<li><strong>備援機制（redundancy）</strong>：同時呼叫三個提供相同服務的伺服器，誰先回應就用誰的資料。</li>
+<li><strong>逾時控制（timeout）</strong>：同時等待「主要工作」與「計時工作 (<code>Task.Delay</code>)」，看誰先完成。如果計時工作先完成，就代表逾時了。</li>
+</ul>
+<p>以下範例示範如何利用 <code>Task.WhenAny</code> 搭配 <code>Task.Delay</code> 實作逾時控制：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1"></a>async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadWithTimeoutAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>    <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a>    Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> downloadTask <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>    Task timeoutTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">3000</span><span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span> <span class="co">// 3秒逾時</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="co">// 等待兩者之一完成</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>    Task completedTask <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAny</span><span class="op">(</span>downloadTask<span class="op">,</span> timeoutTask<span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11"></a>    <span class="kw">if</span> <span class="op">(</span>completedTask <span class="op">==</span> timeoutTask<span class="op">)</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>    <span class="op">{</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a>        <span class="co">// 逾時了！取消下載工作並拋出例外</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>        cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"下載作業逾時。"</span><span class="op">);</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a>    <span class="op">}</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a></span>
+<span id="cb5-18"><a href="#cb5-18"></a>    <span class="co">// 下載先完成，順便取消 timeoutTask，避免它繼續無意義地計時</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a>    cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a></span>
+<span id="cb5-21"><a href="#cb5-21"></a>    <span class="co">// 下載先完成，取得結果</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a>    <span class="kw">return</span> await downloadTask<span class="op">;</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這段程式的重點在於：<code>Task.WhenAny</code> 回傳的是「先完成的那個工作」，而不是下載結果本身。因此，確認先完成的是 <code>downloadTask</code> 之後，仍然要再 <code>await downloadTask</code> 一次，才能取得下載內容或讓下載過程中的例外正常拋出。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch03/DemoTaskWhenAny">DemoTaskWhenAny</a></p>
+</blockquote>
+</section>
+<section id="sec-task-wheneach" class="level3">
+<h3 class="anchored" data-anchor-id="sec-task-wheneach">依序處理完成的工作：<code>Task.WhenEach</code> (.NET 9)</h3>
+<p>除了「等全部完成」和「搶第一個完成」，還有另一個很常見的需求：先發動多個非同步工作，然後<strong>每當有一個完成時，就立刻處理它</strong>，例如更新 UI 進度條，而不是等到全部都做完才一次處理。</p>
+<p>在 .NET 9 之前，要實現這個模式，通常得搭配 <code>Task.WhenAny</code> 寫一個 <code>while</code> 迴圈，並不斷從任務清單中移除已完成的工作。那樣的程式碼既冗長又容易出錯，時間複雜度也會變成 <span class="math inline">\(O(N^2)\)</span>。</p>
+<blockquote class="blockquote">
+<p><strong>為何 <code>Task.WhenAny</code> 搭配迴圈是 <code>O(N^2)</code>？</strong></p>
+<p>假設你有 N 個任務。每次呼叫 <code>Task.WhenAny(tasks)</code> 時，它內部需要為清單中每一個任務逐一註冊回呼（花費 <span class="math inline">\(O(N)\)</span> 時間）。接著，從 <code>List&lt;Task&gt;</code> 中 <code>Remove</code> 完成的任務，又是一個需要挪動陣列元素的 <span class="math inline">\(O(N)\)</span> 操作。</p>
+<p>第一圈花費 <span class="math inline">\(O(N)\)</span>，第二圈花費 <span class="math inline">\(O(N-1)\)</span>，以此類推直到最後一個。根據等差級數公式，總成本會落在 <span class="math inline">\(O(N^2)\)</span>。以具體數字來說：若有 1,000 個任務，<code>WhenAny</code> 迴圈方式需要大約 500,000 次操作（1000 * 999 / 2），而 <code>WhenEach</code> 只需 1,000 次。這代表當任務數量一多（例如伺服器同時處理數千個請求），使用 <code>WhenAny</code> 的效能就會急遽惡化。</p>
+</blockquote>
+<p>.NET 9 引入了 <code>Task.WhenEach</code>。如果傳入的是 <code>Task&lt;TResult&gt;</code>，它會回傳 <code>IAsyncEnumerable&lt;Task&lt;TResult&gt;&gt;</code>；如果傳入的是非泛型 <code>Task</code>，則會回傳 <code>IAsyncEnumerable&lt;Task&gt;</code>。因此，我們可以直接用 <code>await foreach</code> 逐一處理每一個完成的工作。這不僅語法更乾淨，底層的時間複雜度也被大幅優化至 <span class="math inline">\(O(N)\)</span>。</p>
+<p>來看看實際的用法：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">// .NET 9+ 的新寫法：乾淨、直觀</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>async Task <span class="fu">ProcessTasksAsTheyCompleteAsync</span><span class="op">()</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>    <span class="dt">var</span> tasks <span class="op">=</span> <span class="kw">new</span> List<span class="op">&lt;</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;&gt;();</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">5</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>    <span class="op">{</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>        tasks<span class="op">.</span><span class="fu">Add</span><span class="op">(</span><span class="fu">DoWorkAsync</span><span class="op">(</span>i<span class="op">));</span> <span class="co">// 假設 DoWorkAsync 回傳 Task&lt;int&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>    <span class="op">}</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a></span>
+<span id="cb6-10"><a href="#cb6-10"></a>    <span class="co">// 這裡的 t 代表一個「已經完成」的工作</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>    <span class="co">// 迴圈會依照「完成的順序」迭代，而不是原本串列的順序！</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>    await <span class="kw">foreach</span> <span class="op">(</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> t <span class="kw">in</span> Task<span class="op">.</span><span class="fu">WhenEach</span><span class="op">(</span>tasks<span class="op">))</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>    <span class="op">{</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>        <span class="kw">try</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>        <span class="op">{</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>            <span class="co">// 這裡 await 只是為了取得結果或例外，不會阻塞</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>            <span class="dt">int</span> result <span class="op">=</span> await t<span class="op">;</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"完成了一個工作，結果是：{result}"</span><span class="op">);</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a>        <span class="op">}</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a>        <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>        <span class="op">{</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"有個工作失敗了：{ex.Message}"</span><span class="op">);</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a>        <span class="op">}</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a>    <span class="op">}</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這裡特別留意一下 <code>await foreach (... in Task.WhenEach(tasks))</code> 這個迴圈。它會依照「工作完成的順序」迭代，而不是 <code>tasks</code> 串列原本的順序。換句話說，每完成一個工作，就會立刻跑一次迴圈去處理那個剛完成的工作。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch03/DemoTaskWhenEach">DemoTaskWhenEach</a></p>
+</blockquote>
+<p><code>Task.WhenEach</code> 大幅簡化了這類「一有結果就處理」的模式，是 .NET 9 很實用的新功能。如果你的目標框架是 .NET 9 或更新版本，遇到這類需求時，它應該是首選的工具。</p>
+</section>
+</section>
+<section id="sec-control-flow-and-synchronization-context" class="level2">
+<h2 class="anchored" data-anchor-id="sec-control-flow-and-synchronization-context">控制流的走向：<code>SynchronizationContext</code> 的角色</h2>
+<p>了解 <code>await</code> 的暫停與恢復之後，接著要看另一個關鍵細節：當 <code>Task</code> 完成後，<code>await</code> 後面的程式碼究竟會在哪一條執行緒上恢復執行？</p>
+<p>答案不是固定的，它取決於當時是否存在一個 <strong><code>SynchronizationContext</code></strong>。</p>
+<p><code>SynchronizationContext</code> 是一個抽象類別，你可以把它想像成一個「排程器」，它知道如何把一段程式碼排入特定執行緒去執行。在 <code>await</code> 執行暫停並將控制權交還給呼叫端之前，它會先捕捉當前的 <code>SynchronizationContext</code>，留著備用。</p>
+<p>打個比方，在 UI 應用程式中，UI 執行緒就像餐廳裡唯一能操作收銀機和接待客人的前台經理。他去交代廚房備料，也就是發動非同步操作後，後續仍然要回到櫃台。</p>
+<p>而 <code>SynchronizationContext</code> 就像一個盡責的「傳令兵」：它確保廚房把料備好後，後續動作，例如在收銀機上結帳或更新 UI 畫面，會被排程交還給這位前台經理來完成，而不是讓廚房裡的人直接碰收銀機。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sync-context-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>不同類型的應用程式，其 <code>SynchronizationContext</code> 的行為也不同：</p>
+<ul>
+<li><p><strong>UI 應用程式（WPF, MAUI, WinForms）</strong>：主 UI 執行緒上有一個專屬的 <code>SynchronizationContext</code>。它的工作就是確保任何排程給它的程式碼，都會回到<strong>原始的 UI 執行緒</strong>上執行。這非常方便，因為所有更新 UI 元件的操作都必須在 UI 執行緒上進行。<code>await</code> 會自動幫我們處理這個切換。</p></li>
+<li><p><strong>傳統 ASP.NET（ASP.NET 4.x）</strong>：每個 HTTP 請求都有一個專屬的 <code>SynchronizationContext</code>（也就是 <code>AspNetSynchronizationContext</code>）。它的作用與 UI 應用程式類似，會試圖將 <code>await</code> 之後的程式碼帶回該請求原本的 request context，以確保像是 <code>HttpContext.Current</code> 這種存取請求狀態的操作能夠正常運作。</p></li>
+<li><p><strong>主控台應用程式（Console App） / ASP.NET Core</strong>：預設情況下，<strong>沒有</strong> <code>SynchronizationContext</code>。在這些環境中，當 <code>await</code> 的工作完成後，後續程式碼<strong>不保證</strong>回到原本的執行緒；它可能就在完成工作的那條執行緒上接著跑，也可能由 <strong>執行緒集區（thread pool）</strong> 排程到其他可用執行緒上繼續執行。</p></li>
+</ul>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>ASP.NET Core 在設計之初，微軟團隊就刻意移除了 <code>SynchronizationContext</code>。這個架構上的重大改變，消除了 ASP.NET 4.x 中常見的 <code>context switch</code> 成本與死結問題，也是 ASP.NET Core 效能大幅躍升的關鍵原因之一。因此，在 ASP.NET Core 專案中，<code>ConfigureAwait(false)</code> 技術上不再必要（因為根本沒有 context 需要切換）；但許多函式庫仍保留這個寫法，以確保在各種環境下都能正常運作。</p>
+</blockquote>
+</section>
+<section id="sec-async-or-task-run" class="level2">
+<h2 class="anchored" data-anchor-id="sec-async-or-task-run">該用 async/await 還是 Task.Run？</h2>
+<p>初步認識 <code>async/await</code> 之後，往往會冒出一個困惑：「既然 <code>await</code> 這麼好用，那是不是所有背景工作，包括複雜運算，都應該用 <code>await</code> 去處理？」</p>
+<p>這個問題的關鍵，在於第 2 章討論過的 I/O-bound（輸入/輸出密集型）與 CPU-bound（運算密集型）的差異：</p>
+<ul>
+<li><strong>I/O-bound 作業</strong>的核心精神是「<strong>釋放執行緒</strong>」。這是 <code>async/await</code> 的主戰場。使用 <code>await</code>（有時搭配 <code>ConfigureAwait(false)</code>）能以極低的成本達成非阻塞等待。在等待網路或資料庫回應的期間，我們不需要犧牲一條執行緒在原地空等。</li>
+<li><strong>CPU-bound 作業</strong>的核心精神是「<strong>轉移工作</strong>」。這裡仍是 <code>Task.Run</code> 的主戰場。你必須明確地把繁重運算移交給執行緒集區（thread pool），以免佔用 UI 執行緒或主要的處理序。</li>
+</ul>
+<p>這兩者的邊界其實很清楚。如果混淆了它們，就很容易寫出有問題的程式碼。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/io-cpu-bound-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>最常見的反模式（anti-pattern），就是<strong>用 <code>Task.Run</code> 來包裝一個純 I/O-bound 的 <code>async</code> 方法</strong>。 例如：<code>Task.Run(() =&gt; httpClient.GetStringAsync(url))</code>。</p>
+<p>這不僅多此一舉，而且通常有害。它會額外增加一次不必要的排程與執行緒切換成本；明明原本的 I/O 非同步 API 就已經能在等待期間釋放執行緒，卻還要先透過 <code>Task.Run</code> 把工作丟進執行緒集區。記住一個簡單的口訣：</p>
+<ul>
+<li><code>async/await</code> 的目標是<strong>非同步</strong>（asynchrony），追求 I/O 等待的高效能。</li>
+<li><code>Task.Run</code> 的目標是<strong>平行</strong>（parallelism），發揮 CPU 的最大運算能力。</li>
+</ul>
+</blockquote>
+<p>另一種常見的誤用則是：在 UI 應用程式的 <code>async</code> 方法裡直接執行 CPU 密集計算，卻沒有用 <code>Task.Run</code> 卸載。這會導致 UI 執行緒在計算期間被佔住，造成介面凍結。以 WPF 為例，先看錯誤的做法：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">// 錯誤示範：CPU 密集計算直接在 async 方法中執行（佔住 UI 執行緒）</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>    <span class="co">// 這段 CPU 密集計算會一直佔用 UI 執行緒，</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>    <span class="co">// 導致介面凍結，無法回應使用者操作。</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>    <span class="dt">var</span> data <span class="op">=</span> <span class="fu">PerformHeavyCalculation</span><span class="op">();</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a></span>
+<span id="cb7-8"><a href="#cb7-8"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>此範例的 <code>PerformHeavyCalculation()</code> 會一直佔用 UI 執行緒，直到計算完成。在此期間，介面完全無法回應使用者的操作。</p>
+<p>正確的做法是用 <code>await Task.Run(...)</code> 把繁重的計算卸載到執行緒集區，讓 UI 執行緒能繼續處理使用者的操作：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">// 正確做法：用 Task.Run 卸載 CPU 密集計算，釋放 UI 執行緒</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="op">{</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>    <span class="co">// 將 CPU 密集計算移到執行緒集區，UI 執行緒可繼續回應使用者操作</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="dt">var</span> data <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span> <span class="fu">PerformHeavyCalculation</span><span class="op">());</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Warning</strong></p>
+<p>上述 <code>Task.Run</code> 的技巧適用於 UI 應用程式，但<strong>不適用於 ASP.NET Core Web API</strong>。在 ASP.NET Core 中，處理 HTTP 請求的執行緒本身就是 thread pool 執行緒，使用 <code>Task.Run</code> 只是把 CPU 工作從一條 thread pool 執行緒搬到另一條，總共佔用的執行緒數量不會減少，反而還增加了排程與執行緒切換的開銷。如果伺服器端有 CPU 密集的需求，應考慮使用背景服務（background service）或訊息佇列等機制來處理。</p>
+<p><strong>延伸閱讀：</strong> <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices">ASP.NET Core Best Practices</a></p>
+</blockquote>
+<p>釐清這條界線之後，就更容易理解為何 <code>await</code> 一個 I/O 操作可以不阻塞 UI 執行緒：因為在等待 I/O 完成的期間，根本不需要一條執行緒在原地阻塞等候。接著，我們要來探討 <code>ConfigureAwait</code>。</p>
+</section>
+<section id="sec-ui-thread-and-configure-await-false" class="level2">
+<h2 class="anchored" data-anchor-id="sec-ui-thread-and-configure-await-false">UI 執行緒與 <code>ConfigureAwait(false)</code> 的重要性</h2>
+<p>在 UI 應用程式中，<code>await</code> 預設會把後續程式碼帶回原始的 UI 執行緒，這在需要更新 UI 時當然很好。但如果 <code>await</code> 後面的程式碼根本不需要碰 UI 元件呢？例如它只是做一些純計算，或把結果寫入檔案。</p>
+<p>在這種情況下，強制回到 UI 執行緒不但沒有必要，還可能形成效能瓶頸。而且，如果使用不當，甚至可能引發<strong>死結（deadlock）</strong>。</p>
+<blockquote class="blockquote">
+<p><strong>為何會發生 UI 死結？</strong></p>
+<p>想像一個常見的錯誤情境：你在 UI 執行緒（例如 Windows Forms 或 WPF 的按鈕點擊事件）中呼叫了一個非同步方法，但卻貪圖方便，直接呼叫了 <code>.Result</code> 或 <code>.Wait()</code> 來「同步」等待它完成。</p>
+<ol type="1">
+<li>UI 執行緒呼叫了 <code>.Result</code>，於是 UI 執行緒被<strong>阻塞</strong>了，停在原地等待。</li>
+<li>背景的 <code>Task</code> 完成了工作，因為沒有加 <code>ConfigureAwait(false)</code>，它試圖把後續的程式碼（continuation）排程回原來的 UI 執行緒上執行。</li>
+<li>但此刻 UI 執行緒正被第一步的 <code>.Result</code> 阻塞著，根本無法處理這個背景任務傳回來的要求！</li>
+<li>於是，背景工作等 UI 執行緒空出來，UI 執行緒等背景工作完成——死結就這樣誕生了，整個應用程式完全卡死。</li>
+</ol>
+</blockquote>
+<p>為了解決這個問題，.NET 提供了 <code>ConfigureAwait(false)</code> 方法。當你在一個 <code>Task</code> 後面加上它，就等於是在告訴 <code>await</code>：</p>
+<blockquote class="blockquote">
+<p>「我不在乎你待會在哪條執行緒上恢復執行，請<strong>不要</strong>嘗試回到原本的 <code>SynchronizationContext</code>。」</p>
+</blockquote>
+<p>若沒有呼叫 <code>ConfigureAwait</code>，預設值是 <code>true</code>，也就是 <code>await</code> 會盡量回到原本的 <code>SynchronizationContext</code>。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/configure-await-false-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>下面用一個範例來看如何在類別庫（class library）中正確使用 <code>ConfigureAwait(false)</code>，以避免不必要的執行緒切換與潛在死結：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">// 假設這是在一個通用類別庫中</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">public</span> <span class="kw">class</span> MyApiClient</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="op">{</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>    <span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a>    <span class="kw">public</span> async Task<span class="op">&lt;</span>JsonNode<span class="op">&gt;</span> <span class="fu">GetDataFromApiAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a>    <span class="op">{</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>        <span class="co">// 1. 開始非同步下載</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>        <span class="dt">string</span> json <span class="op">=</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>            await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">)</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>                              <span class="op">.</span><span class="fu">ConfigureAwait</span><span class="op">(</span><span class="kw">false</span><span class="op">);</span> <span class="co">// &lt;--- 關鍵！</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a></span>
+<span id="cb9-13"><a href="#cb9-13"></a>        <span class="co">// 2. 後續程式碼不會被強制帶回原本的 SynchronizationContext。</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a>        <span class="co">//    實際在哪條執行緒上恢復執行，則不一定。</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a>        <span class="kw">return</span> JsonNode<span class="op">.</span><span class="fu">Parse</span><span class="op">(</span>json<span class="op">);</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a>    <span class="op">}</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>使用 <code>ConfigureAwait(false)</code>，通常是撰寫通用類別庫（class library）時的建議作法。因為你在寫類別庫時，不會知道將來有哪些類型的應用程式會拿它來用；透過明確指定 <code>ConfigureAwait(false)</code>，通常可以避免不必要的 <code>context switch</code>，也能降低某些潛在的死結（deadlock）風險。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>如果你在撰寫不需要回到原本 context 的程式碼（特別是開發會被其他專案共用的類別庫時），就應該認真考慮使用 <code>.ConfigureAwait(false)</code>。但如果後續程式碼需要操作 UI、存取特定 request context，或依賴呼叫端環境，就不應盲目套用。</p>
+</blockquote>
+<p><strong>延伸閱讀：</strong> <a href="https://devblogs.microsoft.com/dotnet/configureawait-faq/">ConfigureAwait FAQ</a> by Stephen Toub</p>
+</section>
+<section id="sec-avoiding-async-void" class="level2">
+<h2 class="anchored" data-anchor-id="sec-avoiding-async-void">避免 <code>async void</code></h2>
+<p>在掌握了 <code>async</code> 搭配 <code>Task</code> 的標準用法後，你可能會注意到，C# 語法其實也允許我們寫出回傳型別為 <code>void</code> 的 <code>async</code> 方法。然而，這往往是一個危險的陷阱。</p>
+<p>先說結論：在一般方法中，<code>async</code> 最常見的回傳型別是 <code>Task</code>、<code>Task&lt;T&gt;</code>，以及為了效能優化而生的 <code>ValueTask</code> 及其泛型版本 <code>ValueTask&lt;T&gt;</code>；此外還有像事件處理常式這類特殊情況使用的 <code>void</code>。在決定回傳型別時，你應該<strong>永遠優先使用</strong> <code>Task</code> 家族，並極力避免 <code>async void</code>。</p>
+<p>為什麼 <code>async void</code> 如此危險？它主要有兩大問題：</p>
+<ol type="1">
+<li><strong>例外無法被捕捉</strong>：從 <code>async void</code> 方法中拋出的例外，無法被呼叫端的 <code>try-catch</code> 區塊捕捉到。這樣的例外會被重新拋出到方法啟動當下所捕捉的 <code>SynchronizationContext</code> 所在的執行緒上（例如 UI 執行緒）；若當時沒有 <code>SynchronizationContext</code>，則會在執行緒集區的執行緒上拋出。在大多數情況下，這會導致你的應用程式直接崩潰。</li>
+<li><strong>無法被等待</strong>：呼叫端無法 <code>await</code> 一個 <code>async void</code> 方法，因此完全不知道這個非同步操作何時完成。這讓程式的流程變得難以追蹤與測試。</li>
+</ol>
+<p>既然如此，<code>async void</code> 還有存在的理由嗎？有，但只有一個合法的使用情境，就是<strong>事件處理常式（event handler）</strong>，例如按鈕點擊事件。原因在於，.NET 標準的事件委派，例如 <code>EventHandler</code>，回傳型別本來就是 <code>void</code>。如果你把事件處理常式宣告成 <code>async Task</code>，方法簽章就會和委派不符，進而導致編譯錯誤。也正因如此，C# 才特別允許 <code>async void</code> 這種寫法作為特例，讓開發者能在事件處理常式中順利使用 <code>await</code>。</p>
+<p>下面這個範例展示的就是這個「唯一」的合法情境。請特別留意：既然外層捕捉不到 <code>async void</code> 丟出的例外，你就必須像下面示範的那樣，在方法內部用 <code>try-catch</code> 把所有可能的錯誤攔下來並妥善處理：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">// 這是 async void 的「唯一」建議使用情境</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">private</span> async <span class="dt">void</span> <span class="fu">OnMyButtonClick</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>    <span class="kw">try</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>        <span class="co">// ... await some async operations ...</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>    <span class="op">}</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a>    <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a>    <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10"></a>        <span class="co">// 必須在這裡處理所有例外！</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a>        <span class="fu">ShowErrorMessage</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>    <span class="op">}</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>重點</strong></p>
+<p>除非你在寫事件處理常式，否則請一律使用 <code>async Task</code> 或 <code>async Task&lt;T&gt;</code>。</p>
+</blockquote>
+</section>
+<section id="結語" class="level2">
+<h2 class="anchored" data-anchor-id="結語">結語</h2>
+<p>本章介紹了 <code>async</code> 與 <code>await</code> 的核心概念。這對關鍵字透過編譯器產生的狀態機，讓我們能以近乎同步的語法，寫出易於理解、而且不會阻塞執行緒的非同步程式碼。</p>
+<p>我們也學到了，<code>await</code> 如何在 <code>SynchronizationContext</code> 的幫助下，決定後續程式碼該在哪裡恢復執行，以及如何使用 <code>ConfigureAwait(false)</code> 來優化這個行為。同時，我們也理解了 <code>async void</code> 帶來的風險，並知道它只該出現在什麼場合。</p>
+<p>掌握了 <code>async/await</code> 的基礎後，我們已經具備了撰寫現代非同步程式碼的核心能力。不過，真實世界的應用程式還會面臨更多挑戰，例如：如何處理非同步操作中發生的錯誤？又該如何取消一個已經開始、但後來不再需要的非同步任務？</p>
+<p>這些問題，將是我們下一章要探討的主題。</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script>
+(() => {
+  const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+  if (!match) {
+    return;
+  }
+
+  const current = match[1];
+  const target = current === "zh-tw" ? "en" : "zh-tw";
+  const link = document.createElement("a");
+
+  link.className = "language-switch";
+  link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+    + window.location.search
+    + window.location.hash;
+  link.textContent = current === "zh-tw" ? "English" : "繁體中文";
+  link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+  link.setAttribute(
+    "aria-label",
+    current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+  );
+
+  const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+  if (sidebarHeader) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "language-switch-wrapper";
+    wrapper.appendChild(link);
+    sidebarHeader.appendChild(wrapper);
+    return;
+  }
+
+  const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+  const searchButton = header?.querySelector(".quarto-search-button");
+  if (header && searchButton) {
+    header.insertBefore(link, searchButton);
+  } else {
+    document.body.appendChild(link);
+  }
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "已複製");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "已複製");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/dotnetconcurrency\.huanlin\.cc\/zh-tw\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../ch02/threads-and-tasks.html" class="pagination-link" aria-label="第 2 章：.NET 中的執行緒與工作">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">第 2 章：.NET 中的執行緒與工作</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../ch04/exceptions-and-cancellation.html" class="pagination-link" aria-label="第 4 章：例外處理與取消">
+        <span class="nav-page-text"><span class="chapter-title">第 4 章：例外處理與取消</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>免費試讀版：第 1 至第 4 章全文</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p><a href="https://huanlin.cc/">作者網站</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
