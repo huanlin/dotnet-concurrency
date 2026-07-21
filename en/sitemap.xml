@@ -2,19 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/index.html</loc>
-    <lastmod>2026-07-21T14:20:31.710Z</lastmod>
+    <lastmod>2026-07-21T15:18:17.116Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/preface.html</loc>
-    <lastmod>2026-07-21T14:20:31.717Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.478Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-book.html</loc>
-    <lastmod>2026-07-21T14:20:31.718Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.479Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-author.html</loc>
-    <lastmod>2026-07-21T14:20:31.722Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.480Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch01/introduction.html</loc>
@@ -34,30 +34,30 @@
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch05/thread-synchronization.html</loc>
-    <lastmod>2026-07-21T14:21:33.388Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.497Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch06/thread-safety-and-immutable-collections.html</loc>
-    <lastmod>2026-07-21T14:21:33.389Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.499Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch07/parallel-programming-and-plinq.html</loc>
-    <lastmod>2026-07-21T14:21:33.390Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.500Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch08/async-streams.html</loc>
-    <lastmod>2026-07-21T14:21:33.392Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.500Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch09/advanced-task-programming.html</loc>
-    <lastmod>2026-07-21T14:21:33.395Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.506Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch10/async-patterns-and-practices.html</loc>
-    <lastmod>2026-07-21T14:21:33.401Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.506Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch11/async-api-design.html</loc>
-    <lastmod>2026-07-21T14:21:33.403Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.508Z</lastmod>
   </url>
 </urlset>

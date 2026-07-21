@@ -8,9 +8,9 @@
 
 <meta name="author" content="Michael Tsai">
 <meta name="dcterms.date" content="2026-04-20">
-<meta name="description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta name="description" content="Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.">
 
-<title>Demystifying .NET 10 Asynchronous Programming</title>
+<title>Concurrency in .NET 10</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -79,14 +79,14 @@ ul.task-list li input[type="checkbox"] {
 
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="styles-html.css">
-<meta property="og:title" content="Demystifying .NET 10 Asynchronous Programming">
-<meta property="og:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta property="og:title" content="Concurrency in .NET 10">
+<meta property="og:description" content="Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.">
 <meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/en/images/cover-en.png">
-<meta property="og:site_name" content="Demystifying .NET 10 Asynchronous Programming">
+<meta property="og:site_name" content="Concurrency in .NET 10">
 <meta property="og:image:height" content="1900">
 <meta property="og:image:width" content="1440">
-<meta name="twitter:title" content="Demystifying .NET 10 Asynchronous Programming">
-<meta name="twitter:description" content="Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.">
+<meta name="twitter:title" content="Concurrency in .NET 10">
+<meta name="twitter:description" content="Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.">
 <meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/en/images/cover-en.png">
 <meta name="twitter:image-height" content="1900">
 <meta name="twitter:image-width" content="1440">
@@ -118,7 +118,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Demystifying .NET 10 Asynchronous Programming</a> 
+      <a href="./">Concurrency in .NET 10</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/huanlin/dotnet-concurrency" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
@@ -151,101 +151,68 @@ ul.task-list li input[type="checkbox"] {
   <a href="./ch00/about-author.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">About the author</span></a>
   </div>
 </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 1: Fundamentals</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch01/introduction.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">1 Understanding threads and asynchrony</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch02/threads-and-tasks.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">2 Threads and tasks in .NET</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch03/async-await-essentials.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">3 async and await</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch04/exceptions-and-cancellation.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">4 Exception handling and cancellation</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 2: Concurrency and parallelism</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">5 Thread synchronization and classic problems</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch06/thread-safety-and-immutable-collections.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">6 Thread safety and immutable collections</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch07/parallel-programming-and-plinq.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">7 Parallel processing and PLINQ</span></a>
   </div>
 </li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
- <span class="menu-text">Part 3: Advanced topics</span></a>
-          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 ">  
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch08/async-streams.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">8 Asynchronous streams and resource management</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch09/advanced-task-programming.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">9 Advanced Task programming</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch10/async-patterns-and-practices.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">10 Practical scenarios and best practices</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
+        <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./ch11/async-api-design.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">11 Guidelines for designing asynchronous APIs</span></a>
   </div>
 </li>
-      </ul>
-  </li>
     </ul>
     </div>
 </nav>
@@ -259,13 +226,13 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Demystifying .NET 10 Asynchronous Programming</h1>
-<p class="subtitle lead">Core Principles and Advanced Techniques — Free Preview Edition</p>
+<h1 class="title">Concurrency in .NET 10</h1>
+<p class="subtitle lead">Core Principles and Advanced Techniques (Free Preview Edition)</p>
 </div>
 
 <div>
   <div class="description">
-    Free English preview of Demystifying .NET 10 Asynchronous Programming, with Chapters 1–4 available in full.
+    Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.
   </div>
 </div>
 
@@ -300,9 +267,9 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p><img src="images/cover-en.png" title="Demystifying .NET 10 Asynchronous Programming" class="quarto-cover-image nolightbox img-fluid"></p>
+<p><img src="images/cover-en.png" title="Concurrency in .NET 10" class="quarto-cover-image nolightbox img-fluid"></p>
 <hr>
-<p><em>Demystifying .NET 10 Asynchronous Programming</em> begins with the foundations of threads and asynchrony, then builds toward <code>Task</code>, <code>async</code>/<code>await</code>, cancellation, synchronization, parallel processing, and asynchronous API design.</p>
+<p><em>Concurrency in .NET 10</em> begins with the foundations of threads and asynchrony, then builds toward <code>Task</code>, <code>async</code>/<code>await</code>, cancellation, synchronization, parallel processing, and asynchronous API design.</p>
 <p>This website is the free English preview edition. Chapters 1–4 are available in full; Chapters 5–11 provide topic summaries. Please see the formally published edition for the complete book.</p>
 <p><strong>Table of contents</strong></p>
 <ul>
