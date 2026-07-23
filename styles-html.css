@@ -1,4 +1,27 @@
 /* HTML-only layout and preview-site components. */
+/* Use platform-native CJK fallbacks only for Chinese code glyphs. */
+@font-face {
+    font-family: "CJK Code Fallback";
+    src: local("Noto Sans Mono CJK TC"), local("PingFang TC"), local("Microsoft JhengHei");
+    unicode-range:
+        U+2E80-2EFF,
+        U+2F00-2FDF,
+        U+3000-303F,
+        U+3100-312F,
+        U+31A0-31BF,
+        U+3400-4DBF,
+        U+4E00-9FFF,
+        U+F900-FAFF,
+        U+FE30-FE4F,
+        U+FF00-FFEF;
+}
+
+:not(pre) > code {
+    font-family: "CJK Code Fallback", "Source Code Pro", ui-monospace,
+        "Cascadia Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+}
+
 body {
     max-width: 1600px;
     margin-right: auto;
@@ -24,6 +47,7 @@ body {
 .language-switch {
     display: inline-flex;
     align-items: center;
+    gap: 0.35rem;
     min-height: 2rem;
     padding: 0.25rem 0.65rem;
     border: 1px solid #ced4da;
@@ -37,16 +61,40 @@ body {
     box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08);
 }
 
-.quarto-secondary-nav .language-switch {
-    margin-left: 0.5rem;
+.site-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.language-switch-wrapper {
+.site-tools-sidebar {
     margin-top: 0.75rem;
 }
 
+.quarto-secondary-nav .site-tools {
+    margin-left: 0.5rem;
+}
+
+.github-repo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.3rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    font-size: 1.15rem;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08);
+}
+
 .language-switch:hover,
-.language-switch:focus {
+.language-switch:focus,
+.github-repo-link:hover,
+.github-repo-link:focus {
     color: var(--bs-link-color, #0d6efd);
     text-decoration: none;
 }
@@ -84,5 +132,11 @@ main.content > section:first-of-type > h2:nth-child(1) {
         padding-right: 0.45rem;
         padding-left: 0.45rem;
         font-size: 0.8125rem;
+    }
+
+    .github-repo-link {
+        width: 1.85rem;
+        height: 1.85rem;
+        font-size: 1.05rem;
     }
 }
