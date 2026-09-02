@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -83,10 +118,16 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../styles-html.css">
 <meta property="og:title" content="Chapter 5: Thread synchronization and classic problems – Concurrency in .NET 10">
 <meta property="og:description" content="Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/en/ch05/images/title.png">
 <meta property="og:site_name" content="Concurrency in .NET 10">
+<meta property="og:image:height" content="431">
+<meta property="og:image:width" content="1091">
 <meta name="twitter:title" content="Chapter 5: Thread synchronization and classic problems – Concurrency in .NET 10">
 <meta name="twitter:description" content="Free English preview of Concurrency in .NET 10, with Chapters 1–4 available in full.">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/en/ch05/images/title.png">
+<meta name="twitter:image-height" content="431">
+<meta name="twitter:image-width" content="1091">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/en/ch05/thread-synchronization.html">
 </head>
 
@@ -99,7 +140,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch05/thread-synchronization.html">5 Thread synchronization</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch05/thread-synchronization.html"><span class="chapter-title">5 Thread synchronization</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -169,8 +210,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">5 Thread synchronization</span></a>
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">5 Thread synchronization</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -214,15 +254,37 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#sec-why-synchronization-is-needed" id="toc-sec-why-synchronization-is-needed" class="nav-link active" data-scroll-target="#sec-why-synchronization-is-needed">Why synchronization is needed: the risk of shared data</a></li>
+  <li><a href="#sec-classic-problems" id="toc-sec-classic-problems" class="nav-link" data-scroll-target="#sec-classic-problems">Classic problems</a>
+  <ul class="collapse">
+  <li><a href="#race-condition" id="toc-race-condition" class="nav-link" data-scroll-target="#race-condition">Race condition</a></li>
+  <li><a href="#sec-deadlocks" id="toc-sec-deadlocks" class="nav-link" data-scroll-target="#sec-deadlocks">Deadlock</a></li>
+  <li><a href="#common-deadlock-prevention-strategies" id="toc-common-deadlock-prevention-strategies" class="nav-link" data-scroll-target="#common-deadlock-prevention-strategies">Common deadlock-prevention strategies</a></li>
+  </ul></li>
+  <li><a href="#sec-synchronization-mechanisms" id="toc-sec-synchronization-mechanisms" class="nav-link" data-scroll-target="#sec-synchronization-mechanisms">Synchronization mechanisms</a>
+  <ul class="collapse">
+  <li><a href="#interlocked-atomic-operations-on-a-single-field" id="toc-interlocked-atomic-operations-on-a-single-field" class="nav-link" data-scroll-target="#interlocked-atomic-operations-on-a-single-field"><code>Interlocked</code>: atomic operations on a single field</a></li>
+  <li><a href="#sec-the-lock-keyword" id="toc-sec-the-lock-keyword" class="nav-link" data-scroll-target="#sec-the-lock-keyword">The <code>lock</code> keyword: the simplest lock</a></li>
+  <li><a href="#a-more-modern-lock-system.threading.lock-.net-9" id="toc-a-more-modern-lock-system.threading.lock-.net-9" class="nav-link" data-scroll-target="#a-more-modern-lock-system.threading.lock-.net-9">A more modern lock: <code>System.Threading.Lock</code> (.NET 9+)</a></li>
+  <li><a href="#the-boundary-between-lock-and-async" id="toc-the-boundary-between-lock-and-async" class="nav-link" data-scroll-target="#the-boundary-between-lock-and-async">The boundary between <code>lock</code> and <code>async</code></a></li>
+  <li><a href="#sec-semaphoreslim" id="toc-sec-semaphoreslim" class="nav-link" data-scroll-target="#sec-semaphoreslim"><code>SemaphoreSlim</code>: limiting concurrency</a></li>
+  <li><a href="#sec-mutex" id="toc-sec-mutex" class="nav-link" data-scroll-target="#sec-mutex"><code>Mutex</code>: cross-process synchronization</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Chapter 5: Thread synchronization and classic problems</h1>
+<h1 class="title"><span id="chapter-05" class="quarto-section-identifier"><span class="chapter-title">Chapter 5: Thread synchronization and classic problems</span></span></h1>
 </div>
 
 
@@ -245,19 +307,557 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This chapter explains why shared data creates race conditions and uses classic concurrency problems to build a practical model for deciding when synchronization is necessary.</p>
-<p><strong>Topics covered</strong></p>
-<ul>
-<li>Shared data, non-atomic operations, and race conditions.</li>
-<li>Classic problems such as deadlock, livelock, and starvation.</li>
-<li>When to use <code>lock</code>, <code>Monitor</code>, mutexes, semaphores, and other synchronization mechanisms.</li>
-</ul>
-<div class="full-edition-notice" data-preview-only="true">
-<p>This chapter is part of the full edition. The free preview edition does not include its full text.</p>
-<p><a href="https://huanlin.cc/en/about/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">View the author’s works and full-edition information</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/title.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
 </div>
+<p>So far, we have learned how to use <code>Task.Run</code> and <code>async/await</code> to perform asynchronous and concurrent work. The former is commonly used to move CPU-bound work onto background threads, while the latter lets us wait for I/O without blocking a thread, helping the application stay responsive. But once multiple threads begin to run truly in parallel, another, trickier problem appears: what happens if they need to access the same data at the same time?</p>
+<p>Imagine a banking system in which account A and account B both transfer money into account C at the same time. If the system does not handle those two concurrent operations correctly, account C may end up with the wrong final balance, causing losses for the bank or its customers.</p>
+<p>That is exactly the problem that <strong>thread synchronization</strong> is meant to solve. Its core goal is simple: <strong>when multiple threads access shared resources, data integrity and consistency must not be compromised.</strong></p>
+<p>This chapter steps into one of the most important and challenging areas of multithreaded programming. By the end, you will be able to:</p>
+<ul>
+<li>Understand why synchronization is needed through concrete examples.</li>
+<li>Recognize two classic problems: <strong>race condition</strong> and <strong>deadlock</strong>.</li>
+<li>Use the most important synchronization tools in .NET: <code>Interlocked</code>, <code>lock</code>, <code>SemaphoreSlim</code>, and <code>Mutex</code>.</li>
+</ul>
+<hr>
+<section id="sec-why-synchronization-is-needed" class="level2">
+<h2 class="anchored" data-anchor-id="sec-why-synchronization-is-needed">Why synchronization is needed: the risk of shared data</h2>
+<p>Consider a simple counter example. The program starts two tasks, and each task increments the same shared counter variable, <code>counter</code>, one million times:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co">// Start two tasks that increment counter concurrently.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-label="4"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-label="6"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-label="8"></a>        counter<span class="op">++;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-label="9"></a>    <span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-label="10"></a><span class="op">});</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-label="11"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-label="12"></a>Task task2 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-label="13"></a><span class="op">{</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-label="14"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-label="15"></a>    <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-label="16"></a>        counter<span class="op">++;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-label="17"></a>    <span class="op">}</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-label="18"></a><span class="op">});</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-label="19"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-label="20"></a><span class="co">// Wait for both tasks to finish.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-label="21"></a>Task<span class="op">.</span><span class="fu">WaitAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-label="22"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-label="23"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"The final counter value is: {counter}"</span><span class="op">);</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Intuitively, we would expect the final result to be <code>2000000</code>. However, when you run this code, you will usually find that the output is unreliable and often falls short of <code>2000000</code>. The final number might be <code>1384127</code> or <code>1098221</code>, and it might differ from run to run. Occasionally, it may even “happen to look correct.” This is one of the hardest parts of concurrent programming: bugs do not always appear consistently, and tiny timing differences in scheduling can determine whether the problem surfaces at all.</p>
+<p>A real run might produce results like these:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a>The final counter value is: 1040247</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>The final counter value is: 1205015</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Note:</strong> The result may differ every time you run it, and now and then it might even “accidentally look correct” and produce <code>2000000</code>.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoRaceCondition">DemoRaceCondition</a></p>
+</blockquote>
+<p>So why is the final counter value not <code>2000000</code>? The problem lies in the seemingly simple expression <code>counter++</code>. If we look at what the computer is really doing, this is not an <strong>atomic operation</strong>. It is actually made up of three separate steps:</p>
+<ol type="1">
+<li><strong>Read</strong> the current value of <code>counter</code> into a CPU register.</li>
+<li><strong>Add one</strong> to that value inside the register.</li>
+<li><strong>Write</strong> the new value back to the memory location of <code>counter</code>.</li>
+</ol>
+<p>Because these three steps can be interrupted and the operating system’s scheduler can perform a <code>context switch</code> between any two machine instructions, the following situation can occur when two threads run the code simultaneously:</p>
+<ol type="1">
+<li><code>Thread A</code> reads the value of <code>counter</code>, say <code>100</code>.</li>
+<li>A <code>context switch</code> happens, and the OS gives control of the CPU to <code>Thread B</code>.</li>
+<li><code>Thread B</code> also reads the value of <code>counter</code>, which is still <code>100</code>.</li>
+<li><code>Thread B</code> adds one, making it <code>101</code>, and writes that value back to <code>counter</code>. Now <code>counter</code> is <code>101</code>.</li>
+<li>Another <code>context switch</code> happens, and control returns to <code>Thread A</code>.</li>
+<li><code>Thread A</code> resumes where it left off, adds one to its register value, which is still <code>100</code>, and gets <code>101</code>.</li>
+<li><code>Thread A</code> writes <code>101</code> back to <code>counter</code>.</li>
+</ol>
+<p>In the end, both threads performed an increment, but <code>counter</code> moved only from <code>100</code> to <code>101</code>, instead of the expected <code>102</code>. One increment was lost. Once this happens hundreds of thousands of times, the large gap in the final result is no longer surprising.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/inc-counter-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-classic-problems" class="level2">
+<h2 class="anchored" data-anchor-id="sec-classic-problems">Classic problems</h2>
+<p>The counter example above demonstrates the first classic difficulty in multithreaded programming: the <strong>race condition</strong>. To build a solid foundation, let’s define it clearly, and then look at another equally common—and often even harder to diagnose—problem: <strong>deadlock</strong>.</p>
+<section id="race-condition" class="level3">
+<h3 class="anchored" data-anchor-id="race-condition">Race condition</h3>
+<p>A <strong>race condition</strong> describes unpredictable behavior in which the final result of a program depends on the <strong>relative timing</strong> of threads running concurrently.</p>
+<p>The counter example is a textbook race condition. Because the “read-modify-write” sequence behind <code>counter++</code> can be interrupted at any time by another thread, the final result depends on which thread “gets there first,” and the outcome becomes unpredictable.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>Race conditions are among the hardest multithreading bugs to debug because they are usually intermittent and difficult to reproduce reliably. More concretely, the exact same code may appear almost problem-free on a dual-core development machine, yet surface much more frequently on a production server with many CPU cores, where true parallel execution becomes far more likely. The most reliable approach is to identify every shared resource accessed by multiple threads and protect it appropriately, whether through synchronization, immutable data, or by avoiding shared mutable state altogether.</p>
+</blockquote>
+</section>
+<section id="sec-deadlocks" class="level3">
+<h3 class="anchored" data-anchor-id="sec-deadlocks">Deadlock</h3>
+<p>If a race condition feels like everybody “rushing at once,” then a <strong>deadlock</strong> is more like everybody being stuck in a standoff.</p>
+<p>This usually happens when two or more threads each hold a resource the other needs, while simultaneously waiting for the other side to release its resource. Without outside intervention, this creates an infinite cycle of waiting.</p>
+<p>Here is a classic bank-transfer analogy. Suppose two threads are running:</p>
+<ul>
+<li><code>Thread A</code>: transfer money from account X to account Y.</li>
+<li><code>Thread B</code>: transfer money from account Y to account X.</li>
+</ul>
+<p>To ensure the transfer is atomic, we require that an account must be locked before it is modified. Now imagine the following execution order:</p>
+<ol type="1">
+<li><code>Thread A</code> successfully locks account X.</li>
+<li><code>Thread B</code> successfully locks account Y.</li>
+<li><code>Thread A</code> tries to lock account Y so it can finish the transfer, but Y is already locked by <code>Thread B</code>, so <code>Thread A</code> goes into a waiting state.</li>
+<li><code>Thread B</code> tries to lock account X so it can finish the transfer, but X is already locked by <code>Thread A</code>, so <code>Thread B</code> also goes into a waiting state.</li>
+</ol>
+<p>At this point, <code>Thread A</code> is waiting for <code>Thread B</code> to release Y, while <code>Thread B</code> is waiting for <code>Thread A</code> to release X. Since neither side can proceed, they wait forever, and the transfer system locks up completely.</p>
+</section>
+<section id="common-deadlock-prevention-strategies" class="level3">
+<h3 class="anchored" data-anchor-id="common-deadlock-prevention-strategies">Common deadlock-prevention strategies</h3>
+<p>Deadlocks usually do not involve a single lock. They happen when <strong>multiple locks wait on each other in a cycle</strong>. Here are a few common deadlock-prevention strategies worth remembering. We will discuss the specific .NET types later in the chapter:</p>
+<ol type="1">
+<li><strong>Use a fixed lock-acquisition order</strong>. When multiple resources must be locked together, every thread must follow the same order. In the bank-transfer example, we could say, “Always lock the lower account number first, then the higher one.” That way, whether the transfer goes from X to Y or from Y to X, all threads try to lock the same account first. This removes the possibility of circular waiting at its root. If everyone always locks X before Y, you can no longer end up with thread A holding Y while waiting for X while thread B holds X and waits for Y.</li>
+<li><strong>Keep the critical section small</strong>. Protect only the necessary shared data. In other words, once you take a lock, do not place I/O, long-running computations, or waiting operations inside it.</li>
+<li><strong>Avoid waiting forever</strong>. Prefer “try to acquire the lock” APIs when possible, such as <code>Monitor.TryEnter</code>, or waiting APIs that support a timeout, such as <code>Mutex.WaitOne(timeout)</code>. If the lock cannot be acquired, give up or retry later instead of blocking forever.</li>
+<li><strong>Prefer higher-level abstractions</strong>. If <code>SemaphoreSlim</code>, thread-safe collections, or message queues can solve the problem, avoid hand-writing coordination logic across multiple locks unless absolutely necessary.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/anti-deadlock-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-synchronization-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="sec-synchronization-mechanisms">Synchronization mechanisms</h2>
+<p>To address the risks of race conditions and deadlocks, .NET provides several synchronization mechanisms. Although they differ in implementation details, they all serve the same fundamental purpose: defining and protecting a <strong>critical section</strong> in your code. This ensures that only a limited number of threads—sometimes only one—can enter that block at any given time.</p>
+<p>To address different concurrency needs, this section covers the most common tools first, then moves on to more specialized scenarios:</p>
+<ul>
+<li><strong><code>Interlocked</code></strong>: The lightest-weight choice when you only need atomic operations on a single shared field, such as a counter or a state flag.</li>
+<li><strong><code>lock</code> and <code>System.Threading.Lock</code></strong>: The default choices when you need to protect a shared resource and ensure exclusive access.</li>
+<li><strong><code>SemaphoreSlim</code></strong>: Useful when you need to limit concurrent access to “at most N at a time.”</li>
+<li><strong><code>Mutex</code></strong>: Useful for cross-process synchronization, such as preventing multiple instances of an application from running simultaneously.</li>
+</ul>
+<p>Once you understand these four categories, you can quickly choose the right mechanism based on the <strong>scope of synchronization</strong> and the <strong>number of concurrent entries allowed</strong>.</p>
+<section id="interlocked-atomic-operations-on-a-single-field" class="level3">
+<h3 class="anchored" data-anchor-id="interlocked-atomic-operations-on-a-single-field"><code>Interlocked</code>: atomic operations on a single field</h3>
+<p>When you are working with simple scenarios such as counters, state flags, or reference swaps, and you only need to operate on <strong>one shared field</strong>, the lightweight <code>Interlocked</code> class is often a good fit.</p>
+<p><code>Interlocked</code> provides atomic operations backed by guarantees at the CPU and operating-system level. Common methods include:</p>
+<ul>
+<li><code>Interlocked.Increment</code> / <code>Decrement</code></li>
+<li><code>Interlocked.Add</code></li>
+<li><code>Interlocked.Exchange</code></li>
+<li><code>Interlocked.CompareExchange</code></li>
+</ul>
+<p>Next, let’s use <code>Interlocked.Increment</code> to fix the counter problem from earlier in the chapter. The following example uses <code>Parallel.For</code> to perform one million increments, while <code>Interlocked.Increment</code> guarantees that each increment happens atomically and does not interfere with the others:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>Parallel<span class="op">.</span><span class="fu">For</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>_000_000<span class="op">,</span> _ <span class="op">=&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a>    Interlocked<span class="op">.</span><span class="fu">Increment</span><span class="op">(</span><span class="kw">ref</span> counter<span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a><span class="op">});</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>counter<span class="op">);</span> <span class="co">// Predictable result</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Here, <code>Parallel.For</code> is the parallel loop utility provided by .NET. It automatically spreads iterations across multiple threads. In this example, we deliberately use it to create a “many threads competing at once” scenario so we can verify the atomicity guarantee of <code>Interlocked.Increment</code>. We will cover the <code>Parallel</code> class in more detail in chapter 7.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoInterlocked">DemoInterlocked</a></p>
+</blockquote>
+<p>That said, while <code>Interlocked</code> is excellent for solving counter-style races, its scope is limited. It is suitable only for atomic updates to a single field. Once your business logic involves <strong>multiple fields that must change together and remain consistent</strong>, <code>Interlocked</code> is no longer enough. Even if you call an <code>Interlocked</code> method on each field separately, other threads may still observe an inconsistent intermediate state—for example, after the first field is updated but before the second one is. In such situations, you should use <code>lock</code> or another mechanism that protects the entire critical section.</p>
+</section>
+<section id="sec-the-lock-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-lock-keyword">The <code>lock</code> keyword: the simplest lock</h3>
+<p>Now that we have seen how to protect a single variable, let’s move on to the most common synchronization tool: <code>lock</code>.</p>
+<p><code>lock</code> is one of the most widely used synchronization mechanisms in C#. It ensures that only one thread can enter a <code>lock</code> block at a time.</p>
+<p>To use <code>lock</code>, you must first prepare a lock object that all participating threads can access. In practice, that object is usually a private <code>readonly object</code> field.</p>
+<p>Here is the broken counter example rewritten using <code>lock</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co">// Protect the counter with lock.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="dt">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="fu">ThreadSafeCounter</span><span class="op">();</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-label="3"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-label="4"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-label="7"></a>        counter<span class="op">.</span><span class="fu">Increment</span><span class="op">();</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-label="8"></a><span class="op">});</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-label="9"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-label="10"></a>Task task2 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-label="11"></a><span class="op">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-label="12"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-label="13"></a>        counter<span class="op">.</span><span class="fu">Increment</span><span class="op">();</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-label="14"></a><span class="op">});</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-label="15"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-label="16"></a>Task<span class="op">.</span><span class="fu">WaitAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-label="17"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-label="18"></a><span class="co">// The result is always 2000000.</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-label="19"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"The final counter value is: {counter.Value}"</span><span class="op">);</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-label="20"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-label="21"></a><span class="kw">public</span> <span class="kw">class</span> ThreadSafeCounter</span>
+<span id="cb5-22"><a href="#cb5-22" aria-label="22"></a><span class="op">{</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-label="23"></a>    <span class="kw">private</span> <span class="dt">int</span> _count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-label="24"></a>    <span class="kw">private</span> <span class="kw">readonly</span> <span class="dt">object</span> _lock <span class="op">=</span> <span class="kw">new</span> <span class="dt">object</span><span class="op">();</span> <span class="co">// Lock object</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-label="25"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-label="26"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">Increment</span><span class="op">()</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-label="27"></a>    <span class="op">{</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-label="28"></a>        <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span> <span class="co">// Enter the critical section</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-label="29"></a>        <span class="op">{</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-label="30"></a>            _count<span class="op">++;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-label="31"></a>        <span class="op">}</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-label="32"></a>    <span class="op">}</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-label="33"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-label="34"></a>    <span class="kw">public</span> <span class="dt">int</span> Value</span>
+<span id="cb5-35"><a href="#cb5-35" aria-label="35"></a>    <span class="op">{</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-label="36"></a>        get</span>
+<span id="cb5-37"><a href="#cb5-37" aria-label="37"></a>        <span class="op">{</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-label="38"></a>            <span class="co">// In this specific example,</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-label="39"></a>            <span class="co">// locking the getter is not strictly required.</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-label="40"></a>            <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-label="41"></a>            <span class="op">{</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-label="42"></a>                <span class="kw">return</span> _count<span class="op">;</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-label="43"></a>            <span class="op">}</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-label="44"></a>        <span class="op">}</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-label="45"></a>    <span class="op">}</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-label="46"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>One detail is worth highlighting. In the execution flow of this sample, the main program already calls <code>Task.WaitAll</code> and waits for both tasks to finish before it reads the <code>Value</code> property. For that reason, the getter would still return the correct result even without a <code>lock</code> here. <code>Task.WaitAll</code> guarantees that all writes from both tasks have completed before the read happens, so there is no race in this particular read. However, if you intend to design <code>ThreadSafeCounter</code> as a reusable thread-safe type, a stricter approach is better: both reads and writes should use the same lock. This is the safer and more widely recommended practice.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoLock">DemoLock</a></p>
+</blockquote>
+<p>With this change in place, any thread that wants to increment <code>_count</code> or read <code>Value</code> must first acquire the exclusive lock on <code>_lock</code>. If another thread already holds the lock, subsequent threads must wait. Once the current owner leaves the <code>lock</code> block, the lock is released automatically, and the next waiting thread gets a chance to enter. Through this mechanism, the “read-modify-write” operation behind <code>_count++</code> is wrapped into a single indivisible unit, and readers will not observe an intermediate value.</p>
+<p>The reasons <code>_lock</code> is declared as <code>private readonly object</code> are:</p>
+<ul>
+<li><strong>private</strong>: only code inside this class can lock it, preventing external code from accidentally locking the same object and causing deadlocks.</li>
+<li><strong>readonly</strong>: the lock object itself cannot be accidentally replaced later.</li>
+<li><strong>object</strong>: any reference type could work, but <code>object</code> is the simplest option.</li>
+</ul>
+<p>There is one critical warning to keep in mind. While any reference type can technically serve as a lock target, you should avoid locking the following three types because doing so can lead to hard-to-diagnose deadlocks or synchronization bugs:</p>
+<ol type="1">
+<li><strong>Value types (<code>struct</code>)</strong>: you cannot directly use a value type as a <code>lock</code> target because the C# compiler rejects it. Be especially careful not to “work around” that compiler error by manually casting the value to <code>object</code> before locking. This causes boxing, creating a different object each time, which makes the locking protection useless.</li>
+<li><strong>Strings (<code>string</code>)</strong>: this is a well-known anti-pattern. Because of .NET string interning, identical string literals and strings explicitly passed to <code>string.Intern()</code> may refer to the same object instance. If you lock <code>"my_lock"</code> and some unrelated third-party library also locks <code>"my_lock"</code>, the two pieces of code can block each other, causing surprising cross-module deadlocks. Dynamically constructed strings are not usually interned, but you cannot safely assume that third-party code will never intern the same value, so strings as a whole are risky lock objects.</li>
+<li><strong>Type objects (<code>typeof(T)</code>)</strong>: the reason is similar to strings. The <code>Type</code> instance representing a given type is unique and globally shared within the process.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lock-object-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>C# does not allow <code>await</code> inside a <code>lock</code> block, regardless of whether the target is a traditional <code>object</code> or the newer <code>.NET 9+</code> type <code>System.Threading.Lock</code>. In the former case, the issue is thread affinity in <code>Monitor</code>. In the latter case, the issue is that <code>Lock.Scope</code> is a <code>ref struct</code>, which cannot live across an <code>await</code> boundary. If a critical section must wait for asynchronous work, use an async-friendly mutual-exclusion approach such as <code>SemaphoreSlim(1, 1)</code> instead, but be aware of its own traps, which we will discuss later.</p>
+</blockquote>
+<section id="the-relationship-between-traditional-lockobject-and-monitor" class="level4">
+<h4 class="anchored" data-anchor-id="the-relationship-between-traditional-lockobject-and-monitor">The relationship between traditional <code>lock(object)</code> and <code>Monitor</code></h4>
+<p>When the target of <code>lock</code> is a normal reference type, such as <code>object</code>, the <code>lock</code> keyword can be viewed as syntactic sugar over the <code>Monitor</code> class. When you write:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    <span class="co">// Critical section</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-label="4"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>the compiler turns it into code roughly like this:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="dt">bool</span> lockTaken <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="kw">try</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-label="4"></a>    Monitor<span class="op">.</span><span class="fu">Enter</span><span class="op">(</span>_lock<span class="op">,</span> <span class="kw">ref</span> lockTaken<span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-label="5"></a>    <span class="co">// Critical section</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-label="6"></a><span class="op">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-label="7"></a><span class="kw">finally</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a><span class="op">{</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a>    <span class="kw">if</span> <span class="op">(</span>lockTaken<span class="op">)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a>    <span class="op">{</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a>        Monitor<span class="op">.</span><span class="fu">Exit</span><span class="op">(</span>_lock<span class="op">);</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-label="12"></a>    <span class="op">}</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-label="13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>That translation logic mainly applies to the traditional <code>lock(object)</code> form. Starting with C# 13 and .NET 9, if your lock object is <code>System.Threading.Lock</code>, the compiler instead uses a specialized, optimized path, effectively generating <code>using (_lock.EnterScope()) { ... }</code> under the hood instead of the traditional <code>Monitor.Enter/Exit</code>.</p>
+<p>In most situations, using the <code>lock</code> keyword directly is sufficient. It is concise and automatically handles cleanup. However, in certain advanced cases, calling <code>Monitor</code> methods directly provides greater control. For example, one of the deadlock-prevention strategies mentioned earlier, “avoid waiting forever,” can be implemented with <code>Monitor.TryEnter</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="dt">object</span> _lock <span class="op">=</span> <span class="kw">new</span> <span class="dt">object</span><span class="op">();</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co">// Try to acquire the lock for at most 5 seconds</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-label="4"></a><span class="co">// instead of blocking forever.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-label="5"></a><span class="kw">if</span> <span class="op">(</span>Monitor<span class="op">.</span><span class="fu">TryEnter</span><span class="op">(</span>_lock<span class="op">,</span> TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">5</span><span class="op">)))</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-label="6"></a><span class="op">{</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-label="7"></a>    <span class="kw">try</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-label="8"></a>    <span class="op">{</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-label="9"></a>        <span class="co">// The lock was acquired successfully. Run the critical section.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-label="10"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Lock acquired. Doing work..."</span><span class="op">);</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-label="11"></a>    <span class="op">}</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-label="12"></a>    <span class="kw">finally</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-label="13"></a>    <span class="op">{</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-label="14"></a>        Monitor<span class="op">.</span><span class="fu">Exit</span><span class="op">(</span>_lock<span class="op">);</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-label="15"></a>    <span class="op">}</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-label="16"></a><span class="op">}</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-label="17"></a><span class="kw">else</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-label="18"></a><span class="op">{</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-label="19"></a>    <span class="co">// The lock could not be acquired. Give up or choose another strategy.</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-label="20"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-label="21"></a>        <span class="st">"Could not acquire the lock. "</span> <span class="op">+</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-label="22"></a>        <span class="st">"Giving up or retrying later."</span><span class="op">);</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-label="23"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The benefit of this approach is that if the program cannot acquire the lock within the timeout, it can choose an alternative strategy instead of waiting indefinitely, reducing the risk of deadlock.</p>
+<blockquote class="blockquote">
+<p><strong>Further reading:</strong> Microsoft documentation, <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock">The lock statement - ensure exclusive access to a shared resource</a></p>
+</blockquote>
+</section>
+</section>
+<section id="a-more-modern-lock-system.threading.lock-.net-9" class="level3">
+<h3 class="anchored" data-anchor-id="a-more-modern-lock-system.threading.lock-.net-9">A more modern lock: <code>System.Threading.Lock</code> (.NET 9+)</h3>
+<p>As mentioned earlier, traditional <code>lock (object)</code> is expanded by the compiler into <code>Monitor.Enter/Exit</code>. In .NET 9 or later, if you need a lock within a single process, you can use the dedicated lock type <strong><code>System.Threading.Lock</code></strong> instead. Its usage looks very similar to the traditional <code>lock</code>, but its intent is clearer, and it can be more efficient in high-concurrency scenarios:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co">// Use the dedicated Lock type instead of object.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-label="4"></a>Lock _lock <span class="op">=</span> <span class="kw">new</span> <span class="fu">Lock</span><span class="op">();</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-label="5"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-label="6"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-label="7"></a><span class="op">{</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-label="8"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-label="9"></a>    <span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-label="10"></a>        <span class="co">// The syntax looks the same as before, but the compiler</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-label="11"></a>        <span class="co">// generates more efficient code for Lock.</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-label="12"></a>        <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-label="13"></a>        <span class="op">{</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-label="14"></a>            counter<span class="op">++;</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-label="15"></a>        <span class="op">}</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-label="16"></a>    <span class="op">}</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-label="17"></a><span class="op">});</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Besides working with the <code>lock</code> keyword, <code>System.Threading.Lock</code> also provides a more explicit API: <code>EnterScope()</code>. This method returns a <code>ref struct</code> named <code>Lock.Scope</code>. Although it does not implement <code>IDisposable</code>, it does expose a <code>Dispose()</code> method, which makes it a natural fit for <code>using</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co">// The EnterScope style</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="kw">using</span> <span class="op">(</span>_lock<span class="op">.</span><span class="fu">EnterScope</span><span class="op">())</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-label="4"></a>    <span class="co">// Enter the critical section</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-label="5"></a>    counter<span class="op">++;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-label="6"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>That means the lock is released automatically when execution leaves the <code>using</code> block. See the Microsoft documentation: <a href="https://learn.microsoft.com/dotnet/api/system.threading.lock.scope">Lock.Scope struct</a>.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoLockNet9Plus">DemoLockNet9Plus</a></p>
+</blockquote>
+<p>One benefit of this style is that, when used with <code>using</code>, the lock is still released automatically even if an exception occurs. <code>System.Threading.Lock</code> also provides more advanced methods such as <code>Enter</code>, <code>TryEnter</code>, and <code>Exit</code>, which give you more explicit control when you need it.</p>
+<blockquote class="blockquote">
+<p><strong>Recommendation</strong></p>
+<p>If your project has already moved to .NET 9 or later, prefer <code>System.Threading.Lock</code> over the traditional <code>object</code> lock when practical. It gives you clearer intent, and in lightly contended scenarios, it also performs better than the traditional <code>Monitor</code>-based approach.</p>
+</blockquote>
+<p><strong>Further reading:</strong> Microsoft documentation, <a href="https://learn.microsoft.com/dotnet/api/system.threading.lock">Lock Class</a></p>
+</section>
+<section id="the-boundary-between-lock-and-async" class="level3">
+<h3 class="anchored" data-anchor-id="the-boundary-between-lock-and-async">The boundary between <code>lock</code> and <code>async</code></h3>
+<p>This is a good place to pause and organize a few key ideas, because developers often stumble here when transitioning from synchronous to asynchronous code:</p>
+<ul>
+<li><code>lock</code> is a <strong>thread-oriented</strong> synchronization mechanism. Its job is to protect short, synchronous critical sections that do not involve I/O blocking.</li>
+<li>C# does not allow <code>await</code> inside a <code>lock</code> block, regardless of which lock target is used:
+<ul>
+<li><strong><code>lock(object)</code></strong>: the compiler expands it into <code>Monitor.Enter/Exit</code>, and <code>Monitor</code> has thread affinity. In other words, the thread that acquires the lock must also release it. However, after an <code>await</code> expression, execution may resume on a different thread, preventing the lock from being released correctly.</li>
+<li><strong><code>lock(Lock)</code></strong> (.NET 9+): when the target is <code>System.Threading.Lock</code>, the compiler expands it into <code>using (_lock.EnterScope())</code>, and <code>Lock.Scope</code> is a <code>ref struct</code>. A <code>ref struct</code> cannot live across an <code>await</code> boundary, so the compiler rejects this usage directly. The deeper reason is that <code>await</code> lifts locals into fields of the async state machine, and <code>ref struct</code> values are not allowed to become fields.</li>
+</ul></li>
+</ul>
+<p>If your requirement is “only one asynchronous flow may enter at a time,” then you should use <code>SemaphoreSlim(1, 1)</code> as the mutual-exclusion mechanism instead. The first <code>1</code> is the initial count, and the second <code>1</code> is the maximum count. When both are <code>1</code>, at most one flow may enter at a time, which is effectively mutual exclusion. Here is the typical pattern:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="kw">private</span> <span class="kw">readonly</span> SemaphoreSlim _gate <span class="op">=</span> <span class="kw">new</span><span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-label="2"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>async Task <span class="fu">UpdateSharedStateAsync</span><span class="op">()</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-label="5"></a>    await _gate<span class="op">.</span><span class="fu">WaitAsync</span><span class="op">();</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-label="6"></a>    <span class="kw">try</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-label="8"></a>        await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">100</span><span class="op">);</span> <span class="co">// Simulate asynchronous work</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-label="9"></a>        <span class="co">// Update shared state</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-label="10"></a>    <span class="op">}</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-label="11"></a>    <span class="kw">finally</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-label="13"></a>        _gate<span class="op">.</span><span class="fu">Release</span><span class="op">();</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-label="14"></a>    <span class="op">}</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-label="15"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This “async mutual exclusion” pattern is very common in I/O-bound code.</p>
+<blockquote class="blockquote">
+<p><strong>Further reading:</strong> Microsoft documentation, <a href="https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim">SemaphoreSlim Class</a></p>
+</blockquote>
+</section>
+<section id="sec-semaphoreslim" class="level3">
+<h3 class="anchored" data-anchor-id="sec-semaphoreslim"><code>SemaphoreSlim</code>: limiting concurrency</h3>
+<p>The <code>lock</code> mechanism discussed earlier provides <strong>exclusive access</strong>—one thread at a time. However, sometimes our requirement is not “only one,” but rather <strong>“at most N at a time.”</strong> This is where <code>SemaphoreSlim</code> comes in.</p>
+<p>You can think of <code>SemaphoreSlim</code> as the bouncer at the entrance of a nightclub. Suppose the club is allowed to hold at most 100 guests, and the bouncer has 100 wristbands, corresponding to the initial count of the semaphore. Every time a guest enters, the bouncer gives out one wristband. Every time a guest leaves, the bouncer takes one back. Once all wristbands have been handed out, anyone else who wants to get in has to wait in line until a wristband becomes available again.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/semaphore-slim-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+<p>For example, it can limit:</p>
+<ul>
+<li>How many files can be downloaded simultaneously.</li>
+<li>How many concurrent calls can be made to an external API.</li>
+<li>How many database connections can be used concurrently.</li>
+</ul>
+<p>It is also well suited to <code>async/await</code> because it provides the <code>WaitAsync()</code> method. This allows your code to wait for an available “wristband” asynchronously without blocking a thread. Here is a typical example:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co">// Allow at most 3 operations to perform</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="co">// this expensive work at the same time.</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>SemaphoreSlim _semaphore <span class="op">=</span> <span class="kw">new</span> <span class="fu">SemaphoreSlim</span><span class="op">(</span><span class="dv">3</span><span class="op">,</span> <span class="dv">3</span><span class="op">);</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-label="4"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-label="5"></a>async Task <span class="fu">PerformExpensiveOperationAsync</span><span class="op">(</span><span class="dt">int</span> id<span class="op">)</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-label="6"></a><span class="op">{</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-label="7"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Task {id} is waiting to enter..."</span><span class="op">);</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-label="8"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-label="9"></a>    <span class="co">// Wait asynchronously for a slot.</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-label="10"></a>    await _semaphore<span class="op">.</span><span class="fu">WaitAsync</span><span class="op">();</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-label="11"></a>    <span class="kw">try</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-label="13"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"--&gt; Task {id} entered and is running..."</span><span class="op">);</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-label="14"></a>        await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// Simulate expensive work</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-label="15"></a>    <span class="op">}</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-label="16"></a>    <span class="kw">finally</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-label="17"></a>    <span class="op">{</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-label="18"></a>        <span class="co">// Always release the slot.</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-label="19"></a>        _semaphore<span class="op">.</span><span class="fu">Release</span><span class="op">();</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-label="20"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"&lt;-- Task {id} left."</span><span class="op">);</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-label="21"></a>    <span class="op">}</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-label="22"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Notice that <code>Release()</code> is called inside the <code>finally</code> block so the slot is returned even if an exception occurs. Also notice that when we declared the semaphore, we explicitly set both <code>maxCount</code> and the initial count to <code>3</code>. This not only clearly communicates that “the capacity limit is three,” but also helps the runtime catch bugs earlier if someone accidentally calls <code>Release()</code> too many times and exceeds the configured maximum.</p>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoSemaphoreSlim">DemoSemaphoreSlim</a></p>
+</blockquote>
+<p>Example output, abbreviated:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>Task 1 is waiting to enter...</span>
+<span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>--&gt; Task 1 entered and is running...</span>
+<span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>Task 2 is waiting to enter...</span>
+<span id="cb13-4"><a href="#cb13-4" aria-label="4"></a>--&gt; Task 2 entered and is running...</span>
+<span id="cb13-5"><a href="#cb13-5" aria-label="5"></a>Task 3 is waiting to enter...</span>
+<span id="cb13-6"><a href="#cb13-6" aria-label="6"></a>--&gt; Task 3 entered and is running...</span>
+<span id="cb13-7"><a href="#cb13-7" aria-label="7"></a>Task 4 is waiting to enter...</span>
+<span id="cb13-8"><a href="#cb13-8" aria-label="8"></a>Task 5 is waiting to enter...</span>
+<span id="cb13-9"><a href="#cb13-9" aria-label="9"></a>Task 6 is waiting to enter...</span>
+<span id="cb13-10"><a href="#cb13-10" aria-label="10"></a>...</span>
+<span id="cb13-11"><a href="#cb13-11" aria-label="11"></a>&lt;-- Task 1 left.</span>
+<span id="cb13-12"><a href="#cb13-12" aria-label="12"></a>&lt;-- Task 3 left.</span>
+<span id="cb13-13"><a href="#cb13-13" aria-label="13"></a>&lt;-- Task 2 left.</span>
+<span id="cb13-14"><a href="#cb13-14" aria-label="14"></a>--&gt; Task 4 entered and is running...</span>
+<span id="cb13-15"><a href="#cb13-15" aria-label="15"></a>--&gt; Task 5 entered and is running...</span>
+<span id="cb13-16"><a href="#cb13-16" aria-label="16"></a>--&gt; Task 6 entered and is running...</span>
+<span id="cb13-17"><a href="#cb13-17" aria-label="17"></a>...</span>
+<span id="cb13-18"><a href="#cb13-18" aria-label="18"></a>All tasks have finished.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This output clearly illustrates the behavior. Initially, only three tasks can enter. As tasks leave, waiting tasks can enter in turn.</p>
+<blockquote class="blockquote">
+<p><strong>Important: the reentrancy trap of <code>SemaphoreSlim</code></strong></p>
+<p>When converting traditional synchronous code that uses <code>lock</code> into an asynchronous version that uses <code>await SemaphoreSlim.WaitAsync()</code>, one of the easiest mistakes to make is forgetting about <strong>reentrancy</strong>.</p>
+<p><code>lock</code> is <strong>reentrant</strong> and is tied to a thread. If the same thread enters the same <code>lock</code> again, it does not get stuck waiting on itself.</p>
+<p><code>SemaphoreSlim</code>, however, has <strong>no concept of thread ownership at all</strong>. You can think of it as recognizing wristbands, not people. If the same asynchronous execution flow—such as a recursive call or method A awaiting method B while both try to acquire the same <code>SemaphoreSlim</code>—ends up calling <code>WaitAsync()</code> twice, the second call will wait for a slot that will never become available. In other words, the flow deadlocks itself. This detail is easy to miss when designing async mutual exclusion, so treat it with care.</p>
+</blockquote>
+</section>
+<section id="sec-mutex" class="level3">
+<h3 class="anchored" data-anchor-id="sec-mutex"><code>Mutex</code>: cross-process synchronization</h3>
+<p>A <code>Mutex</code> (short for “mutual exclusion”) serves a similar purpose to <code>lock</code> by providing exclusive access. However, it has one key difference: a <code>Mutex</code> can be <strong>system-wide</strong>. This means it can synchronize threads <strong>across different processes</strong>.</p>
+<p>This is useful for scenarios such as:</p>
+<ul>
+<li>Ensuring only a single instance of an application is running within the scope of a named mutex.</li>
+<li>Coordinating access to shared files or hardware resources across multiple independent applications.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/mutex-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>The following example demonstrates one of the most common uses of a named <code>Mutex</code>: detecting whether another instance already holds the same system-level lock.</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>The following example uses the new .NET 10 type <code>NamedWaitHandleOptions</code> with <code>CurrentUserOnly</code> and <code>CurrentSessionOnly</code>. If your target framework is .NET 9, you can remove that constructor argument and fall back to the traditional <code>new Mutex(false, name)</code> form.</p>
+</blockquote>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co">// Create a named mutex.</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co">// The name should be a unique</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="co">// cross-platform-friendly string to avoid collisions.</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-label="4"></a><span class="co">// In .NET 10, NamedWaitHandleOptions can be used</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-label="5"></a><span class="co">// to define the visibility scope explicitly.</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-label="6"></a><span class="kw">using</span> Mutex mutex <span class="op">=</span> <span class="kw">new</span> <span class="fu">Mutex</span><span class="op">(</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-label="7"></a>    <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-label="8"></a>    <span class="st">"com.example.myawesomeapp.single-instance.A1B2C3D4"</span><span class="op">,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-label="9"></a>    <span class="kw">new</span> NamedWaitHandleOptions</span>
+<span id="cb14-10"><a href="#cb14-10" aria-label="10"></a>    <span class="op">{</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-label="11"></a>        CurrentUserOnly <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-label="12"></a>        CurrentSessionOnly <span class="op">=</span> <span class="kw">true</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-label="13"></a>    <span class="op">});</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-label="14"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-label="15"></a><span class="kw">try</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-label="16"></a><span class="op">{</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-label="17"></a>    <span class="co">// Try to acquire the lock. Wait 0 milliseconds</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-label="18"></a>    <span class="co">// so the call returns immediately.</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-label="19"></a>    <span class="kw">if</span> <span class="op">(!</span>mutex<span class="op">.</span><span class="fu">WaitOne</span><span class="op">(</span><span class="dv">0</span><span class="op">))</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-label="20"></a>    <span class="op">{</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-label="21"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-label="22"></a>            <span class="st">"The application is already running. "</span> <span class="op">+</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-label="23"></a>            <span class="st">"Do not open it twice."</span><span class="op">);</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-label="24"></a>        <span class="kw">return</span><span class="op">;</span> <span class="co">// Exit the application</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-label="25"></a>    <span class="op">}</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-label="26"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-label="27"></a>    <span class="kw">try</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-label="28"></a>    <span class="op">{</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-label="29"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-label="30"></a>            <span class="st">"Application started successfully. "</span> <span class="op">+</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-label="31"></a>            <span class="st">"Press Enter to exit..."</span><span class="op">);</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-label="32"></a>        Console<span class="op">.</span><span class="fu">ReadLine</span><span class="op">();</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-label="33"></a>    <span class="op">}</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-label="34"></a>    <span class="kw">finally</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-label="35"></a>    <span class="op">{</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-label="36"></a>        <span class="co">// Make sure the mutex is released when leaving.</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-label="37"></a>        mutex<span class="op">.</span><span class="fu">ReleaseMutex</span><span class="op">();</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-label="38"></a>    <span class="op">}</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-label="39"></a><span class="op">}</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-label="40"></a><span class="kw">catch</span> <span class="op">(</span>AbandonedMutexException<span class="op">)</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-label="41"></a><span class="op">{</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-label="42"></a>    <span class="co">// Defensive handling:</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-label="43"></a>    <span class="co">// if the previous owner of the mutex ended abnormally,</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-label="44"></a>    <span class="co">// and at that time there were still other waiters</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-label="45"></a>    <span class="co">// or open handles that kept the named mutex object alive,</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-label="46"></a>    <span class="co">// then the next waiter to succeed on</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-label="47"></a>    <span class="co">// WaitOne may receive AbandonedMutexException.</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-label="48"></a>    <span class="co">// Receiving this exception means this instance now owns the mutex,</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-label="49"></a>    <span class="co">// but it does not guarantee</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-label="50"></a>    <span class="co">// that the protected shared state is still safe</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-label="51"></a>    <span class="co">// or consistent.</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-label="52"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-label="53"></a>        <span class="st">"Detected that the previous application instance "</span> <span class="op">+</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-label="54"></a>        <span class="st">"did not close cleanly (abandoned mutex)."</span><span class="op">);</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-label="55"></a></span>
+<span id="cb14-56"><a href="#cb14-56" aria-label="56"></a>    <span class="co">// ... state validation or repair logic could go here ...</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-label="57"></a>    <span class="kw">try</span></span>
+<span id="cb14-58"><a href="#cb14-58" aria-label="58"></a>    <span class="op">{</span></span>
+<span id="cb14-59"><a href="#cb14-59" aria-label="59"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-60"><a href="#cb14-60" aria-label="60"></a>            <span class="st">"Application started successfully. "</span> <span class="op">+</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-label="61"></a>            <span class="st">"Press Enter to exit..."</span><span class="op">);</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-label="62"></a>        Console<span class="op">.</span><span class="fu">ReadLine</span><span class="op">();</span></span>
+<span id="cb14-63"><a href="#cb14-63" aria-label="63"></a>    <span class="op">}</span></span>
+<span id="cb14-64"><a href="#cb14-64" aria-label="64"></a>    <span class="kw">finally</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-label="65"></a>    <span class="op">{</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-label="66"></a>        mutex<span class="op">.</span><span class="fu">ReleaseMutex</span><span class="op">();</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-label="67"></a>    <span class="op">}</span></span>
+<span id="cb14-68"><a href="#cb14-68" aria-label="68"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch05/DemoMutex">DemoMutex</a></p>
+</blockquote>
+<p>There are two important considerations. First, the naming style of a mutex affects its cross-platform behavior. On Windows, prefixes such as <code>Global\</code> and <code>Local\</code> affect the visibility of the lock across terminal sessions. If no prefix is specified, the behavior defaults to <code>Local\</code>. However, on Linux or macOS, these prefixes do not necessarily have the same meaning. Therefore, if your goal is a “single instance across platforms,” it is better to avoid platform-specific prefixes. Instead, use a unique reverse-domain-style name appended with a GUID or another uniquely identifiable suffix. Always test this behavior on the actual target platform before shipping.</p>
+<p>Second, in modern .NET, you should carefully consider the security scope of named wait handles. If you use the traditional <code>new Mutex(false, name)</code> form, the resulting lock is not necessarily limited to the user who created it. If another user on the same machine runs the same code, their process might open a mutex with the identical name and interfere with yours. If your requirement is strictly “single instance for the current user,” use <code>NamedWaitHandleOptions.CurrentUserOnly</code> to make that intent explicit. In the sample above, we also set <code>CurrentSessionOnly = true</code>, which further limits the lock to the current session of the current user. If you truly need sharing across sessions, that option can be set to <code>false</code> instead.</p>
+<blockquote class="blockquote">
+<p><strong>Warning: the abandoned-mutex trap</strong></p>
+<p>A cross-process <code>Mutex</code> has a unique exception behavior. If the thread holding the mutex ends abnormally and never gets a chance to call <code>ReleaseMutex()</code>, the outcome depends on whether there are any waiters at that time:</p>
+<ul>
+<li><strong>If other threads are waiting</strong> and the mutex object stays alive because handles still exist, then the next waiter that successfully acquires the mutex will <strong>definitely</strong> receive <code>AbandonedMutexException</code>. This exception means ownership of the mutex has been transferred to your code, but it is also a warning sign: the previous owner may have died before leaving the protected shared state in a clean condition. If the mutex protects an important data structure, validate or repair the state before continuing. If it is only used as a single-instance gate, logging a warning and continuing is often acceptable. In this case, a defensive <code>catch (AbandonedMutexException)</code> is appropriate.</li>
+<li><strong>If there are no waiters and all handles have been closed</strong>, then the named mutex object itself disappears. The next process creates a brand-new mutex with the same name and <strong>does not</strong> receive <code>AbandonedMutexException</code>. In this scenario, no special handling is typically required.</li>
+</ul>
+</blockquote>
+<p>Overall, <code>Mutex</code> is a heavier synchronization tool than <code>lock</code> and incurs greater performance overhead due to operating-system kernel calls. For most cases where you only need to coordinate threads within a single application, <code>lock</code> or <code>SemaphoreSlim</code> is a better and more efficient choice.</p>
+<p><strong>Related Microsoft documentation:</strong></p>
+<ul>
+<li><a href="https://learn.microsoft.com/dotnet/standard/threading/mutexes">Mutexes</a></li>
+<li><a href="https://learn.microsoft.com/dotnet/api/system.threading.abandonedmutexexception">AbandonedMutexException Class</a></li>
+</ul>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>This chapter introduced one of the trickiest categories of problems in multithreaded programming. We started with a simple counter example and saw how unprotected shared data can produce a race condition. Then, through the bank-transfer analogy, we saw how deadlocks can trap multiple threads in an endless cycle of waiting.</p>
+<p>To address these challenges, we explored four key synchronization mechanisms:</p>
+<ul>
+<li><strong><code>Interlocked</code></strong>: for atomic operations on a single shared field, such as incrementing a counter or swapping a flag. In the right scenario, it is lighter than <code>lock</code>.</li>
+<li><strong><code>lock</code></strong> and <strong><code>System.Threading.Lock</code></strong>: for building simple exclusive critical sections and protecting a single in-memory resource. These are the most common mutual-exclusion tools in day-to-day development.</li>
+<li><strong><code>SemaphoreSlim</code></strong>: for limiting how many operations can enter a resource or critical section simultaneously. It is a powerful tool for controlling concurrency levels and throttling.</li>
+<li><strong><code>Mutex</code></strong>: for cross-process synchronization, useful for system-level coordination such as preventing an application from launching multiple instances.</li>
+</ul>
+<p>With these synchronization tools in mind, you can write reliable concurrent code with more confidence. Even so, manually managed locks still carry hidden risks. A mistake as simple as forgetting to release a lock in a <code>finally</code> block can cause serious problems.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sync-tools-matrix-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+<p>Is there a safer and simpler way to handle shared data in multithreaded code?</p>
+<p>Yes. In the next chapter, we will explore the thread-safe collections provided by .NET. These specially designed collections handle many of the tricky synchronization details internally, allowing us to work with concurrent data much more safely.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script>
@@ -726,6 +1326,35 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "huanlin/dotnet-concurrency";
+    script.dataset.repoId = "R_kgDOTfLcsw";
+    script.dataset.category = "General";
+    script.dataset.categoryId = "DIC_kwDOTfLcs84DBqHh";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "en";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../ch04/exceptions-and-cancellation.html" class="pagination-link" aria-label="4 Exception handling and cancellation">
@@ -746,7 +1375,7 @@ ul.task-list li input[type="checkbox"] {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><a href="https://huanlin.cc/en/">Author website</a></p>
 </div>

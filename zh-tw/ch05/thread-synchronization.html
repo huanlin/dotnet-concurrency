@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -83,10 +118,16 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="../styles-html.css">
 <meta property="og:title" content="第 5 章：執行緒同步與經典問題 – 深入淺出 .NET 10 併發程式設計">
 <meta property="og:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
+<meta property="og:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch05/images/title.png">
 <meta property="og:site_name" content="深入淺出 .NET 10 併發程式設計">
+<meta property="og:image:height" content="431">
+<meta property="og:image:width" content="1091">
 <meta name="twitter:title" content="第 5 章：執行緒同步與經典問題 – 深入淺出 .NET 10 併發程式設計">
 <meta name="twitter:description" content="《深入淺出 .NET 10 併發程式設計》繁體中文版免費試讀，完整公開第 1 至第 4 章。">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dotnetconcurrency.huanlin.cc/zh-tw/ch05/images/title.png">
+<meta name="twitter:image-height" content="431">
+<meta name="twitter:image-width" content="1091">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/zh-tw/ch05/thread-synchronization.html">
 </head>
 
@@ -99,7 +140,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch05/thread-synchronization.html">第 5 章：執行緒同步與經典問題</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../ch05/thread-synchronization.html"><span class="chapter-title">第 5 章：執行緒同步與經典問題</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="切換側邊欄導航" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="搜尋" onclick="window.quartoOpenSearch();">
@@ -169,8 +210,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">第 5 章：執行緒同步與經典問題</span></a>
+  <a href="../ch05/thread-synchronization.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">第 5 章：執行緒同步與經典問題</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -214,15 +254,37 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">目錄</h2>
+   
+  <ul>
+  <li><a href="#sec-why-synchronization-is-needed" id="toc-sec-why-synchronization-is-needed" class="nav-link active" data-scroll-target="#sec-why-synchronization-is-needed">為何需要同步：共享資料的風險</a></li>
+  <li><a href="#sec-classic-problems" id="toc-sec-classic-problems" class="nav-link" data-scroll-target="#sec-classic-problems">經典問題</a>
+  <ul class="collapse">
+  <li><a href="#競爭狀況race-condition" id="toc-競爭狀況race-condition" class="nav-link" data-scroll-target="#競爭狀況race-condition">競爭狀況（race condition）</a></li>
+  <li><a href="#sec-deadlocks" id="toc-sec-deadlocks" class="nav-link" data-scroll-target="#sec-deadlocks">死結（deadlock）</a></li>
+  <li><a href="#常見死結預防策略" id="toc-常見死結預防策略" class="nav-link" data-scroll-target="#常見死結預防策略">常見死結預防策略</a></li>
+  </ul></li>
+  <li><a href="#sec-synchronization-mechanisms" id="toc-sec-synchronization-mechanisms" class="nav-link" data-scroll-target="#sec-synchronization-mechanisms">同步機制</a>
+  <ul class="collapse">
+  <li><a href="#interlocked單一欄位的原子操作" id="toc-interlocked單一欄位的原子操作" class="nav-link" data-scroll-target="#interlocked單一欄位的原子操作"><code>Interlocked</code>：單一欄位的原子操作</a></li>
+  <li><a href="#sec-the-lock-keyword" id="toc-sec-the-lock-keyword" class="nav-link" data-scroll-target="#sec-the-lock-keyword"><code>lock</code> 關鍵字：最簡單的鎖</a></li>
+  <li><a href="#更現代的鎖system.threading.lock-.net-9" id="toc-更現代的鎖system.threading.lock-.net-9" class="nav-link" data-scroll-target="#更現代的鎖system.threading.lock-.net-9">更現代的鎖：<code>System.Threading.Lock</code> (.NET 9+)</a></li>
+  <li><a href="#lock-與-async-的邊界" id="toc-lock-與-async-的邊界" class="nav-link" data-scroll-target="#lock-與-async-的邊界"><code>lock</code> 與 <code>async</code> 的邊界</a></li>
+  <li><a href="#sec-semaphoreslim" id="toc-sec-semaphoreslim" class="nav-link" data-scroll-target="#sec-semaphoreslim"><code>SemaphoreSlim</code>：限制併發數量</a></li>
+  <li><a href="#sec-mutex" id="toc-sec-mutex" class="nav-link" data-scroll-target="#sec-mutex"><code>Mutex</code>：跨處理序同步</a></li>
+  </ul></li>
+  <li><a href="#結語" id="toc-結語" class="nav-link" data-scroll-target="#結語">結語</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">第 5 章：執行緒同步與經典問題</h1>
+<h1 class="title"><span id="chapter-05" class="quarto-section-identifier"><span class="chapter-title">第 5 章：執行緒同步與經典問題</span></span></h1>
 </div>
 
 
@@ -245,19 +307,536 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>本章說明多個執行緒共享資料時為何會產生競爭條件，並以經典併發問題建立判斷同步需求的基礎。</p>
-<p><strong>主要內容</strong></p>
-<ul>
-<li>共享資料、非原子操作與競爭條件。</li>
-<li>deadlock、livelock 與 starvation 等經典問題。</li>
-<li><code>lock</code>、<code>Monitor</code>、mutex、semaphore 及其他同步機制的適用情境。</li>
-</ul>
-<div class="full-edition-notice" data-preview-only="true">
-<p>本章屬於完整正式版內容，免費試讀版不公開全文。</p>
-<p><a href="https://huanlin.cc/about/" class="btn btn-primary" target="_blank" rel="noopener noreferrer">查看作者作品與正式版資訊</a></p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/title.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
 </div>
+<p>到目前為止，我們已經學會了如何使用 <code>Task.Run</code> 和 <code>async/await</code> 來執行非同步與併發操作。前者常用來把 CPU-bound 工作交給背景執行緒處理，後者則讓我們在等待 I/O 時不必阻塞執行緒，從而維持應用程式的回應性。不過，當多條執行緒開始真正「平行」執行時，另一個更棘手的問題也跟著浮現了：如果它們需要同時存取同一份資料，會發生什麼事？</p>
+<p>想像一下銀行系統，A 帳戶和 B 帳戶同時向 C 帳戶轉帳。如果系統沒有處理好這兩個同時發生的操作，C 帳戶的最終餘額很可能會出錯，造成銀行或客戶的損失。</p>
+<p>這就是<strong>執行緒同步（thread synchronization）</strong> 要解決的問題。它的核心目標是：<strong>確保當多條執行緒存取共享資源時，資料的完整性與一致性不會被破壞。</strong></p>
+<p>本章會進入多執行緒程式設計中最核心、也最具挑戰性的領域。學習目標包括：</p>
+<ul>
+<li>透過實際範例，理解為何需要同步機制。</li>
+<li>認識兩個經典問題：競爭狀況 (race condition) 與死結 (deadlock)。</li>
+<li>掌握 .NET 中最關鍵的同步工具：<code>Interlocked</code>、<code>lock</code>、<code>SemaphoreSlim</code> 與 <code>Mutex</code>。</li>
+</ul>
+<hr>
+<section id="sec-why-synchronization-is-needed" class="level2">
+<h2 class="anchored" data-anchor-id="sec-why-synchronization-is-needed">為何需要同步：共享資料的風險</h2>
+<p>先看一個簡單的計數器範例。此範例會啟動兩個任務，各自對同一個共享計數器變數 <code>counter</code> 執行一百萬次遞增操作：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co">// 啟動兩個 Task，併發地對 counter 進行遞增</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-label="4"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-label="6"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-label="8"></a>        counter<span class="op">++;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-label="9"></a>    <span class="op">}</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-label="10"></a><span class="op">});</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-label="11"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-label="12"></a>Task task2 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-label="13"></a><span class="op">{</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-label="14"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-label="15"></a>    <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-label="16"></a>        counter<span class="op">++;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-label="17"></a>    <span class="op">}</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-label="18"></a><span class="op">});</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-label="19"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-label="20"></a><span class="co">// 等待兩個 Task 都完成</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-label="21"></a>Task<span class="op">.</span><span class="fu">WaitAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-label="22"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-label="23"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"計數器的最終結果是: {counter}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>按直覺來看，計數器的最終結果應該是 <code>2000000</code>。然而，當你實際執行這段程式碼時，會發現輸出的結果並不可靠，往往達不到 <code>2000000</code>。最終數字可能是 <code>1384127</code> 或 <code>1098221</code>，每次執行都可能跑出不同的結果；甚至偶爾還會「看起來剛好正確」。這正是併發程式設計中最難除錯的地方：錯誤不會每次都穩定出現，而工作排程的微小時序差異也會影響問題是否發生。</p>
+<p>實際的執行結果會類似這樣：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a>計數器的最終結果是: 1040247</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>計數器的最終結果是: 1205015</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>注意：</strong> 每次執行的結果都可能不同；偶爾甚至可能「碰巧看起來正確」而得到 <code>2000000</code>。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoRaceCondition">DemoRaceCondition</a></p>
+</blockquote>
+<p>究竟為什麼計數器的最終結果不是 <code>2000000</code>？問題就出在 <code>counter++</code> 這個看似單純的語法上。如果切換到電腦內部的運作視角，這並不是一個「原子操作 (atomic operation)」，而是由三個獨立的步驟組成：</p>
+<ol type="1">
+<li><strong>讀取</strong> <code>counter</code> 的目前值到 CPU 暫存器。</li>
+<li>在暫存器中將該值<strong>加一</strong>。</li>
+<li>將暫存器中的新值<strong>寫回</strong> <code>counter</code> 的記憶體位置。</li>
+</ol>
+<p>由於這三個步驟是可以被中斷的（作業系統的排程器可以在任何兩條機器指令之間進行 context switch），當我們讓兩條執行緒同時執行這段程式碼時，就可能會發生下面這種情境：</p>
+<ol type="1">
+<li><code>Thread A</code> 讀取 <code>counter</code> 的值（假設是 100）。</li>
+<li>此時發生 <code>context switch</code>，作業系統將 CPU 控制權交給 <code>Thread B</code>。</li>
+<li><code>Thread B</code> 也讀取 <code>counter</code> 的值（它仍然是 100）。</li>
+<li><code>Thread B</code> 將值加一（變成 101），並寫回 <code>counter</code>。現在 <code>counter</code> 是 101。</li>
+<li><code>context switch</code> 再次發生，控制權回到 <code>Thread A</code>。</li>
+<li><code>Thread A</code> 從它上次中斷的地方繼續，將它暫存器中的值（100）加一，得到 101。</li>
+<li><code>Thread A</code> 將 101 寫回 <code>counter</code>。</li>
+</ol>
+<p>最終，雖然兩條執行緒都執行了遞增操作，但 <code>counter</code> 的值只從 100 變成了 101，而不是我們預期的 102。一次遞增操作就這樣遺失了。當這個情境發生數十萬次時，最終結果的巨大誤差也就不難理解了。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/inc-counter-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</section>
+<section id="sec-classic-problems" class="level2">
+<h2 class="anchored" data-anchor-id="sec-classic-problems">經典問題</h2>
+<p>剛才介紹的計數器範例展示了多執行緒程式設計中的第一個經典難關：競爭狀況（race condition）。為了將基礎打穩，接下來我們會先把它定義清楚，接著再來看另一個同樣常見、甚至更難排查的問題：死結（deadlock）。</p>
+<section id="競爭狀況race-condition" class="level3">
+<h3 class="anchored" data-anchor-id="競爭狀況race-condition">競爭狀況（race condition）</h3>
+<p><strong>競爭狀況 (race condition)</strong> 描述的是一種不可預期的行為：當多個執行緒併發執行時，程式的最終結果取決於各執行緒競爭執行的<strong>相對時間順序</strong>。</p>
+<p>剛才的計數器範例就是一個典型的競爭狀況。因為 <code>counter++</code> 這個「讀取-修改-寫回」的執行序列隨時可能被另一條執行緒中斷，導致最終結果取決於哪條執行緒「跑得比較快」，結果也就變得無法預測了。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>競爭狀況是多執行緒程式中最難除錯的問題之一，因為它們通常是間歇發生，很難穩定重現。更具體來說，同一段程式碼在雙核心的開發機上可能幾乎看不到問題，但在生產環境的多核心伺服器上，多執行緒真正同時執行的機會大增，競爭狀況就會更頻繁地浮現。實務上，可靠的做法是先識別所有可能被多執行緒存取的共享資源，然後選擇適當的保護方式，例如同步機制、不可變資料，或直接避免共享可變狀態。</p>
+</blockquote>
+</section>
+<section id="sec-deadlocks" class="level3">
+<h3 class="anchored" data-anchor-id="sec-deadlocks">死結（deadlock）</h3>
+<p>如果說競爭狀況像是大家「搶成一團」，那麼<strong>死結 (deadlock)</strong> 就比較像是大家「僵持不下」。</p>
+<p>這種情況通常發生在：兩個或多個執行緒各自持有對方需要的資源，同時又在等待對方先釋放資源。在沒有外力介入的情況下，這會形成一個無限等待的循環。</p>
+<p>這裡用一個經典的「銀行轉帳」比喻來解釋。假設現在系統中有兩條執行緒在運作：</p>
+<ul>
+<li><code>Thread A</code>：要從帳戶 X 轉帳到帳戶 Y。</li>
+<li><code>Thread B</code>：要從帳戶 Y 轉帳到帳戶 X。</li>
+</ul>
+<p>為了確保轉帳的原子性，我們規定在操作帳戶前必須先「鎖定」它。現在想像以下執行順序：</p>
+<ol type="1">
+<li><code>Thread A</code> 成功鎖定了帳戶 X。</li>
+<li><code>Thread B</code> 成功鎖定了帳戶 Y。</li>
+<li><code>Thread A</code> 嘗試鎖定帳戶 Y 以完成轉帳，但發現 Y 已被 <code>Thread B</code> 鎖定，於是 <code>Thread A</code> 進入等待狀態。</li>
+<li><code>Thread B</code> 嘗試鎖定帳戶 X 以完成轉帳，但發現 X 已被 <code>Thread A</code> 鎖定，於是 <code>Thread B</code> 也進入等待狀態。</li>
+</ol>
+<p>此時，<code>Thread A</code> 正在等待 <code>Thread B</code> 釋放 Y，而 <code>Thread B</code> 也正在等待 <code>Thread A</code> 釋放 X。由於雙方都不肯退讓，它們將會永遠等待下去，導致整個轉帳系統就這樣鎖死了。</p>
+</section>
+<section id="常見死結預防策略" class="level3">
+<h3 class="anchored" data-anchor-id="常見死結預防策略">常見死結預防策略</h3>
+<p>死結通常不是發生在「同一把鎖」上，而是發生在「多把鎖彼此交互等待」的情境。在實務上，可以先記住下面幾個常見策略（其中提到的 .NET 類別會在稍後介紹）：</p>
+<ol type="1">
+<li><strong>固定鎖的取得順序</strong>：當需要同時鎖定多個資源時，所有執行緒都必須遵守相同的鎖定順序。例如在銀行轉帳情境中，可以規定「永遠先鎖定帳戶號碼較小的帳戶，再鎖定號碼較大的」。這樣一來，無論是從 X 轉帳到 Y 或從 Y 轉帳到 X，所有執行緒都會先嘗試鎖定同一個帳戶。固定順序之所以有效，是因為它從根本上消除了「循環等待」的可能性：若所有人都先取 X 再取 Y，就不可能出現 Thread A 持有 Y 等待 X、Thread B 持有 X 等待 Y 的僵局。</li>
+<li><strong>縮小關鍵區段（critical section）</strong>：只保護必要的共享資料，即「上鎖」時，不要把 I/O、長時間運算或等待操作放進鎖內。</li>
+<li><strong>避免無限等待</strong>：盡可能使用支援「嘗試取得鎖」的方法（例如 <code>Monitor.TryEnter</code>），或使用帶逾時參數的等待機制（例如 <code>Mutex.WaitOne(timeout)</code>）。若無法取得鎖就放棄或重試，而不是無限期地阻塞。</li>
+<li><strong>優先使用高階抽象</strong>：能用 <code>SemaphoreSlim</code>、執行緒安全集合或訊息佇列時，盡量少手寫多鎖協調。</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/anti-deadlock-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-synchronization-mechanisms" class="level2">
+<h2 class="anchored" data-anchor-id="sec-synchronization-mechanisms">同步機制</h2>
+<p>為了解決上述的競爭狀況與死結風險，.NET 提供了多種同步機制。儘管實作細節各異，這些工具其實都在做同一件事：為程式碼劃定並保護「<strong>關鍵區段（critical section）</strong>」。這代表在同一時間，只允許有限數量的執行緒（甚至只允許一條執行緒）進入該區塊執行。</p>
+<p>針對不同的併發需求，本節會先從最常見、最具代表性的工具看起，再逐步展開到特定的應用場景：</p>
+<ul>
+<li><strong><code>Interlocked</code></strong>：當你只需要對單一共享欄位進行原子操作時（例如計數器、狀態旗標），這是最輕量的選擇。</li>
+<li><strong><code>lock</code> 與 <code>System.Threading.Lock</code></strong>：當你要保護單一共享資料，並確保一次只有一條執行緒可進入時，這是首選。</li>
+<li><strong><code>SemaphoreSlim</code></strong>：當你不是要「一次一個」，而是要「一次最多 N 個」並行操作時使用。</li>
+<li><strong><code>Mutex</code></strong>：當同步範圍要跨越不同處理序（processes）時使用（例如防止應用程式重複啟動）。</li>
+</ul>
+<p>先掌握這四類工具，你就能依「同步範圍」與「允許併發數」（可同時進入的數量上限）快速判斷該用哪一種機制。</p>
+<section id="interlocked單一欄位的原子操作" class="level3">
+<h3 class="anchored" data-anchor-id="interlocked單一欄位的原子操作"><code>Interlocked</code>：單一欄位的原子操作</h3>
+<p>在處理計數器、狀態旗標或參考交換等簡單情境時，如果你只需要對<strong>單一共享欄位</strong>進行操作，通常可以使用比較輕量的 <code>Interlocked</code> 類別。</p>
+<p><code>Interlocked</code> 能提供作業系統與 CPU 層級保證的原子操作。它的常見方法包括：</p>
+<ul>
+<li><code>Interlocked.Increment</code> / <code>Decrement</code></li>
+<li><code>Interlocked.Add</code></li>
+<li><code>Interlocked.Exchange</code></li>
+<li><code>Interlocked.CompareExchange</code></li>
+</ul>
+<p>接著用 <code>Interlocked.Increment</code> 來修正本章開頭的計數器問題。以下範例會改用 <code>Parallel.For</code> 執行一百萬次遞增操作，並透過 <code>Interlocked.Increment</code> 確保每一次遞增都不會互相干擾：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>Parallel<span class="op">.</span><span class="fu">For</span><span class="op">(</span><span class="dv">0</span><span class="op">,</span> <span class="dv">1</span>_000_000<span class="op">,</span> _ <span class="op">=&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a>    Interlocked<span class="op">.</span><span class="fu">Increment</span><span class="op">(</span><span class="kw">ref</span> counter<span class="op">);</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a><span class="op">});</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>counter<span class="op">);</span> <span class="co">// 結果可預期</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這裡使用的 <code>Parallel.For</code> 是 .NET 提供的平行迴圈工具，它會自動把迭代分配給多個執行緒同時執行。在這個範例中，我們刻意用它來製造「多執行緒同時競爭」的情境，好驗證 <code>Interlocked.Increment</code> 的原子性保證。至於 <code>Parallel</code> 類別的詳細用法，會在第 7 章介紹。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoInterlocked">DemoInterlocked</a></p>
+</blockquote>
+<p>不過，<code>Interlocked</code> 雖然很適合解決計數器的競爭問題，適用範圍仍然有限。它只適合單一欄位的原子更新。一旦你的商業邏輯牽涉到「多個欄位必須一起改變並維持一致性」，這時 <code>Interlocked</code> 就力有未逮了。即使你對每個欄位分別呼叫 <code>Interlocked</code>，也無法保證其他執行緒看到的是一致的狀態——它可能在你更新完第一個欄位、還沒更新第二個欄位的空隙讀到半途中的值。這時你應該改用 <code>lock</code> 或其他同步機制來保護整個關鍵區段。</p>
+</section>
+<section id="sec-the-lock-keyword" class="level3">
+<h3 class="anchored" data-anchor-id="sec-the-lock-keyword"><code>lock</code> 關鍵字：最簡單的鎖</h3>
+<p>看完了單一變數的保護，接著來看最常見的工具：<code>lock</code>。</p>
+<p><code>lock</code> 是 C# 中最普遍、寫起來也最單純的同步機制。它能確保在 <code>lock</code> 所包圍的區塊內，同一時間絕對只有一條執行緒可以進入執行。</p>
+<p>要使用 <code>lock</code>，你必須先準備一個所有執行緒都能存取到的「鎖物件」。實務上，這個物件通常是一個私有、唯讀的 <code>object</code> 欄位。</p>
+<p>下面用 <code>lock</code> 改寫最初那個會出錯的計數器範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="co">// 使用 lock 保護計數器</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="dt">var</span> counter <span class="op">=</span> <span class="kw">new</span> <span class="fu">ThreadSafeCounter</span><span class="op">();</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-label="3"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-label="4"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-label="7"></a>        counter<span class="op">.</span><span class="fu">Increment</span><span class="op">();</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-label="8"></a><span class="op">});</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-label="9"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-label="10"></a>Task task2 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-label="11"></a><span class="op">{</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-label="12"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-label="13"></a>        counter<span class="op">.</span><span class="fu">Increment</span><span class="op">();</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-label="14"></a><span class="op">});</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-label="15"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-label="16"></a>Task<span class="op">.</span><span class="fu">WaitAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-label="17"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-label="18"></a><span class="co">// 結果永遠是 2000000</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-label="19"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"計數器的最終結果是: {counter.Value}"</span><span class="op">);</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-label="20"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-label="21"></a><span class="kw">public</span> <span class="kw">class</span> ThreadSafeCounter</span>
+<span id="cb5-22"><a href="#cb5-22" aria-label="22"></a><span class="op">{</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-label="23"></a>    <span class="kw">private</span> <span class="dt">int</span> _count <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-label="24"></a>    <span class="kw">private</span> <span class="kw">readonly</span> <span class="dt">object</span> _lock <span class="op">=</span> <span class="kw">new</span> <span class="dt">object</span><span class="op">();</span> <span class="co">// 鎖物件</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-label="25"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-label="26"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">Increment</span><span class="op">()</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-label="27"></a>    <span class="op">{</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-label="28"></a>        <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span> <span class="co">// 進入關鍵區段</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-label="29"></a>        <span class="op">{</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-label="30"></a>            _count<span class="op">++;</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-label="31"></a>        <span class="op">}</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-label="32"></a>    <span class="op">}</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-label="33"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-label="34"></a>    <span class="kw">public</span> <span class="dt">int</span> Value</span>
+<span id="cb5-35"><a href="#cb5-35" aria-label="35"></a>    <span class="op">{</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-label="36"></a>        get</span>
+<span id="cb5-37"><a href="#cb5-37" aria-label="37"></a>        <span class="op">{</span>   <span class="co">// 此範例的 getter 不一定非得上鎖</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-label="38"></a>            <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-label="39"></a>            <span class="op">{</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-label="40"></a>                <span class="kw">return</span> _count<span class="op">;</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-label="41"></a>            <span class="op">}</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-label="42"></a>        <span class="op">}</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-label="43"></a>    <span class="op">}</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-label="44"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>值得一提的是，在這個範例的執行流程裡，由於主程式已經預先呼叫了 <code>Task.WaitAll</code> 來等待兩個任務都完成，之後才讀取 <code>Value</code> 屬性，因此這裡的 getter 其實不加 <code>lock</code> 也會得到正確結果——<code>Task.WaitAll</code> 確保了兩個任務的所有寫入都已完成，讀取端才接著執行，順序上不存在競爭。然而，如果你打算將 <code>ThreadSafeCounter</code> 設計成一個可供各處重複使用的執行緒安全型別，那就必須採取更嚴謹的態度：讓讀取與寫入行為共用同一把鎖。這才是通用且安全的建議作法。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoLock">DemoLock</a></p>
+</blockquote>
+<p>經過這樣的修改，一旦任何執行緒想要遞增 <code>_count</code> 或讀取 <code>Value</code>，都必須先取得 <code>_lock</code> 物件的獨佔鎖。如果這把鎖已經被其他執行緒持有，後來的執行緒就必須等待。等取得鎖的執行緒離開 <code>lock</code> 區塊，該鎖會自動釋放，下一條等待中的執行緒才有機會進入。透過這樣的機制，<code>_count++</code> 的「讀取-修改-寫回」操作就被嚴格包裝成一個不可分割的單位，讀取端也就不可能在更新過程進行到一半時，看到處於過渡期的錯誤數值。</p>
+<p>鎖物件 <code>_lock</code> 之所以宣告為 <code>private readonly object</code>，原因如下：</p>
+<ul>
+<li><strong>private</strong>: 確保只有這個類別的內部可以鎖定它，避免外部程式碼不小心鎖住同一個物件而引發死結。</li>
+<li><strong>readonly</strong>: 確保鎖物件本身不會被意外替換掉。</li>
+<li><strong>object</strong>: 任何參考型別都可以，但 <code>object</code> 是最單純的選擇。</li>
+</ul>
+<p>這裡要特別提醒的是，雖然只要是參考型別都可以上鎖，但請盡量避免鎖定以下三種東西，否則一旦出錯，可能會引發極難追蹤的死結或同步錯誤：</p>
+<ol type="1">
+<li><strong>實值型別 (<code>struct</code>)</strong>：不能直接拿實值型別當作 <code>lock</code> 目標，C# 編譯器會直接報錯。請特別注意，不要為了繞過編譯錯誤而手動將實值轉型成 <code>object</code> 後再上鎖；因為這會觸發裝箱（boxing）動作，導致每次上鎖時都產生不同的物件，讓鎖的保護機制完全失效。</li>
+<li><strong>字串 (<code>string</code>)</strong>：這是一個眾所皆知的「反模式 (anti-pattern)」。由於 .NET 的「字串留置 (string interning)」機制，預設會將相同內容的字串常值（以及明確呼叫 <code>string.Intern()</code> 的字串）指向同一個物件實體。如果你鎖定 <code>"my_lock"</code>，碰巧另一個不相干的第三方套件也鎖定了 <code>"my_lock"</code>，你們兩邊就會互相阻塞，造成難以預期的跨模組死結。雖然動態建構的字串通常不會被留置，但你無法保證第三方程式碼不會明確 intern 相同內容的字串，因此字串整體而言都是危險的鎖物件。</li>
+<li><strong>型別物件 (<code>typeof(T)</code>)</strong>：原因與字串類似。同一個型別所對應的 <code>Type</code> 實例，在整個處理序的記憶體空間中是唯一且全域共享的。</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lock-object-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>C# 不允許在 <code>lock</code> 區塊中使用 <code>await</code>——無論鎖定目標是傳統的 <code>object</code> 還是 .NET 9+ 的 <code>System.Threading.Lock</code> 皆然。前者因為 <code>Monitor</code> 具有執行緒親和性；後者因為 <code>Lock.Scope</code> 是 <code>ref struct</code>，不能跨越 <code>await</code> 邊界存在。如果關鍵區段內需要等待非同步作業，請改用 <code>SemaphoreSlim(1, 1)</code> 這種 async-friendly 的互斥寫法（但須注意其陷阱，見後文）。</p>
+</blockquote>
+<section id="傳統-lockobject-與-monitor-的關係" class="level4">
+<h4 class="anchored" data-anchor-id="傳統-lockobject-與-monitor-的關係">傳統 <code>lock(object)</code> 與 <code>Monitor</code> 的關係</h4>
+<p>當 <code>lock</code> 的目標是一個一般的參考型別（例如 <code>object</code>）時，<code>lock</code> 關鍵字可以視為 <code>Monitor</code> 類別的語法糖。當你寫下：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-label="3"></a>    <span class="co">// 關鍵區段</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-label="4"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>編譯器會將它轉換成類似以下的程式碼：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="dt">bool</span> lockTaken <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="kw">try</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-label="4"></a>    Monitor<span class="op">.</span><span class="fu">Enter</span><span class="op">(</span>_lock<span class="op">,</span> <span class="kw">ref</span> lockTaken<span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-label="5"></a>    <span class="co">// 關鍵區段</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-label="6"></a><span class="op">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-label="7"></a><span class="kw">finally</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a><span class="op">{</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a>    <span class="kw">if</span> <span class="op">(</span>lockTaken<span class="op">)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a>    <span class="op">{</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a>        Monitor<span class="op">.</span><span class="fu">Exit</span><span class="op">(</span>_lock<span class="op">);</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-label="12"></a>    <span class="op">}</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-label="13"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>不過，這套轉換邏輯主要是針對傳統的 <code>lock(object)</code> 寫法。自從 C# 13 與 .NET 9 推出後，如果你宣告的鎖物件是 <code>System.Threading.Lock</code>，編譯器就會採取專屬的最佳化路徑，在底層等同於產生 <code>using (_lock.EnterScope()) { ... }</code>，而不再透過傳統的 <code>Monitor.Enter/Exit</code>。</p>
+<p>在絕大多數情況下，直接使用 <code>lock</code> 關鍵字就已經足夠，因為它既簡潔又能自動處理釋放資源的問題。只不過，當某些進階場景需要更細緻的控制時，直接呼叫 <code>Monitor</code> 類別的方法會更有彈性。舉例來說，在稍早談到的死結預防策略之一：避免無限等待，就可以利用 <code>Monitor.TryEnter</code> 來達成：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="dt">object</span> _lock <span class="op">=</span> <span class="kw">new</span> <span class="dt">object</span><span class="op">();</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-label="2"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co">// 設定最多等待 5 秒鐘嘗試取得鎖，而不是無限期卡住</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-label="4"></a><span class="kw">if</span> <span class="op">(</span>Monitor<span class="op">.</span><span class="fu">TryEnter</span><span class="op">(</span>_lock<span class="op">,</span> TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">5</span><span class="op">)))</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-label="6"></a>    <span class="kw">try</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-label="8"></a>        <span class="co">// 成功取得鎖，執行關鍵區段</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-label="9"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"已取得鎖，執行工作..."</span><span class="op">);</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-label="10"></a>    <span class="op">}</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-label="11"></a>    <span class="kw">finally</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-label="13"></a>        Monitor<span class="op">.</span><span class="fu">Exit</span><span class="op">(</span>_lock<span class="op">);</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-label="14"></a>    <span class="op">}</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-label="15"></a><span class="op">}</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-label="16"></a><span class="kw">else</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-label="17"></a><span class="op">{</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-label="18"></a>    <span class="co">// 無法取得鎖，選擇放棄或採取其他策略</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-label="19"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"無法取得鎖，放棄或稍後重試"</span><span class="op">);</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-label="20"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這種寫法的好處是，當程式無法立即取得鎖時，還有機會改採其他策略，而不是無限期等待，從而降低死結風險。</p>
+<blockquote class="blockquote">
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock">The lock statement - ensure exclusive access to a shared resource</a></p>
+</blockquote>
+</section>
+</section>
+<section id="更現代的鎖system.threading.lock-.net-9" class="level3">
+<h3 class="anchored" data-anchor-id="更現代的鎖system.threading.lock-.net-9">更現代的鎖：<code>System.Threading.Lock</code> (.NET 9+)</h3>
+<p>前面提到，傳統 <code>lock (object)</code> 會由編譯器展開成 <code>Monitor.Enter/Exit</code>。在 .NET 9 以上，如果你只需要一把處理序內使用的鎖，還可以改用專門的鎖定型別：<strong><code>System.Threading.Lock</code></strong>。它的用法和傳統 <code>lock</code> 很相似，但語意更明確，在高併發場景下也更有效率：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="dt">int</span> counter <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-label="2"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="co">// 使用專用的 Lock 型別，而不是 object</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-label="4"></a>Lock _lock <span class="op">=</span> <span class="kw">new</span> <span class="fu">Lock</span><span class="op">();</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-label="5"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-label="6"></a>Task task1 <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-label="7"></a><span class="op">{</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-label="8"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">1</span>_000_000<span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-label="9"></a>    <span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-label="10"></a>        <span class="co">// 語法看起來跟舊的一樣，但編譯器會</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-label="11"></a>        <span class="co">// 針對 Lock 型別產生更高效的程式碼！</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-label="12"></a>        <span class="kw">lock</span> <span class="op">(</span>_lock<span class="op">)</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-label="13"></a>        <span class="op">{</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-label="14"></a>            counter<span class="op">++;</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-label="15"></a>        <span class="op">}</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-label="16"></a>    <span class="op">}</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-label="17"></a><span class="op">});</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>除了支援 <code>lock</code> 關鍵字，<code>System.Threading.Lock</code> 還提供了一個更明確的 API：<code>EnterScope()</code>。這個方法會回傳一個 <code>ref struct Lock.Scope</code> 結構；雖然它不是透過實作 <code>IDisposable</code> 來運作，但它有提供 <code>Dispose()</code> 方法，因此很適合配合 <code>using</code> 語句使用：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co">// 使用 EnterScope 的寫法</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="kw">using</span> <span class="op">(</span>_lock<span class="op">.</span><span class="fu">EnterScope</span><span class="op">())</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-label="4"></a>    <span class="co">// 進入關鍵區段</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-label="5"></a>    counter<span class="op">++;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-label="6"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這表示在離開 <code>using</code> 區塊時會自動釋放鎖。參考微軟文件：<a href="https://learn.microsoft.com/dotnet/api/system.threading.lock.scope">Lock.Scope 結構</a>。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoLockNet9Plus">DemoLockNet9Plus</a></p>
+</blockquote>
+<p>這種寫法的好處在於，若你搭配 <code>using</code> 來管理範圍，即使發生例外，也能自動釋放鎖。此外，<code>System.Threading.Lock</code> 還提供了 <code>Enter</code>、<code>TryEnter</code>、<code>Exit</code> 等進階方法，讓你在需要時採用更明確的控制方式。</p>
+<blockquote class="blockquote">
+<p><strong>建議</strong></p>
+<p>如果你的專案已經升級到 .NET 9 或更新的版本，建議在程式中優先使用 <code>System.Threading.Lock</code> 來取代傳統的 <code>object</code> 鎖。這樣不只能獲得更清楚的語意，在競爭不激烈的情境下效能也比傳統 <code>Monitor</code> 更好。</p>
+</blockquote>
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/api/system.threading.lock">Lock Class</a></p>
+</section>
+<section id="lock-與-async-的邊界" class="level3">
+<h3 class="anchored" data-anchor-id="lock-與-async-的邊界"><code>lock</code> 與 <code>async</code> 的邊界</h3>
+<p>這裡要停下來整理幾個重點，因為這是很多人從同步程式碼過渡到非同步程式碼時最容易踩到的坑：</p>
+<ul>
+<li><code>lock</code> 是一種「執行緒導向」的同步機制，它的目標是保護短小、沒有 I/O 阻塞、且維持同步執行的關鍵區段（critical section）。</li>
+<li>C# 不允許在 <code>lock</code> 區塊內使用 <code>await</code>，不論鎖定目標是哪一種皆然：
+<ul>
+<li><strong><code>lock(object)</code></strong>：編譯器展開為 <code>Monitor.Enter/Exit</code>，而 <code>Monitor</code> 具有執行緒親和性（即鎖的取得與釋放必須在同一條執行緒上完成）——<code>await</code> 之後卻可能在不同執行緒繼續執行，導致鎖無法正確釋放。</li>
+<li><strong><code>lock(Lock)</code></strong>（.NET 9+）：鎖定目標是 <code>System.Threading.Lock</code> 物件時，編譯器展開為 <code>using (_lock.EnterScope())</code>，而 <code>Lock.Scope</code> 是 <code>ref struct</code>，不能跨越 <code>await</code> 邊界存在，編譯器會直接拒絕這種用法。（原因：<code>await</code> 會將區域變數提升為 async state machine 的欄位，而 <code>ref struct</code> 在語言規格上不允許成為欄位。）</li>
+</ul></li>
+</ul>
+<p>如果你的需求是「同一時間只允許一個非同步流程進入」，你應該改用 <code>SemaphoreSlim(1, 1)</code> 來擔任互斥鎖的角色。第一個 <code>1</code> 代表初始可用數量，第二個 <code>1</code> 則是最大上限。若兩者皆為 1，就能確保同一時間只允許一個流程進入，這在語意上等同於互斥鎖。以下範例展示了它的典型用法：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="kw">private</span> <span class="kw">readonly</span> SemaphoreSlim _gate <span class="op">=</span> <span class="kw">new</span><span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-label="2"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>async Task <span class="fu">UpdateSharedStateAsync</span><span class="op">()</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-label="5"></a>    await _gate<span class="op">.</span><span class="fu">WaitAsync</span><span class="op">();</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-label="6"></a>    <span class="kw">try</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-label="8"></a>        await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">100</span><span class="op">);</span> <span class="co">// 模擬非同步工作</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-label="9"></a>        <span class="co">// 更新共享狀態</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-label="10"></a>    <span class="op">}</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-label="11"></a>    <span class="kw">finally</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-label="13"></a>        _gate<span class="op">.</span><span class="fu">Release</span><span class="op">();</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-label="14"></a>    <span class="op">}</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-label="15"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>這種「async 互斥」的寫法，在 I/O-bound 工作中很常見。</p>
+<blockquote class="blockquote">
+<p><strong>延伸閱讀：</strong> 微軟文件 <a href="https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim">SemaphoreSlim Class</a></p>
+</blockquote>
+</section>
+<section id="sec-semaphoreslim" class="level3">
+<h3 class="anchored" data-anchor-id="sec-semaphoreslim"><code>SemaphoreSlim</code>：限制併發數量</h3>
+<p>前面介紹的 <code>lock</code> 提供的是「獨佔存取」，也就是一次只讓一個進入。但有些情況下，我們的需求不是「一次只能一個」，而是<strong>一次最多允許 N 個</strong>。這時候就輪到 <code>SemaphoreSlim</code> 出場了。</p>
+<blockquote class="blockquote">
+<p>註：Semaphore 在英文裡是「號誌、旗號」的意思，它最早被用來管控鐵路列車的通行。</p>
+</blockquote>
+<p>你可以把 <code>SemaphoreSlim</code> 想像成夜店門口的保全。假設這家夜店最多只能容納 100 位客人，而保全手上有 100 個手環（也就是 <code>SemaphoreSlim</code> 的初始計數）。每當放行一位客人進去，保全就會發給他一個手環；每當有客人出來，他就會回收手環。一旦所有手環發放完畢，後來想進門的人就只能排隊，等待下一個空出的手環。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/semaphore-slim-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p><code>SemaphoreSlim</code> 非常適合用來限制對有限資源的存取，例如：</p>
+<ul>
+<li>限制同時下載檔案的數量。</li>
+<li>限制同時呼叫外部 API 的數量。</li>
+<li>限制資料庫連接池的使用數量。</li>
+</ul>
+<p>此外，<code>SemaphoreSlim</code> 對 <code>async/await</code> 特別友善：它提供了 <code>WaitAsync()</code> 方法，讓你的程式碼不必阻塞執行緒，而是能夠以非同步的方式等待可用的「手環」。下面是一個典型範例：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co">// 限制最多只能有 3 個操作同時執行某個昂貴的工作</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>SemaphoreSlim _semaphore <span class="op">=</span> <span class="kw">new</span> <span class="fu">SemaphoreSlim</span><span class="op">(</span><span class="dv">3</span><span class="op">,</span> <span class="dv">3</span><span class="op">);</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-label="3"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-label="4"></a>async Task <span class="fu">PerformExpensiveOperationAsync</span><span class="op">(</span><span class="dt">int</span> id<span class="op">)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-label="6"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"任務 {id} 正在等待進入..."</span><span class="op">);</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-label="7"></a>    <span class="co">// 非同步地等待號誌（手環）</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-label="8"></a>    await _semaphore<span class="op">.</span><span class="fu">WaitAsync</span><span class="op">();</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-label="9"></a>    <span class="kw">try</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-label="10"></a>    <span class="op">{</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-label="11"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"--&gt; 任務 {id} 已進入，正在執行..."</span><span class="op">);</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-label="12"></a>        await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 模擬耗時工作</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-label="13"></a>    <span class="op">}</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-label="14"></a>    <span class="kw">finally</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-label="15"></a>    <span class="op">{</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-label="16"></a>        <span class="co">// 確保一定會釋放號誌（手環）</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-label="17"></a>        _semaphore<span class="op">.</span><span class="fu">Release</span><span class="op">();</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-label="18"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"&lt;-- 任務 {id} 已離開。"</span><span class="op">);</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-label="19"></a>    <span class="op">}</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-label="20"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>注意 <code>finally</code> 區塊有呼叫 <code>Release()</code>，以確保即使發生例外，號誌（手環）也一定會被歸還。另外，我們在宣告時明確將 <code>maxCount</code> 以及初始計數都設成 <code>3</code>，不只清楚傳達「名額上限就是三個」，而且哪天如果有人不小心多呼叫了 <code>Release()</code> 而導致超出上限時，系統也能及早報錯，方便排查。</p>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoSemaphoreSlim">DemoSemaphoreSlim</a></p>
+</blockquote>
+<p>執行結果（節錄）：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a>任務 1 正在等待進入...</span>
+<span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>--&gt; 任務 1 已進入，正在執行...</span>
+<span id="cb13-3"><a href="#cb13-3" aria-label="3"></a>任務 2 正在等待進入...</span>
+<span id="cb13-4"><a href="#cb13-4" aria-label="4"></a>--&gt; 任務 2 已進入，正在執行...</span>
+<span id="cb13-5"><a href="#cb13-5" aria-label="5"></a>任務 3 正在等待進入...</span>
+<span id="cb13-6"><a href="#cb13-6" aria-label="6"></a>--&gt; 任務 3 已進入，正在執行...</span>
+<span id="cb13-7"><a href="#cb13-7" aria-label="7"></a>任務 4 正在等待進入...</span>
+<span id="cb13-8"><a href="#cb13-8" aria-label="8"></a>任務 5 正在等待進入...</span>
+<span id="cb13-9"><a href="#cb13-9" aria-label="9"></a>任務 6 正在等待進入...</span>
+<span id="cb13-10"><a href="#cb13-10" aria-label="10"></a>...</span>
+<span id="cb13-11"><a href="#cb13-11" aria-label="11"></a>&lt;-- 任務 1 已離開。</span>
+<span id="cb13-12"><a href="#cb13-12" aria-label="12"></a>&lt;-- 任務 3 已離開。</span>
+<span id="cb13-13"><a href="#cb13-13" aria-label="13"></a>&lt;-- 任務 2 已離開。</span>
+<span id="cb13-14"><a href="#cb13-14" aria-label="14"></a>--&gt; 任務 4 已進入，正在執行...</span>
+<span id="cb13-15"><a href="#cb13-15" aria-label="15"></a>--&gt; 任務 5 已進入，正在執行...</span>
+<span id="cb13-16"><a href="#cb13-16" aria-label="16"></a>--&gt; 任務 6 已進入，正在執行...</span>
+<span id="cb13-17"><a href="#cb13-17" aria-label="17"></a>...</span>
+<span id="cb13-18"><a href="#cb13-18" aria-label="18"></a>所有任務執行完畢。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<p>從這個輸出可以清楚看出：一開始只有 3 個任務能同時進入；必須等其中幾個任務離開後，下一批等待中的任務才會依序獲得放行。</p>
+<blockquote class="blockquote">
+<p><strong>重要：SemaphoreSlim 缺乏重入性的陷阱</strong></p>
+<p>當我們將傳統的同步程式碼（使用 <code>lock</code>）轉換為非同步版本（使用 <code>await SemaphoreSlim.WaitAsync()</code>）時，最常踩的坑就是<strong>重入性（reentrancy）</strong>。</p>
+<p><code>lock</code> 是<strong>具備重入性</strong>的，並且與「執行緒」綁定：同一條執行緒如果再次進入它已經持有的同一個 <code>lock</code>，並不會被卡住。</p>
+<p>但 <code>SemaphoreSlim</code> <strong>完全沒有執行緒或擁有者的概念</strong>，你可以想成它「認環不認人」。如果同一個非同步方法的執行流程（例如遞迴呼叫，或是方法 A 等待方法 B，而兩者都嘗試去拿同一個 <code>SemaphoreSlim</code>），呼叫了兩次 <code>WaitAsync()</code>，第二次呼叫因為沒有多餘的號誌可拿，就會<strong>把自己的流程鎖住</strong>。在設計非同步互斥鎖時，這個小細節請務必特別留意。</p>
+</blockquote>
+</section>
+<section id="sec-mutex" class="level3">
+<h3 class="anchored" data-anchor-id="sec-mutex"><code>Mutex</code>：跨處理序同步</h3>
+<p><code>Mutex</code> (mutual exclusion) 的功能和 <code>lock</code> 很相似，都是提供獨佔存取。不過它有一個很重要的特點：<code>Mutex</code> 可以是<strong>系統級的</strong>。也就是說，它可以拿來同步<strong>不同處理序 (process)</strong> 之間的執行緒。</p>
+<p>這在某些特殊情境下非常有用，例如：</p>
+<ul>
+<li>確保你的應用程式在某個具名 Mutex 的可見範圍內只有一個執行個體（single instance）。</li>
+<li>多個獨立的應用程式需要協調對同一個共享檔案或硬體資源的存取。</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/mutex-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
+</figure>
+</div>
+<p>下面範例展示它最常見的使用情境之一：利用具名 <code>Mutex</code> 偵測是否已有另一個執行個體正在使用同一把系統鎖。</p>
+<blockquote class="blockquote">
+<p><strong>Note</strong></p>
+<p>以下範例使用了 .NET 10 新增的 <code>NamedWaitHandleOptions</code>（<code>CurrentUserOnly</code>、<code>CurrentSessionOnly</code>）。若目標框架為 .NET 9，可移除該建構式引數，改用 <code>new Mutex(false, name)</code> 的傳統寫法。</p>
+</blockquote>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co">// 建立一個具名的 Mutex。名稱建議使用可跨平台辨識的唯一字串以避免衝突。</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="co">// 在 .NET 10 中，可用 NamedWaitHandleOptions 明確限制可見範圍。</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="kw">using</span> Mutex mutex <span class="op">=</span> <span class="kw">new</span> <span class="fu">Mutex</span><span class="op">(</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-label="4"></a>    <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-label="5"></a>    <span class="st">"com.example.myawesomeapp.single-instance.A1B2C3D4"</span><span class="op">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-label="6"></a>    <span class="kw">new</span> NamedWaitHandleOptions</span>
+<span id="cb14-7"><a href="#cb14-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-label="8"></a>        CurrentUserOnly <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-label="9"></a>        CurrentSessionOnly <span class="op">=</span> <span class="kw">true</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-label="10"></a>    <span class="op">});</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-label="11"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-label="12"></a><span class="kw">try</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-label="13"></a><span class="op">{</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-label="14"></a>    <span class="co">// 嘗試取得鎖，等待 0 毫秒（立即回傳結果）</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-label="15"></a>    <span class="kw">if</span> <span class="op">(!</span>mutex<span class="op">.</span><span class="fu">WaitOne</span><span class="op">(</span><span class="dv">0</span><span class="op">))</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-label="16"></a>    <span class="op">{</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-label="17"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"應用程式已經在執行中了！請勿重複開啟。"</span><span class="op">);</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-label="18"></a>        <span class="kw">return</span><span class="op">;</span> <span class="co">// 離開應用程式</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-label="19"></a>    <span class="op">}</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-label="20"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-label="21"></a>    <span class="kw">try</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-label="22"></a>    <span class="op">{</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-label="23"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"應用程式啟動成功，按 Enter 鍵離開..."</span><span class="op">);</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-label="24"></a>        Console<span class="op">.</span><span class="fu">ReadLine</span><span class="op">();</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-label="25"></a>    <span class="op">}</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-label="26"></a>    <span class="kw">finally</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-label="27"></a>    <span class="op">{</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-label="28"></a>        <span class="co">// 確保離開時釋放 Mutex</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-label="29"></a>        mutex<span class="op">.</span><span class="fu">ReleaseMutex</span><span class="op">();</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-label="30"></a>    <span class="op">}</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-label="31"></a><span class="op">}</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-label="32"></a><span class="kw">catch</span> <span class="op">(</span>AbandonedMutexException<span class="op">)</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-label="33"></a><span class="op">{</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-label="34"></a>    <span class="co">// 防禦性處理：如果上一個持有此 Mutex 的執行緒異常結束，</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-label="35"></a>    <span class="co">// 而此時仍有其他等待者或既有 handle 讓該具名 Mutex 物件持續存在，</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-label="36"></a>    <span class="co">// 下一個成功 WaitOne 的等待者就可能收到 AbandonedMutexException。</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-label="37"></a>    <span class="co">// 收到這個例外代表目前這個執行個體已取得 Mutex，</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-label="38"></a>    <span class="co">// 但不代表被保護的共享狀態一定安全或一致。</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-label="39"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"偵測到上一次應用程式未正常關閉 (Mutex 被遺棄)。"</span><span class="op">);</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-label="40"></a></span>
+<span id="cb14-41"><a href="#cb14-41" aria-label="41"></a>    <span class="co">// ... 在這裡可以執行狀態驗證或修復邏輯 ...</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-label="42"></a>    <span class="kw">try</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-label="43"></a>    <span class="op">{</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-label="44"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"應用程式啟動成功，按 Enter 鍵離開..."</span><span class="op">);</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-label="45"></a>        Console<span class="op">.</span><span class="fu">ReadLine</span><span class="op">();</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-label="46"></a>    <span class="op">}</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-label="47"></a>    <span class="kw">finally</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-label="48"></a>    <span class="op">{</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-label="49"></a>        mutex<span class="op">.</span><span class="fu">ReleaseMutex</span><span class="op">();</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-label="50"></a>    <span class="op">}</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-label="51"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<blockquote class="blockquote">
+<p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch05/DemoMutex">DemoMutex</a></p>
+</blockquote>
+<p>這裡要提醒兩點。第一，Mutex 的命名方式會影響應用程式跨平台時的行為。在 Windows 作業系統中，加上 <code>Global\</code> 與 <code>Local\</code> 前綴會影響這把鎖在不同終端機 session 裡的可見範圍；若不指定前綴，預設相當於 <code>Local\</code>。然而一旦切換到了 Linux 或 macOS，這些前綴不一定有相同語意。因此，如果你的程式需要在多平台上實現「只允許一個執行個體（single instance）」，建議避免使用專屬於特定平台的前綴字，改用「反向網域名稱再加上 GUID」作為唯一名稱，並且在上線前先於目標平台測試。</p>
+<p>其次，在較新版本的 .NET 開發環境中，特別要注意這類「具名 wait handle」的安全隔離範圍。如果使用傳統的 <code>new Mutex(false, name)</code> 寫法，這把鎖不一定只限於建立它的使用者存取。要是在同一台機器上，其他使用者也能啟動同一套程式碼，其他處理序就有可能打開同名的 Mutex，並造成干擾。為了杜絕這種可能，如果你的需求只是「限制目前這個使用者的單一執行個體」，那就應該使用 <code>NamedWaitHandleOptions.CurrentUserOnly</code> 定義清楚。在剛剛示範的程式裡，我們甚至把 <code>CurrentSessionOnly = true</code> 也明確寫出來，表示這把鎖只會在同一位使用者的當前 session 中可見；若你需要跨 session 分享，則可以把這個屬性設為 <code>false</code>。</p>
+<blockquote class="blockquote">
+<p><strong>Warning: Mutex 的遺棄例外陷阱</strong></p>
+<p>跨處理序的 <code>Mutex</code> 有一個比較特別的例外行為。如果持有 Mutex 的執行緒異常結束，導致它沒來得及呼叫 <code>ReleaseMutex()</code>，結果會依當時是否有其他等待者而分成兩種情況：</p>
+<ul>
+<li><strong>有其他執行緒正在等待</strong>（即 handle 尚未消失）：下一個成功取得 Mutex 的等待者<strong>必定</strong>收到 <code>AbandonedMutexException</code>。此例外代表 Mutex 所有權已轉移給你的程式，但同時也是警訊——先前持有者可能在共享狀態未完成清理時就異常結束。若 Mutex 保護的是重要資料結構，應先驗證或修復狀態再繼續；若只是用來做「防止重複啟動」的門閂，通常記錄警告後仍可繼續。此情境下應防禦性地 <code>catch (AbandonedMutexException)</code>。</li>
+<li><strong>沒有等待者且所有 handle 已關閉</strong>：該具名 Mutex 物件本身會直接消失，下一個執行個體建立的是同名的全新 Mutex，<strong>不會</strong>收到 <code>AbandonedMutexException</code>，通常不需要特別處理。</li>
+</ul>
+</blockquote>
+<p>整體來說，<code>Mutex</code> 是比 <code>lock</code> 更「重」的同步工具，它的效能開銷也比較大，因為會涉及作業系統核心的系統呼叫。對絕大多數只需要在單一應用程式內部協調執行緒的情境來說，<code>lock</code> 或 <code>SemaphoreSlim</code> 依然是更好、也更有效率的選擇。</p>
+<p><strong>相關微軟文件：</strong></p>
+<ul>
+<li><a href="https://learn.microsoft.com/dotnet/standard/threading/mutexes">Mutexes</a></li>
+<li><a href="https://learn.microsoft.com/dotnet/api/system.threading.abandonedmutexexception">AbandonedMutexException Class</a></li>
+</ul>
+</section>
+</section>
+<section id="結語" class="level2">
+<h2 class="anchored" data-anchor-id="結語">結語</h2>
+<p>本章介紹了多執行緒程式設計中最棘手的一類問題。我們先透過一個簡單的計數器範例，看見共享資料在缺乏保護時如何引發「競爭狀況」；並且透過轉帳的範例了解「死結」是怎麼讓多個執行緒陷入無限等待的僵局。</p>
+<p>為了克服這些挑戰，我們學習了四種關鍵的同步機制：</p>
+<ul>
+<li><strong><code>Interlocked</code></strong>：用於單一共享欄位的原子操作（例如遞增計數器、交換旗標），在合適場景下比 <code>lock</code> 更輕量。</li>
+<li><strong><code>lock</code></strong> 與 <strong><code>System.Threading.Lock</code></strong>：用於建立簡單的獨佔關鍵區段，保護單一記憶體資源，是日常開發中最常用的互斥工具。</li>
+<li><strong><code>SemaphoreSlim</code></strong>：用於限制能同時進入某個資源或關鍵區段的操作數量，是控制併發度 (concurrency level) 和流量管制 (throttling) 的利器。</li>
+<li><strong><code>Mutex</code></strong>：用於實現跨處理序 (cross-process) 的同步，是解決系統級資源協調（例如防止程式重複啟動）的方案。</li>
+</ul>
+<p>理解這些同步工具之後，你就能更有把握地撰寫可靠的併發程式碼。不過，手動管理的鎖 (locks) 仍然伴隨著隱形風險。哪怕只是忘了在 <code>finally</code> 區塊裡釋放一次鎖，都可能導致嚴重問題。</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sync-tools-matrix-tw.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+<p>那麼，有沒有更安全、也更簡單的方式來處理多執行緒下的共享資料呢？</p>
+<p>答案是肯定的。在下一章，我們會探索 .NET 提供的「執行緒安全集合 (thread-safe collections)」。這些特殊設計的集合類別，已經在內部替我們處理好許多複雜的同步細節，讓我們能更安穩地操作併發資料。</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script>
@@ -726,6 +1305,35 @@ ul.task-list li input[type="checkbox"] {
     }
   });
   </script>
+<input type="hidden" id="giscus-base-theme" value="preferred_color_scheme">
+<input type="hidden" id="giscus-alt-theme" value="preferred_color_scheme">
+<script>
+  function loadGiscus() {
+    // Function to get the theme based on body class
+    const getTheme = () => {
+      let baseTheme = document.getElementById('giscus-base-theme').value;
+      let altTheme = document.getElementById('giscus-alt-theme').value;
+      return document.body.classList.contains('quarto-dark') ? altTheme : baseTheme;
+    };
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.dataset.repo = "huanlin/dotnet-concurrency";
+    script.dataset.repoId = "R_kgDOTfLcsw";
+    script.dataset.category = "General";
+    script.dataset.categoryId = "DIC_kwDOTfLcs84DBqHh";
+    script.dataset.mapping = "pathname";
+    script.dataset.reactionsEnabled = "1";
+    script.dataset.emitMetadata = "0";
+    script.dataset.inputPosition = "bottom";
+    script.dataset.theme = getTheme();
+    script.dataset.lang = "zh-TW";
+    script.crossOrigin = "anonymous";
+    // Append the script to the desired div instead of at the end of the body
+    document.getElementById("quarto-content").appendChild(script);
+  }
+  loadGiscus();
+</script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="../ch04/exceptions-and-cancellation.html" class="pagination-link" aria-label="第 4 章：例外處理與取消">
@@ -746,7 +1354,7 @@ ul.task-list li input[type="checkbox"] {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/huanlin/dotnet-concurrency/issues/new" class="toc-action"><i class="bi bi-github"></i>回報問題</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p><a href="https://huanlin.cc/">作者網站</a></p>
 </div>
