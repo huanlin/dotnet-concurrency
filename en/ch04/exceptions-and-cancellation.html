@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,10 +13,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -78,10 +81,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4823106157d336fa738e4aca548b543e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -297,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 3, 2026</p>
+      <p class="date-modified">September 2, 2026</p>
     </div>
   </div>
     
@@ -322,32 +325,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="how-await-handles-exceptions">How <code>await</code> handles exceptions</h2>
 <p>One of the most elegant parts of <code>async/await</code> is that it makes exception handling in asynchronous code feel almost as natural as it does in traditional synchronous code. In practice, that means we can still use familiar <code>try-catch</code> blocks to handle errors thrown by asynchronous work. Even so, there are a few important details worth understanding about what happens under the hood.</p>
 <p>Here is an asynchronous operation that might fail, such as trying to download content from a host that does not exist:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="op">{</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>    <span class="co">// HttpClient may throw HttpRequestException if the request fails</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// or the host name cannot be resolved.</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
-<span id="cb1-8"><a href="#cb1-8"></a>    <span class="kw">return</span> content<span class="op">;</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-label="5"></a>    <span class="co">// HttpClient may throw HttpRequestException if the request fails</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-label="6"></a>    <span class="co">// or the host name cannot be resolved.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-label="7"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-label="8"></a>    <span class="kw">return</span> content<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-label="9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>If <code>GetStringAsync</code> runs into a network problem and throws an <code>HttpRequestException</code>, that exception is not thrown immediately at the call site. Instead, it is first <strong>captured and stored inside the <code>Task</code> returned by the method</strong>. At that point, the <code>Task</code> enters the <code>Faulted</code> state.</p>
 <p>In other words, the exception stays inside the <code>Task</code> until your code actually <code>await</code>s it. At that moment, the stored exception is <strong>re-thrown</strong>.</p>
 <p>Because of this “delayed throw” behavior, we can handle the error very naturally with a standard <code>try-catch</code> block, like this:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1"></a><span class="dt">var</span> url <span class="op">=</span> <span class="st">"https://this-host-does-not-exist.invalid"</span><span class="op">;</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">try</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="op">{</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="dt">string</span> content <span class="op">=</span> await <span class="fu">DownloadPageAsync</span><span class="op">(</span>url<span class="op">);</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Download succeeded!"</span><span class="op">);</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="op">}</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a><span class="kw">catch</span> <span class="op">(</span>HttpRequestException ex<span class="op">)</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="op">{</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"A network error occurred:"</span><span class="op">);</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="dt">var</span> url <span class="op">=</span> <span class="st">"https://this-host-does-not-exist.invalid"</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="kw">try</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a>    <span class="dt">string</span> content <span class="op">=</span> await <span class="fu">DownloadPageAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Download succeeded!"</span><span class="op">);</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-label="6"></a><span class="op">}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-label="7"></a><span class="kw">catch</span> <span class="op">(</span>HttpRequestException ex<span class="op">)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-label="8"></a><span class="op">{</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-label="9"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"A network error occurred:"</span><span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-label="10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-label="11"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Example output:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1"></a>A network error occurred:</span>
-<span id="cb3-2"><a href="#cb3-2"></a>No such host is known. (this-host-does-not-exist.invalid:443)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a>A network error occurred:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>No such host is known. (this-host-does-not-exist.invalid:443)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>As you can see, the behavior is very intuitive. You simply wrap the <code>await</code> calls that might fail in a <code>try-catch</code> block, just as you would in synchronous code. The details, such as storing the exception inside the <code>Task</code> and rethrowing it later, are handled for us by the compiler-generated state machine.</p>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch04/DemoExceptionHandling">DemoExceptionHandling</a></p>
@@ -359,15 +362,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Here, “observing” a <code>Task</code> usually means awaiting it, calling <code>Wait()</code>, or reading its <code>Exception</code> property so the runtime knows that you have acknowledged its failure.</p>
 </blockquote>
 <p>Here is an incorrect example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">public</span> <span class="dt">void</span> <span class="fu">Button_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> EventArgs e<span class="op">)</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="op">{</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a>    <span class="co">// ✘ Incorrect example: no await!</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a>    <span class="co">// If SaveDataAsync returns a Task and throws an exception,</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a>    <span class="co">// nothing catches it here, and the app usually does not crash.</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a>    <span class="co">// The user may think the save succeeded</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a>    <span class="co">// even though it actually failed.</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a>    _ <span class="op">=</span> <span class="fu">SaveDataAsync</span><span class="op">();</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="kw">public</span> <span class="dt">void</span> <span class="fu">Button_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> EventArgs e<span class="op">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a>    <span class="co">// ✘ Incorrect example: no await!</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a>    <span class="co">// If SaveDataAsync returns a Task and throws an exception,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a>    <span class="co">// nothing catches it here, and the app usually does not crash.</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a>    <span class="co">// The user may think the save succeeded</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a>    <span class="co">// even though it actually failed.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>    _ <span class="op">=</span> <span class="fu">SaveDataAsync</span><span class="op">();</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-label="9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>As mentioned earlier, when a <code>Task</code> faults and nobody awaits it, the exception simply stays hidden inside that <code>Task</code> object. Although using the discard operator (<code>_</code>) suppresses the compiler warning about an unawaited task, it <strong>does not</strong> solve the real problem of swallowed exceptions. Later, when the garbage collector reclaims that abandoned <code>Task</code>, the runtime may raise the <code>TaskScheduler.UnobservedTaskException</code> event. By default, however, that does not crash the application, so this kind of bug often remains a silent failure that is difficult to detect.</p>
 <p>To be precise, the pattern “start the task now and await it later” is fine. The dangerous part is throwing the <code>Task</code> away and never looking at it again. Once you do that, the caller no longer has any reliable way to know whether the operation eventually succeeded, failed, or was canceled.</p>
 <p>There is one more important distinction to make here. The silent-failure problem we are discussing applies only to <strong>asynchronous methods that return <code>Task</code> or <code>Task&lt;T&gt;</code></strong>. If the method returns <code>async void</code>, such as a typical UI event handler, the situation is very different. Exceptions thrown inside an <code>async void</code> method are <strong>not</strong> wrapped in a <code>Task</code>. Instead, they are thrown directly to the current <code>SynchronizationContext</code>, if one exists, or to the thread pool otherwise. In practice, that usually becomes an <strong>unhandled exception</strong>, which can crash the entire application. That is why, outside of special cases such as UI event handlers, we should avoid <code>async void</code> whenever possible.</p>
@@ -385,65 +388,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="the-role-of-aggregateexception">The role of <code>AggregateException</code></h2>
 <p>Besides the basic exception flow we just covered, there is another exception type you are very likely to encounter when working with asynchronous APIs in .NET: <code>AggregateException</code>. The word “aggregate” already gives away its purpose. It is essentially a <strong>container that can wrap one or more exceptions</strong>.</p>
 <p>To understand when it appears, first look at what happens when we do not use <code>await</code>. If you wait for a faulted task by calling a blocking API such as <code>Task.Wait()</code> or <code>Task.Result</code>, the original exception inside the task, such as <code>HttpRequestException</code>, is not thrown directly. It is first wrapped inside an <code>AggregateException</code>, and that wrapper is what gets thrown. Consider the following example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1"></a><span class="dt">var</span> faultyTask <span class="op">=</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="st">"https://host-not-exist.invalid"</span><span class="op">);</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a></span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">try</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="op">{</span></span>
-<span id="cb5-5"><a href="#cb5-5"></a>    <span class="co">// Using .Wait() throws AggregateException.</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>    faultyTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a><span class="op">}</span></span>
-<span id="cb5-8"><a href="#cb5-8"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException ex<span class="op">)</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="op">{</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a>    <span class="co">// We need to unwrap the real exception</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a>    <span class="co">// from the InnerExceptions collection.</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a>    <span class="dt">var</span> realException <span class="op">=</span> ex<span class="op">.</span><span class="fu">InnerExceptions</span><span class="op">.</span><span class="fu">First</span><span class="op">();</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a>        <span class="st">"Caught AggregateException. The real error is: "</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a>        <span class="op">+</span> realException<span class="op">.</span><span class="fu">GetType</span><span class="op">().</span><span class="fu">Name</span><span class="op">);</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a><span class="dt">var</span> faultyTask <span class="op">=</span> <span class="fu">DownloadPageAsync</span><span class="op">(</span><span class="st">"https://host-not-exist.invalid"</span><span class="op">);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-label="2"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-label="3"></a><span class="kw">try</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-label="5"></a>    <span class="co">// Using .Wait() throws AggregateException.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a>    faultyTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-label="7"></a><span class="op">}</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-label="8"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException ex<span class="op">)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-label="9"></a><span class="op">{</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-label="10"></a>    <span class="co">// We need to unwrap the real exception</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-label="11"></a>    <span class="co">// from the InnerExceptions collection.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-label="12"></a>    <span class="dt">var</span> realException <span class="op">=</span> ex<span class="op">.</span><span class="fu">InnerExceptions</span><span class="op">.</span><span class="fu">First</span><span class="op">();</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-label="13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-label="14"></a>        <span class="st">"Caught AggregateException. The real error is: "</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-label="15"></a>        <span class="op">+</span> realException<span class="op">.</span><span class="fu">GetType</span><span class="op">().</span><span class="fu">Name</span><span class="op">);</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-label="16"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Example output:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a href="#cb6-1"></a>Caught AggregateException. The real error is: HttpRequestException</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>Caught AggregateException. The real error is: HttpRequestException</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>We are using the synchronous, blocking <code>Wait()</code> method here on purpose, just to demonstrate this behavior. Without <code>await</code>, a faulted task wraps one or more original exceptions inside <code>AggregateException</code>. In real code, of course, we should still prefer <code>await</code> whenever possible.</p>
-<p>Why does <code>Wait()</code> use <code>AggregateException</code>? Because in a synchronous waiting scenario, multiple concurrent tasks may fail at the same time, and the runtime needs a way to surface all of those exceptions together. By contrast, <code>await</code> waits asynchronously and can automatically <strong>unwrap</strong> the aggregate for us, rethrowing one original exception directly instead of handing us an <code>AggregateException</code> that we must manually unpack.</p>
-<p>That also explains why, in the earlier page-download example, we could directly write <code>catch (HttpRequestException ex)</code>. Thanks to <code>await</code>, the exception-handling code stays focused and concise.</p>
+<p>Why do <code>Task.Wait()</code> and <code>.Result</code> throw <code>AggregateException</code>? Because they carry forward the synchronous waiting semantics of the Task Parallel Library (TPL); when a task faults, TPL wraps all generated exceptions and throws them together. By contrast, <code>await</code> adopts an asynchronous exception-propagation mechanism that better aligns with developer intuition: it directly <strong>unwraps</strong> this container and rethrows the <strong>first</strong> original exception from within.</p>
+<p>That also explains why, in the earlier page-download example, we could directly write <code>catch (HttpRequestException ex)</code>, rather than dealing with an entire <code>AggregateException</code>. Thanks to <code>await</code>, the exception-handling code stays focused and concise.</p>
 <p>So if <code>await</code> is this smart, can we simply ignore <code>AggregateException</code>? Not quite. In more advanced scenarios, it still matters. One important case is when we use <code>Task.WhenAll</code> to wait for multiple tasks that may fail at the same time.</p>
 <section id="task.whenall-and-multiple-exceptions" class="level3">
 <h3 class="anchored" data-anchor-id="task.whenall-and-multiple-exceptions"><code>Task.WhenAll</code> and multiple exceptions</h3>
 <p>When we use <code>Task.WhenAll</code> to wait for several tasks at once, the story becomes a little more complicated. If <strong>multiple</strong> tasks happen to fail, then the task returned by <code>Task.WhenAll</code>, which represents the combined progress of all those tasks, contains <strong>all</strong> of the exceptions that occurred.</p>
 <p>When you <code>await</code> that combined task, <code>await</code> still unwraps exceptions automatically, but when multiple failures occur, it has a limitation: it <strong>propagates only one of them</strong>. Which one you get is not guaranteed. The other exceptions remain in the <code>Exception</code> property of the task itself. Consider this example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">try</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="op">{</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a>    <span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a>    <span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a>    await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="op">}</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="op">{</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a>    <span class="co">// Only one of the errors will be caught here.</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Caught: {ex.Message}"</span><span class="op">);</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="kw">try</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-label="3"></a>    <span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-label="4"></a>    <span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-label="5"></a>    await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-label="6"></a><span class="op">}</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-label="7"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a><span class="op">{</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a>    <span class="co">// Only one of the errors will be caught here.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Caught: {ex.Message}"</span><span class="op">);</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Example output:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb8-1"><a href="#cb8-1"></a>Caught: Error 1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a>Caught: Error 1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>As you can see, the second task’s failure never reached the <code>catch</code> block. If you truly need to capture and process <strong>every</strong> error that occurred, you cannot rely only on the exception rethrown by <code>await</code>. You also need to inspect the <code>Task</code> object itself through its <code>Exception</code> property, which is an <code>AggregateException</code>.</p>
 <p>Here is a revised version:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1"></a><span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="dt">var</span> allTasks <span class="op">=</span> Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">try</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a><span class="op">{</span></span>
-<span id="cb9-6"><a href="#cb9-6"></a>    await allTasks<span class="op">;</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="op">}</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="kw">catch</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a><span class="op">{</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>    <span class="co">// Inspect allTasks.Exception to get every error.</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>    <span class="kw">foreach</span> <span class="op">(</span><span class="dt">var</span> innerEx <span class="kw">in</span> allTasks<span class="op">.</span><span class="fu">Exception</span><span class="op">!.</span><span class="fu">InnerExceptions</span><span class="op">)</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a>    <span class="op">{</span></span>
-<span id="cb9-13"><a href="#cb9-13"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Error: {innerEx.Message}"</span><span class="op">);</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>    <span class="op">}</span></span>
-<span id="cb9-15"><a href="#cb9-15"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="dt">var</span> task1 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 1"</span><span class="op">);</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="dt">var</span> task2 <span class="op">=</span> <span class="fu">ThrowAsync</span><span class="op">(</span><span class="st">"Error 2"</span><span class="op">);</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="dt">var</span> allTasks <span class="op">=</span> Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">);</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-label="4"></a><span class="kw">try</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-label="6"></a>    await allTasks<span class="op">;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-label="7"></a><span class="op">}</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-label="8"></a><span class="kw">catch</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-label="9"></a><span class="op">{</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-label="10"></a>    <span class="co">// Inspect allTasks.Exception to get every error.</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-label="11"></a>    <span class="kw">foreach</span> <span class="op">(</span><span class="dt">var</span> innerEx <span class="kw">in</span> allTasks<span class="op">.</span><span class="fu">Exception</span><span class="op">!.</span><span class="fu">InnerExceptions</span><span class="op">)</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-label="13"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Error: {innerEx.Message}"</span><span class="op">);</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-label="14"></a>    <span class="op">}</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-label="15"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Example output:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a href="#cb10-1"></a>Error: Error 1</span>
-<span id="cb10-2"><a href="#cb10-2"></a>Error: Error 2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>Error: Error 1</span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a>Error: Error 2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch04/DemoAggregateException">DemoAggregateException</a></p>
 </blockquote>
@@ -474,21 +477,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sec-requesting-cancellation" class="level3">
 <h3 class="anchored" data-anchor-id="sec-requesting-cancellation">Requesting cancellation</h3>
 <p>The cancellation flow begins by creating a <code>CancellationTokenSource</code> object, usually abbreviated as CTS:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1"></a><span class="co">// 1. Create a CancellationTokenSource.</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
-<span id="cb11-3"><a href="#cb11-3"></a></span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="co">// 2. Get a CancellationToken from the CTS.</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
-<span id="cb11-6"><a href="#cb11-6"></a></span>
-<span id="cb11-7"><a href="#cb11-7"></a><span class="co">// 3. Pass the token to your asynchronous method.</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a><span class="co">// (This example only shows token passing.</span></span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="co">// Full waiting and exception handling</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a><span class="co">// come in the later example.)</span></span>
-<span id="cb11-11"><a href="#cb11-11"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
-<span id="cb11-12"><a href="#cb11-12"></a></span>
-<span id="cb11-13"><a href="#cb11-13"></a><span class="co">// 4. At some later point, when you decide to cancel...</span></span>
-<span id="cb11-14"><a href="#cb11-14"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The user decided to cancel the operation!"</span><span class="op">);</span></span>
-<span id="cb11-15"><a href="#cb11-15"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// Press the “Cancel” button.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a><span class="co">// 1. Create a CancellationTokenSource.</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-label="2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-label="3"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-label="4"></a><span class="co">// 2. Get a CancellationToken from the CTS.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-label="5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-label="6"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-label="7"></a><span class="co">// 3. Pass the token to your asynchronous method.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-label="8"></a><span class="co">// (This example only shows token passing.</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-label="9"></a><span class="co">// Full waiting and exception handling</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-label="10"></a><span class="co">// come in the later example.)</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-label="11"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-label="12"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-label="13"></a><span class="co">// 4. At some later point, when you decide to cancel...</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-label="14"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The user decided to cancel the operation!"</span><span class="op">);</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-label="15"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// Press the “Cancel” button.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Once you call <code>cts.Cancel()</code>, the cancellation signal is sent immediately, and every <code>CancellationToken</code> obtained from that CTS is notified right away. That notification does not forcibly stop a thread, however. It simply marks the token as “cancellation requested” and runs any registered cancellation callbacks. The actual stopping point still depends on when the worker checks the token or when an underlying API that supports cancellation notices the signal.</p>
 <blockquote class="blockquote">
 <p><strong>Note</strong></p>
@@ -509,77 +512,77 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>The following example demonstrates both “keep checking” and “pass it through.” Notice that the method checks for cancellation explicitly inside the loop and also forwards the same <code>token</code> to <code>Task.Delay</code>, a lower-level API that supports cancellation:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">static</span> async Task <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a><span class="op">{</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work started..."</span><span class="op">);</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a>    <span class="kw">try</span></span>
-<span id="cb12-5"><a href="#cb12-5"></a>    <span class="op">{</span></span>
-<span id="cb12-6"><a href="#cb12-6"></a>        <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb12-7"><a href="#cb12-7"></a>        <span class="op">{</span></span>
-<span id="cb12-8"><a href="#cb12-8"></a>            <span class="co">// Check whether cancellation has been requested</span></span>
-<span id="cb12-9"><a href="#cb12-9"></a>            <span class="co">// (for example, inside a CPU-intensive loop).</span></span>
-<span id="cb12-10"><a href="#cb12-10"></a>            token<span class="op">.</span><span class="fu">ThrowIfCancellationRequested</span><span class="op">();</span></span>
-<span id="cb12-11"><a href="#cb12-11"></a></span>
-<span id="cb12-12"><a href="#cb12-12"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Working on part {i + 1}/10..."</span><span class="op">);</span></span>
-<span id="cb12-13"><a href="#cb12-13"></a></span>
-<span id="cb12-14"><a href="#cb12-14"></a>            <span class="co">// Important: keep passing the token to any lower-level API</span></span>
-<span id="cb12-15"><a href="#cb12-15"></a>            <span class="co">// that supports cancellation.</span></span>
-<span id="cb12-16"><a href="#cb12-16"></a>            await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">1000</span><span class="op">,</span> token<span class="op">);</span></span>
-<span id="cb12-17"><a href="#cb12-17"></a>        <span class="op">}</span></span>
-<span id="cb12-18"><a href="#cb12-18"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work completed successfully."</span><span class="op">);</span></span>
-<span id="cb12-19"><a href="#cb12-19"></a>    <span class="op">}</span></span>
-<span id="cb12-20"><a href="#cb12-20"></a>    <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
-<span id="cb12-21"><a href="#cb12-21"></a>    <span class="op">{</span></span>
-<span id="cb12-22"><a href="#cb12-22"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work was canceled."</span><span class="op">);</span></span>
-<span id="cb12-23"><a href="#cb12-23"></a>        <span class="kw">throw</span><span class="op">;</span> <span class="co">// Usually we should rethrow it.</span></span>
-<span id="cb12-24"><a href="#cb12-24"></a>    <span class="op">}</span></span>
-<span id="cb12-25"><a href="#cb12-25"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="kw">static</span> async Task <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-label="3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work started..."</span><span class="op">);</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-label="4"></a>    <span class="kw">try</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-label="5"></a>    <span class="op">{</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-label="6"></a>        <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="dv">10</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-label="7"></a>        <span class="op">{</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-label="8"></a>            <span class="co">// Check whether cancellation has been requested</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-label="9"></a>            <span class="co">// (for example, inside a CPU-intensive loop).</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-label="10"></a>            token<span class="op">.</span><span class="fu">ThrowIfCancellationRequested</span><span class="op">();</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-label="11"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-label="12"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"Working on part {i + 1}/10..."</span><span class="op">);</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-label="13"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-label="14"></a>            <span class="co">// Important: keep passing the token to any lower-level API</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-label="15"></a>            <span class="co">// that supports cancellation.</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-label="16"></a>            await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">1000</span><span class="op">,</span> token<span class="op">);</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-label="17"></a>        <span class="op">}</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-label="18"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work completed successfully."</span><span class="op">);</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-label="19"></a>    <span class="op">}</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-label="20"></a>    <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-label="21"></a>    <span class="op">{</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-label="22"></a>        Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Background work was canceled."</span><span class="op">);</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-label="23"></a>        <span class="kw">throw</span><span class="op">;</span> <span class="co">// Usually we should rethrow it.</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-label="24"></a>    <span class="op">}</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-label="25"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>As the code shows, inside asynchronous work we often call <code>token.ThrowIfCancellationRequested()</code> at the start of a loop or at other key points to check whether the token has been canceled. If cancellation has been requested, that method throws <code>OperationCanceledException</code> and interrupts the operation.</p>
 <blockquote class="blockquote">
 <p><code>ThrowIfCancellationRequested</code> throws <code>OperationCanceledException</code>, and <a href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.delay"><code>Task.Delay</code></a> may also throw <code>OperationCanceledException</code> or its derived type <code>TaskCanceledException</code>.</p>
 </blockquote>
 <p>So what happens at the call site after the worker throws that cancellation exception? When we <code>await</code> a canceled task, the <code>OperationCanceledException</code> mentioned above, or one of its derived types such as <code>TaskCanceledException</code>, is rethrown. That means we can simply catch that specific exception type and clearly distinguish cancellation from a real system failure.</p>
 <p>In other words, catching a cancellation exception is often part of the expected control flow and does not automatically mean there is a bug. If we catch some other exception type, that is when we should treat it as an actual error. The following example connects the caller and the worker:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">// 1. Create a CancellationTokenSource.</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a></span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="co">// 2. Get a CancellationToken from the CTS.</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="co">// 3. Pass the token to your asynchronous method</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a><span class="co">// (do not await it immediately, so it can run in the background).</span></span>
-<span id="cb13-9"><a href="#cb13-9"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
-<span id="cb13-10"><a href="#cb13-10"></a></span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="co">// Simulate the user spending some time before deciding to cancel.</span></span>
-<span id="cb13-12"><a href="#cb13-12"></a>await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2500</span><span class="op">);</span></span>
-<span id="cb13-13"><a href="#cb13-13"></a></span>
-<span id="cb13-14"><a href="#cb13-14"></a><span class="co">// 4. At some later point, when you decide to cancel...</span></span>
-<span id="cb13-15"><a href="#cb13-15"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"</span><span class="sc">\n</span><span class="st">[Caller] The user decided to cancel the operation!"</span><span class="op">);</span></span>
-<span id="cb13-16"><a href="#cb13-16"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// Press the “Cancel” button.</span></span>
-<span id="cb13-17"><a href="#cb13-17"></a></span>
-<span id="cb13-18"><a href="#cb13-18"></a><span class="kw">try</span></span>
-<span id="cb13-19"><a href="#cb13-19"></a><span class="op">{</span></span>
-<span id="cb13-20"><a href="#cb13-20"></a>    await workTask<span class="op">;</span> <span class="co">// Wait for the background work to finish.</span></span>
-<span id="cb13-21"><a href="#cb13-21"></a><span class="op">}</span></span>
-<span id="cb13-22"><a href="#cb13-22"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
-<span id="cb13-23"><a href="#cb13-23"></a><span class="op">{</span></span>
-<span id="cb13-24"><a href="#cb13-24"></a>    <span class="co">// This is expected.</span></span>
-<span id="cb13-25"><a href="#cb13-25"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The caller caught OperationCanceledException."</span><span class="op">);</span></span>
-<span id="cb13-26"><a href="#cb13-26"></a><span class="op">}</span></span>
-<span id="cb13-27"><a href="#cb13-27"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
-<span id="cb13-28"><a href="#cb13-28"></a><span class="op">{</span></span>
-<span id="cb13-29"><a href="#cb13-29"></a>    <span class="co">// This is the real error case.</span></span>
-<span id="cb13-30"><a href="#cb13-30"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"The work failed: {ex.Message}"</span><span class="op">);</span></span>
-<span id="cb13-31"><a href="#cb13-31"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co">// 1. Create a CancellationTokenSource.</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-label="2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-label="4"></a><span class="co">// 2. Get a CancellationToken from the CTS.</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-label="5"></a><span class="dt">var</span> token <span class="op">=</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-label="6"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-label="7"></a><span class="co">// 3. Pass the token to your asynchronous method</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-label="8"></a><span class="co">// (do not await it immediately, so it can run in the background).</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-label="9"></a>Task workTask <span class="op">=</span> <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>token<span class="op">);</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-label="10"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-label="11"></a><span class="co">// Simulate the user spending some time before deciding to cancel.</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-label="12"></a>await Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2500</span><span class="op">);</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-label="13"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-label="14"></a><span class="co">// 4. At some later point, when you decide to cancel...</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-label="15"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"</span><span class="sc">\n</span><span class="st">[Caller] The user decided to cancel the operation!"</span><span class="op">);</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-label="16"></a>cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span> <span class="co">// Press the “Cancel” button.</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-label="17"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-label="18"></a><span class="kw">try</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-label="19"></a><span class="op">{</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-label="20"></a>    await workTask<span class="op">;</span> <span class="co">// Wait for the background work to finish.</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-label="21"></a><span class="op">}</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-label="22"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-label="23"></a><span class="op">{</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-label="24"></a>    <span class="co">// This is expected.</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-label="25"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The caller caught OperationCanceledException."</span><span class="op">);</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-label="26"></a><span class="op">}</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-label="27"></a><span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-label="28"></a><span class="op">{</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-label="29"></a>    <span class="co">// This is the real error case.</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-label="30"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"The work failed: {ex.Message}"</span><span class="op">);</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-label="31"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Example output:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a href="#cb14-1"></a>Background work started...</span>
-<span id="cb14-2"><a href="#cb14-2"></a>Working on part 1/10...</span>
-<span id="cb14-3"><a href="#cb14-3"></a>Working on part 2/10...</span>
-<span id="cb14-4"><a href="#cb14-4"></a>Working on part 3/10...</span>
-<span id="cb14-5"><a href="#cb14-5"></a></span>
-<span id="cb14-6"><a href="#cb14-6"></a>[Caller] The user decided to cancel the operation!</span>
-<span id="cb14-7"><a href="#cb14-7"></a>Background work was canceled.</span>
-<span id="cb14-8"><a href="#cb14-8"></a>The caller caught OperationCanceledException.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a>Background work started...</span>
+<span id="cb14-2"><a href="#cb14-2" aria-label="2"></a>Working on part 1/10...</span>
+<span id="cb14-3"><a href="#cb14-3" aria-label="3"></a>Working on part 2/10...</span>
+<span id="cb14-4"><a href="#cb14-4" aria-label="4"></a>Working on part 3/10...</span>
+<span id="cb14-5"><a href="#cb14-5" aria-label="5"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-label="6"></a>[Caller] The user decided to cancel the operation!</span>
+<span id="cb14-7"><a href="#cb14-7" aria-label="7"></a>Background work was canceled.</span>
+<span id="cb14-8"><a href="#cb14-8" aria-label="8"></a>The caller caught OperationCanceledException.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch04/DemoCancellationToken">DemoCancellationToken</a></p>
 </blockquote>
@@ -598,24 +601,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Case B:</strong> a nested component or third-party library cancels its own operation because it waited too long and throws <code>OperationCanceledException</code>.</li>
 </ul>
 <p>In this situation, C#’s <code>when</code> clause becomes useful. It lets us narrow the conditions under which a <code>catch</code> block runs, so we only handle the cancellation case we care about. For example, if you want to confirm that cancellation was triggered specifically by the token passed in by the caller, you can write:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb15-1"><a href="#cb15-1"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException oce<span class="op">)</span></span>
-<span id="cb15-2"><a href="#cb15-2"></a>    <span class="fu">when</span> <span class="op">(</span>oce<span class="op">.</span><span class="fu">CancellationToken</span> <span class="op">==</span> token<span class="op">)</span></span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="op">{</span></span>
-<span id="cb15-4"><a href="#cb15-4"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The caller requested cancellation."</span><span class="op">);</span></span>
-<span id="cb15-5"><a href="#cb15-5"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb15-1"><a href="#cb15-1" aria-label="1"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException oce<span class="op">)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-label="2"></a>    <span class="fu">when</span> <span class="op">(</span>oce<span class="op">.</span><span class="fu">CancellationToken</span> <span class="op">==</span> token<span class="op">)</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-label="4"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The caller requested cancellation."</span><span class="op">);</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-label="5"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>That said, this comparison is not universal. If <code>CreateLinkedTokenSource</code> is involved, or if a lower-level API throws an <code>OperationCanceledException</code> that carries a different token, then <code>oce.CancellationToken</code> may not equal the original token you passed in. When multiple cancellation sources exist, a more reliable approach is often to do what we will do in the timeout example later: check whether <code>IsCancellationRequested</code> is true on the source token you own.</p>
 </section>
 <section id="registering-cancellation-callbacks" class="level3">
 <h3 class="anchored" data-anchor-id="registering-cancellation-callbacks">Registering cancellation callbacks</h3>
 <p>So far, we have focused on actively checking the token. But sometimes an older or third-party API you are using may not directly support <code>CancellationToken</code>, or you may need to do some extra cleanup the moment cancellation occurs, such as closing an open socket connection or deleting a temporary file that was only half written. In those situations, you can use <code>CancellationToken.Register</code> to register a callback that runs on cancellation:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">using</span> <span class="dt">var</span> registration <span class="op">=</span> token<span class="op">.</span><span class="fu">Register</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="op">{</span></span>
-<span id="cb16-3"><a href="#cb16-3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Cancellation received. Cleaning up resources..."</span><span class="op">);</span></span>
-<span id="cb16-4"><a href="#cb16-4"></a>    <span class="co">// For example: close a custom connection, delete a temp file,</span></span>
-<span id="cb16-5"><a href="#cb16-5"></a>    <span class="co">// or notify another component to stop working.</span></span>
-<span id="cb16-6"><a href="#cb16-6"></a><span class="op">});</span></span>
-<span id="cb16-7"><a href="#cb16-7"></a></span>
-<span id="cb16-8"><a href="#cb16-8"></a><span class="co">// ... perform the operation ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb16-1"><a href="#cb16-1" aria-label="1"></a><span class="kw">using</span> <span class="dt">var</span> registration <span class="op">=</span> token<span class="op">.</span><span class="fu">Register</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-label="3"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Cancellation received. Cleaning up resources..."</span><span class="op">);</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-label="4"></a>    <span class="co">// For example: close a custom connection, delete a temp file,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-label="5"></a>    <span class="co">// or notify another component to stop working.</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-label="6"></a><span class="op">});</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-label="7"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-label="8"></a><span class="co">// ... perform the operation ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>When you call <code>Register</code>, it returns a <code>CancellationTokenRegistration</code>, which implements <code>IDisposable</code>. That is why putting it in a <code>using</code> declaration or a <code>using</code> block is important. Doing so ensures the registration is cleaned up correctly after the operation completes or after the cancellation callbacks finish running. It may look like a small detail, but it matters when you want to avoid memory leaks.</p>
 <p>In practice, cancellation callbacks should be short and reentrant. Because the callback may run as part of the cancellation flow, overly expensive work inside it can slow down or seriously interfere with cancellation itself. “Reentrant” means that even if the same cleanup logic is entered multiple times, or interleaves with other cleanup flows, it should not leave the object in a broken state.</p>
 <blockquote class="blockquote">
@@ -639,34 +642,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Once you understand the cancellation pattern, implementing a timeout becomes quite natural. In essence, a timeout is simply “automatically request cancellation once a certain amount of time has passed.”</p>
 <p><code>CancellationTokenSource</code> makes this easy because one of its constructors accepts a time span. If you pass a duration when creating the CTS, it will automatically call <code>Cancel()</code> after that amount of time has elapsed.</p>
 <p>Let’s start with a simple example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb18-1"><a href="#cb18-1"></a><span class="co">// Create a CTS that automatically cancels after 3 seconds.</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">3</span><span class="op">));</span></span>
-<span id="cb18-3"><a href="#cb18-3"></a></span>
-<span id="cb18-4"><a href="#cb18-4"></a><span class="kw">try</span></span>
-<span id="cb18-5"><a href="#cb18-5"></a><span class="op">{</span></span>
-<span id="cb18-6"><a href="#cb18-6"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
-<span id="cb18-7"><a href="#cb18-7"></a>        <span class="st">"Starting a job that is allowed "</span> <span class="op">+</span></span>
-<span id="cb18-8"><a href="#cb18-8"></a>        <span class="st">"to run for at most 3 seconds..."</span><span class="op">);</span></span>
-<span id="cb18-9"><a href="#cb18-9"></a>    <span class="co">// Assume this work takes more than 10 seconds internally.</span></span>
-<span id="cb18-10"><a href="#cb18-10"></a>    await <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
-<span id="cb18-11"><a href="#cb18-11"></a><span class="op">}</span></span>
-<span id="cb18-12"><a href="#cb18-12"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
-<span id="cb18-13"><a href="#cb18-13"></a><span class="op">{</span></span>
-<span id="cb18-14"><a href="#cb18-14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The work was canceled because it timed out!"</span><span class="op">);</span></span>
-<span id="cb18-15"><a href="#cb18-15"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb18-1"><a href="#cb18-1" aria-label="1"></a><span class="co">// Create a CTS that automatically cancels after 3 seconds.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-label="2"></a><span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">3</span><span class="op">));</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-label="3"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-label="4"></a><span class="kw">try</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-label="6"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-label="7"></a>        <span class="st">"Starting a job that is allowed "</span> <span class="op">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-label="8"></a>        <span class="st">"to run for at most 3 seconds..."</span><span class="op">);</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-label="9"></a>    <span class="co">// Assume this work takes more than 10 seconds internally.</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-label="10"></a>    await <span class="fu">DoSomeLongRunningWorkAsync</span><span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-label="11"></a><span class="op">}</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-label="12"></a><span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-label="13"></a><span class="op">{</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-label="14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"The work was canceled because it timed out!"</span><span class="op">);</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-label="15"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The key point in this design is that <code>DoSomeLongRunningWorkAsync</code> itself does not need to know anything about the concept of a timeout. It only has to listen to the incoming <code>CancellationToken</code>. On the caller side, we simply create a CTS that cancels itself automatically, and any token-aware asynchronous operation gains timeout behavior. This is a highly composable design.</p>
 <p>That said, in this example we can safely interpret the caught <code>OperationCanceledException</code> as “a timeout happened” only because there is <strong>exactly one cancellation source</strong>, namely the auto-canceling CTS we created ourselves. In real APIs, you will often receive another <code>CancellationToken</code> from outside as well. Once multiple cancellation sources are involved, you can no longer assume every <code>OperationCanceledException</code> means a timeout. You need extra logic, as the next section demonstrates, to tell whether a particular cancellation was caused by running too long or by the caller actively canceling the operation.</p>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch04/DemoTimeouts">DemoTimeouts</a></p>
 </blockquote>
 <p>Here is the output from the DemoTimeouts sample:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a href="#cb19-1"></a>Starting a job that is allowed to run for at most 3 seconds...</span>
-<span id="cb19-2"><a href="#cb19-2"></a>Background work started...</span>
-<span id="cb19-3"><a href="#cb19-3"></a>Working on part 1/10...</span>
-<span id="cb19-4"><a href="#cb19-4"></a>Working on part 2/10...</span>
-<span id="cb19-5"><a href="#cb19-5"></a>Working on part 3/10...</span>
-<span id="cb19-6"><a href="#cb19-6"></a>Background work was canceled.</span>
-<span id="cb19-7"><a href="#cb19-7"></a>The work was canceled because it timed out!</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a>Starting a job that is allowed to run for at most 3 seconds...</span>
+<span id="cb19-2"><a href="#cb19-2" aria-label="2"></a>Background work started...</span>
+<span id="cb19-3"><a href="#cb19-3" aria-label="3"></a>Working on part 1/10...</span>
+<span id="cb19-4"><a href="#cb19-4" aria-label="4"></a>Working on part 2/10...</span>
+<span id="cb19-5"><a href="#cb19-5" aria-label="5"></a>Working on part 3/10...</span>
+<span id="cb19-6"><a href="#cb19-6" aria-label="6"></a>Background work was canceled.</span>
+<span id="cb19-7"><a href="#cb19-7" aria-label="7"></a>The work was canceled because it timed out!</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <section id="testable-timeout-logic-with-timeprovider-.net-8" class="level3">
 <h3 class="anchored" data-anchor-id="testable-timeout-logic-with-timeprovider-.net-8">Testable timeout logic with <code>TimeProvider</code> (.NET 8+)</h3>
 <p>This section shows how to use .NET’s <code>TimeProvider</code> to decouple timeout logic from the real system clock, so timeout behavior becomes fast and reliable to test.</p>
@@ -674,36 +677,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>.NET 8 introduced the abstract class <code>System.TimeProvider</code> to solve that problem. It allows us to fast-forward time in tests and control the passage of time precisely.</p>
 <p>This pattern requires .NET 8 or later. On the test side, you can pair it with <code>FakeTimeProvider</code> from the <code>Microsoft.Extensions.TimeProvider.Testing</code> package in the <code>Microsoft.Extensions.Time.Testing</code> namespace. In practice, the first step is usually to inject a <code>TimeProvider</code> into your service, whether by dependency injection or by passing it as a method or constructor parameter. In production, you inject <code>TimeProvider.System</code>. In tests, you inject <code>FakeTimeProvider</code> instead.</p>
 <p>For example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">public</span> <span class="kw">class</span> <span class="fu">MyService</span><span class="op">(</span>TimeProvider timeProvider<span class="op">)</span></span>
-<span id="cb20-2"><a href="#cb20-2"></a><span class="op">{</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a>   <span class="kw">public</span> async Task <span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
-<span id="cb20-4"><a href="#cb20-4"></a>   <span class="op">{</span></span>
-<span id="cb20-5"><a href="#cb20-5"></a>      <span class="co">// Pass TimeProvider to the CancellationTokenSource constructor.</span></span>
-<span id="cb20-6"><a href="#cb20-6"></a>      <span class="co">// This is similar to new CancellationTokenSource(delay),</span></span>
-<span id="cb20-7"><a href="#cb20-7"></a>      <span class="co">// but now it is testable.</span></span>
-<span id="cb20-8"><a href="#cb20-8"></a>      <span class="dt">var</span> seconds <span class="op">=</span> TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">);</span></span>
-<span id="cb20-9"><a href="#cb20-9"></a></span>
-<span id="cb20-10"><a href="#cb20-10"></a>      <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>seconds<span class="op">,</span> timeProvider<span class="op">);</span></span>
-<span id="cb20-11"><a href="#cb20-11"></a></span>
-<span id="cb20-12"><a href="#cb20-12"></a>      <span class="co">// Link the external token too</span></span>
-<span id="cb20-13"><a href="#cb20-13"></a>      <span class="co">// (if the caller cancels, we should cancel as well).</span></span>
-<span id="cb20-14"><a href="#cb20-14"></a>      <span class="kw">using</span> <span class="dt">var</span> linkedCts <span class="op">=</span></span>
-<span id="cb20-15"><a href="#cb20-15"></a>         CancellationTokenSource<span class="op">.</span><span class="fu">CreateLinkedTokenSource</span><span class="op">(</span></span>
-<span id="cb20-16"><a href="#cb20-16"></a>            token<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
-<span id="cb20-17"><a href="#cb20-17"></a>      <span class="kw">try</span></span>
-<span id="cb20-18"><a href="#cb20-18"></a>      <span class="op">{</span></span>
-<span id="cb20-19"><a href="#cb20-19"></a>         await <span class="fu">DoActualWorkAsync</span><span class="op">(</span>linkedCts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
-<span id="cb20-20"><a href="#cb20-20"></a>      <span class="op">}</span></span>
-<span id="cb20-21"><a href="#cb20-21"></a>      <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
-<span id="cb20-22"><a href="#cb20-22"></a>         <span class="fu">when</span> <span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">.</span><span class="fu">IsCancellationRequested</span></span>
-<span id="cb20-23"><a href="#cb20-23"></a>              <span class="op">&amp;&amp;</span> <span class="op">!</span>token<span class="op">.</span><span class="fu">IsCancellationRequested</span><span class="op">)</span></span>
-<span id="cb20-24"><a href="#cb20-24"></a>      <span class="op">{</span></span>
-<span id="cb20-25"><a href="#cb20-25"></a>         <span class="co">// Treat it as a timeout only when the timeout token was canceled</span></span>
-<span id="cb20-26"><a href="#cb20-26"></a>         <span class="co">// and the external token was not.</span></span>
-<span id="cb20-27"><a href="#cb20-27"></a>         <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"The operation timed out."</span><span class="op">);</span></span>
-<span id="cb20-28"><a href="#cb20-28"></a>      <span class="op">}</span></span>
-<span id="cb20-29"><a href="#cb20-29"></a>   <span class="op">}</span></span>
-<span id="cb20-30"><a href="#cb20-30"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb20-1"><a href="#cb20-1" aria-label="1"></a><span class="kw">public</span> <span class="kw">class</span> <span class="fu">MyService</span><span class="op">(</span>TimeProvider timeProvider<span class="op">)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-label="3"></a>   <span class="kw">public</span> async Task <span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken token<span class="op">)</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-label="4"></a>   <span class="op">{</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-label="5"></a>      <span class="co">// Pass TimeProvider to the CancellationTokenSource constructor.</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-label="6"></a>      <span class="co">// This is similar to new CancellationTokenSource(delay),</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-label="7"></a>      <span class="co">// but now it is testable.</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-label="8"></a>      <span class="dt">var</span> seconds <span class="op">=</span> TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">);</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-label="9"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-label="10"></a>      <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">(</span>seconds<span class="op">,</span> timeProvider<span class="op">);</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-label="11"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-label="12"></a>      <span class="co">// Link the external token too</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-label="13"></a>      <span class="co">// (if the caller cancels, we should cancel as well).</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-label="14"></a>      <span class="kw">using</span> <span class="dt">var</span> linkedCts <span class="op">=</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-label="15"></a>         CancellationTokenSource<span class="op">.</span><span class="fu">CreateLinkedTokenSource</span><span class="op">(</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-label="16"></a>            token<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-label="17"></a>      <span class="kw">try</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-label="18"></a>      <span class="op">{</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-label="19"></a>         await <span class="fu">DoActualWorkAsync</span><span class="op">(</span>linkedCts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-label="20"></a>      <span class="op">}</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-label="21"></a>      <span class="kw">catch</span> <span class="op">(</span>OperationCanceledException<span class="op">)</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-label="22"></a>         <span class="fu">when</span> <span class="op">(</span>cts<span class="op">.</span><span class="fu">Token</span><span class="op">.</span><span class="fu">IsCancellationRequested</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-label="23"></a>              <span class="op">&amp;&amp;</span> <span class="op">!</span>token<span class="op">.</span><span class="fu">IsCancellationRequested</span><span class="op">)</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-label="24"></a>      <span class="op">{</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-label="25"></a>         <span class="co">// Treat it as a timeout only when the timeout token was canceled</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-label="26"></a>         <span class="co">// and the external token was not.</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-label="27"></a>         <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"The operation timed out."</span><span class="op">);</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-label="28"></a>      <span class="op">}</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-label="29"></a>   <span class="op">}</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-label="30"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The first step here is to use <code>CancellationTokenSource.CreateLinkedTokenSource</code> to link two cancellation signals that were originally separate: one is the caller’s token (<code>token</code>), and the other is the timeout-driven token (<code>cts.Token</code>). This ensures that if either one requests cancellation, the subsequent work stops.</p>
 <p>Another detail worth noting is that <code>CreateLinkedTokenSource</code> returns a brand-new <code>CancellationTokenSource</code> instance, which we store in <code>linkedCts</code>. That is also why the sample uses <code>using var linkedCts</code>. A linked CTS registers for cancellation notifications on its source tokens, so disposing it afterward removes those registrations. That helps prevent a short-lived operation from being kept alive indirectly by a longer-lived token.</p>
 <p>Once the setup is done, execution enters the <code>try</code> block and starts the asynchronous work. If a cancellation exception occurs, the key is the exception filter on the <code>catch</code> block. By checking the current token states, the filter ensures that only the case where “the timeout token has been canceled, but the external token has not” is translated into a more meaningful <code>TimeoutException</code>. If the caller actively canceled the operation instead, we do nothing and let the original <code>OperationCanceledException</code> preserve its cancellation semantics.</p>
@@ -714,25 +717,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Now let’s look at the testing side.</p>
 <p>In unit tests, we can replace the real clock with <code>FakeTimeProvider</code> from <code>Microsoft.Extensions.Time.Testing</code> and pass that simulated <code>TimeProvider</code> into the service.</p>
 <p><code>FakeTimeProvider</code> does not actually change the system clock. It simply intercepts your code’s calls to <code>TimeProvider</code> APIs, such as <code>GetUtcNow()</code>, and returns whatever fake time you configure, so it does not affect the operating system or other threads. Here is an example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb21-1"><a href="#cb21-1"></a><span class="op">[</span>Fact<span class="op">]</span></span>
-<span id="cb21-2"><a href="#cb21-2"></a><span class="kw">public</span> async Task <span class="fu">Should_Throw_TimeoutException_When_Time_Passes</span><span class="op">()</span></span>
-<span id="cb21-3"><a href="#cb21-3"></a><span class="op">{</span></span>
-<span id="cb21-4"><a href="#cb21-4"></a>    <span class="co">// Arrange</span></span>
-<span id="cb21-5"><a href="#cb21-5"></a>    <span class="dt">var</span> fakeTime <span class="op">=</span> <span class="kw">new</span> <span class="fu">FakeTimeProvider</span><span class="op">();</span></span>
-<span id="cb21-6"><a href="#cb21-6"></a>    <span class="dt">var</span> service <span class="op">=</span> <span class="kw">new</span> <span class="fu">MyService</span><span class="op">(</span>fakeTime<span class="op">);</span></span>
-<span id="cb21-7"><a href="#cb21-7"></a></span>
-<span id="cb21-8"><a href="#cb21-8"></a>    <span class="co">// Act</span></span>
-<span id="cb21-9"><a href="#cb21-9"></a>    <span class="dt">var</span> task <span class="op">=</span> service<span class="op">.</span><span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken<span class="op">.</span><span class="fu">None</span><span class="op">);</span></span>
-<span id="cb21-10"><a href="#cb21-10"></a></span>
-<span id="cb21-11"><a href="#cb21-11"></a>    <span class="co">// Assert: the task should not be completed yet.</span></span>
-<span id="cb21-12"><a href="#cb21-12"></a>    Assert<span class="op">.</span><span class="fu">False</span><span class="op">(</span>task<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">);</span></span>
-<span id="cb21-13"><a href="#cb21-13"></a></span>
-<span id="cb21-14"><a href="#cb21-14"></a>    <span class="co">// Act: fast-forward time by 30 seconds plus 1 tick.</span></span>
-<span id="cb21-15"><a href="#cb21-15"></a>    fakeTime<span class="op">.</span><span class="fu">Advance</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">)</span> <span class="op">+</span> TimeSpan<span class="op">.</span><span class="fu">FromTicks</span><span class="op">(</span><span class="dv">1</span><span class="op">));</span></span>
-<span id="cb21-16"><a href="#cb21-16"></a></span>
-<span id="cb21-17"><a href="#cb21-17"></a>    <span class="co">// Assert: the task should now fail with TimeoutException.</span></span>
-<span id="cb21-18"><a href="#cb21-18"></a>    await Assert<span class="op">.</span><span class="fu">ThrowsAsync</span><span class="op">&lt;</span>TimeoutException<span class="op">&gt;(()</span> <span class="op">=&gt;</span> task<span class="op">);</span></span>
-<span id="cb21-19"><a href="#cb21-19"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb21-1"><a href="#cb21-1" aria-label="1"></a><span class="op">[</span>Fact<span class="op">]</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-label="2"></a><span class="kw">public</span> async Task <span class="fu">Should_Throw_TimeoutException_When_Time_Passes</span><span class="op">()</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-label="4"></a>    <span class="co">// Arrange</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-label="5"></a>    <span class="dt">var</span> fakeTime <span class="op">=</span> <span class="kw">new</span> <span class="fu">FakeTimeProvider</span><span class="op">();</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-label="6"></a>    <span class="dt">var</span> service <span class="op">=</span> <span class="kw">new</span> <span class="fu">MyService</span><span class="op">(</span>fakeTime<span class="op">);</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-label="7"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-label="8"></a>    <span class="co">// Act</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-label="9"></a>    <span class="dt">var</span> task <span class="op">=</span> service<span class="op">.</span><span class="fu">DoWorkWithTimeoutAsync</span><span class="op">(</span>CancellationToken<span class="op">.</span><span class="fu">None</span><span class="op">);</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-label="10"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-label="11"></a>    <span class="co">// Assert: the task should not be completed yet.</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-label="12"></a>    Assert<span class="op">.</span><span class="fu">False</span><span class="op">(</span>task<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">);</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-label="13"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-label="14"></a>    <span class="co">// Act: fast-forward time by 30 seconds plus 1 tick.</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-label="15"></a>    fakeTime<span class="op">.</span><span class="fu">Advance</span><span class="op">(</span>TimeSpan<span class="op">.</span><span class="fu">FromSeconds</span><span class="op">(</span><span class="dv">30</span><span class="op">)</span> <span class="op">+</span> TimeSpan<span class="op">.</span><span class="fu">FromTicks</span><span class="op">(</span><span class="dv">1</span><span class="op">));</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-label="16"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-label="17"></a>    <span class="co">// Assert: the task should now fail with TimeoutException.</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-label="18"></a>    await Assert<span class="op">.</span><span class="fu">ThrowsAsync</span><span class="op">&lt;</span>TimeoutException<span class="op">&gt;(()</span> <span class="op">=&gt;</span> task<span class="op">);</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-label="19"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>In this test, the final assertion basically says, “At this point in the test, I expect this task to fail with a <code>TimeoutException</code>.” Let’s break that down:</p>
 <ul>
 <li><code>Assert.ThrowsAsync&lt;TimeoutException&gt;(...)</code> is the asynchronous assertion helper provided by xUnit. It declares that the action inside should fail by throwing <code>TimeoutException</code>.</li>

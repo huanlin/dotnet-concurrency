@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,10 +13,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -78,10 +81,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4823106157d336fa738e4aca548b543e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -111,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -323,7 +326,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 3, 2026</p>
+      <p class="date-modified">September 2, 2026</p>
     </div>
   </div>
     
@@ -351,34 +354,34 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="sec-how-async-await-simplifies-flow">How <code>async</code> and <code>await</code> simplify asynchronous flow</h2>
 <p>To see what problem <code>async</code> and <code>await</code> solve, let’s first imagine a world without them. Suppose we want to write a method that downloads a web page asynchronously and returns its character count.</p>
 <p>Before <code>async/await</code> existed, we primarily relied on the <code>ContinueWith</code> method on <code>Task</code> objects to chain asynchronous work together. It registers a callback that says, “When the previous task completes, do this next…” Although this approach avoided blocking, the resulting code was quite verbose:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co">// The traditional ContinueWith style (complex and harder to read)</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">static</span> Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsLegacy</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="op">{</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>    <span class="co">// 1. Start the asynchronous download</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>    <span class="kw">return</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">).</span><span class="fu">ContinueWith</span><span class="op">(</span>downloadTask <span class="op">=&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8"></a>    <span class="op">{</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a>        <span class="co">// 2. This block runs only after the download has completed</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a>        <span class="dt">string</span> content <span class="op">=</span> downloadTask<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a>        <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a>    <span class="op">});</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-label="2"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-label="3"></a><span class="co">// The traditional ContinueWith style (complex and harder to read)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-label="4"></a><span class="kw">static</span> Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsLegacy</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-label="6"></a>    <span class="co">// 1. Start the asynchronous download</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-label="7"></a>    <span class="kw">return</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">).</span><span class="fu">ContinueWith</span><span class="op">(</span>downloadTask <span class="op">=&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-label="8"></a>    <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-label="9"></a>        <span class="co">// 2. This block runs only after the download has completed</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-label="10"></a>        <span class="dt">string</span> content <span class="op">=</span> downloadTask<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-label="11"></a>        <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-label="12"></a>    <span class="op">});</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-label="13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>This style relies heavily on lambda expressions. If the workflow becomes even slightly more complicated, for example by parsing the content after downloading it and then saving it to a database, it quickly turns into <strong>callback hell</strong>. The code becomes harder to read and maintain.</p>
 <blockquote class="blockquote">
 <p><strong>Note</strong></p>
 <p>The examples in this book use a reusable, longer-lived <code>HttpClient</code> object so that connections can be shared. This is because creating a new <code>HttpClient</code> for every request can lead to socket exhaustion. That said, reusing one static <code>HttpClient</code> is only a workable baseline, not the ideal solution. A better approach is to use <code>IHttpClientFactory</code>. For details, see Microsoft documentation: <a href="https://learn.microsoft.com/dotnet/architecture/microservices/implement-resilient-applications/use-httpclientfactory-to-implement-resilient-http-requests">Use IHttpClientFactory to implement resilient HTTP requests</a>.</p>
 </blockquote>
 <p>Next, let’s see how the same thing looks with <code>async</code> and <code>await</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1"></a><span class="co">// The modern async/await style (concise and intuitive)</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="op">{</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="co">// 1. Wait asynchronously for the download to complete,</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="co">//    without blocking the thread.</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">// 2. Once the download is done, execution continues from here</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>    <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a><span class="co">// The modern async/await style (concise and intuitive)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a><span class="kw">static</span> async Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> <span class="fu">DownloadPageAndCountCharsAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a>    <span class="co">// 1. Wait asynchronously for the download to complete,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a>    <span class="co">//    without blocking the thread.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-label="6"></a>    <span class="dt">string</span> content <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">);</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-label="7"></a>    <span class="co">// 2. Once the download is done, execution continues from here</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-label="8"></a>    <span class="kw">return</span> content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-label="9"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoDownloadPage">DemoDownloadPage</a></p>
 </blockquote>
@@ -432,50 +435,50 @@ window.Quarto = {
 </ol>
 <p>In other words, the reason you can write “synchronous-looking code” that behaves asynchronously is that all the complicated state tracking and callback registration, which used to be done by hand, has been taken over by the compiler-generated state machine.</p>
 <p>If this still feels abstract, the following heavily simplified pseudocode simulates the state machine the compiler might generate for the earlier <code>DownloadPageAndCountCharsAsync</code> method. Read it together with the comments to follow the internal flow:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">// Compiler-generated state machine</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="co">// (greatly simplified conceptual pseudocode)</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="kw">class</span> DownloadStateMachine <span class="op">:</span> IAsyncStateMachine</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="op">{</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a>    <span class="dt">int</span> _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Initial state is -1</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a>    <span class="dt">string</span> _url<span class="op">;</span>     <span class="co">// Original method parameter</span></span>
-<span id="cb3-7"><a href="#cb3-7"></a>    <span class="dt">string</span> _content<span class="op">;</span> <span class="co">// Original local variable lifted to a field</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a>    TaskAwaiter<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> _awaiter<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a></span>
-<span id="cb3-10"><a href="#cb3-10"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">MoveNext</span><span class="op">()</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a>    <span class="op">{</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a>        <span class="co">// Jump to the correct block based on the current state</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a>        <span class="kw">if</span> <span class="op">(</span>_state <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="kw">goto</span> state_0<span class="op">;</span></span>
-<span id="cb3-14"><a href="#cb3-14"></a></span>
-<span id="cb3-15"><a href="#cb3-15"></a>        <span class="co">// --- State -1 (before the first await) ---</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a>        _awaiter <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>_url<span class="op">).</span><span class="fu">GetAwaiter</span><span class="op">();</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a></span>
-<span id="cb3-18"><a href="#cb3-18"></a>        <span class="co">// If the work is not already complete, prepare to pause</span></span>
-<span id="cb3-19"><a href="#cb3-19"></a>        <span class="kw">if</span> <span class="op">(!</span>_awaiter<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">)</span></span>
-<span id="cb3-20"><a href="#cb3-20"></a>        <span class="op">{</span></span>
-<span id="cb3-21"><a href="#cb3-21"></a>            _state <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// Change state and record that we paused here</span></span>
-<span id="cb3-22"><a href="#cb3-22"></a></span>
-<span id="cb3-23"><a href="#cb3-23"></a>            <span class="co">// Tell the awaiter:</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a>            <span class="co">// "When the download is done, call my MoveNext() again"</span></span>
-<span id="cb3-25"><a href="#cb3-25"></a>            _awaiter<span class="op">.</span><span class="fu">OnCompleted</span><span class="op">(</span><span class="kw">this</span><span class="op">.</span><span class="fu">MoveNext</span><span class="op">);</span></span>
-<span id="cb3-26"><a href="#cb3-26"></a></span>
-<span id="cb3-27"><a href="#cb3-27"></a>            <span class="co">// Key point: return immediately</span></span>
-<span id="cb3-28"><a href="#cb3-28"></a>            <span class="co">// and give the thread back to the caller.</span></span>
-<span id="cb3-29"><a href="#cb3-29"></a>            <span class="kw">return</span><span class="op">;</span></span>
-<span id="cb3-30"><a href="#cb3-30"></a>        <span class="op">}</span></span>
-<span id="cb3-31"><a href="#cb3-31"></a></span>
-<span id="cb3-32"><a href="#cb3-32"></a>    state_0<span class="op">:</span></span>
-<span id="cb3-33"><a href="#cb3-33"></a>        <span class="co">// --- State 0 (resuming after await) ---</span></span>
-<span id="cb3-34"><a href="#cb3-34"></a>        <span class="co">// Note: before jumping here,</span></span>
-<span id="cb3-35"><a href="#cb3-35"></a>        <span class="co">// the compiler has already ensured that all</span></span>
-<span id="cb3-36"><a href="#cb3-36"></a>        <span class="co">// field values, such as _content, have been restored correctly.</span></span>
-<span id="cb3-37"><a href="#cb3-37"></a>        _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Restore the default state</span></span>
-<span id="cb3-38"><a href="#cb3-38"></a>        _content <span class="op">=</span> _awaiter<span class="op">.</span><span class="fu">GetResult</span><span class="op">();</span> <span class="co">// Get the download result</span></span>
-<span id="cb3-39"><a href="#cb3-39"></a></span>
-<span id="cb3-40"><a href="#cb3-40"></a>        <span class="dt">int</span> result <span class="op">=</span> _content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
-<span id="cb3-41"><a href="#cb3-41"></a>        <span class="co">// Put the result into the Task and finish the state machine</span></span>
-<span id="cb3-42"><a href="#cb3-42"></a>        <span class="fu">SetResult</span><span class="op">(</span>result<span class="op">);</span></span>
-<span id="cb3-43"><a href="#cb3-43"></a>    <span class="op">}</span></span>
-<span id="cb3-44"><a href="#cb3-44"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="co">// Compiler-generated state machine</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="co">// (greatly simplified conceptual pseudocode)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-label="3"></a><span class="kw">class</span> DownloadStateMachine <span class="op">:</span> IAsyncStateMachine</span>
+<span id="cb3-4"><a href="#cb3-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-label="5"></a>    <span class="dt">int</span> _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Initial state is -1</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-label="6"></a>    <span class="dt">string</span> _url<span class="op">;</span>     <span class="co">// Original method parameter</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-label="7"></a>    <span class="dt">string</span> _content<span class="op">;</span> <span class="co">// Original local variable lifted to a field</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-label="8"></a>    TaskAwaiter<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> _awaiter<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-label="9"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-label="10"></a>    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">MoveNext</span><span class="op">()</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-label="11"></a>    <span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-label="12"></a>        <span class="co">// Jump to the correct block based on the current state</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-label="13"></a>        <span class="kw">if</span> <span class="op">(</span>_state <span class="op">==</span> <span class="dv">0</span><span class="op">)</span> <span class="kw">goto</span> state_0<span class="op">;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-label="14"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-label="15"></a>        <span class="co">// --- State -1 (before the first await) ---</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-label="16"></a>        _awaiter <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>_url<span class="op">).</span><span class="fu">GetAwaiter</span><span class="op">();</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-label="17"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-label="18"></a>        <span class="co">// If the work is not already complete, prepare to pause</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-label="19"></a>        <span class="kw">if</span> <span class="op">(!</span>_awaiter<span class="op">.</span><span class="fu">IsCompleted</span><span class="op">)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-label="20"></a>        <span class="op">{</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-label="21"></a>            _state <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> <span class="co">// Change state and record that we paused here</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-label="22"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-label="23"></a>            <span class="co">// Tell the awaiter:</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-label="24"></a>            <span class="co">// "When the download is done, call my MoveNext() again"</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-label="25"></a>            _awaiter<span class="op">.</span><span class="fu">OnCompleted</span><span class="op">(</span><span class="kw">this</span><span class="op">.</span><span class="fu">MoveNext</span><span class="op">);</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-label="26"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-label="27"></a>            <span class="co">// Key point: return immediately</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-label="28"></a>            <span class="co">// and give the thread back to the caller.</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-label="29"></a>            <span class="kw">return</span><span class="op">;</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-label="30"></a>        <span class="op">}</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-label="31"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-label="32"></a>    state_0<span class="op">:</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-label="33"></a>        <span class="co">// --- State 0 (resuming after await) ---</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-label="34"></a>        <span class="co">// Note: before jumping here,</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-label="35"></a>        <span class="co">// the compiler has already ensured that all</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-label="36"></a>        <span class="co">// field values, such as _content, have been restored correctly.</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-label="37"></a>        _state <span class="op">=</span> <span class="op">-</span><span class="dv">1</span><span class="op">;</span> <span class="co">// Restore the default state</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-label="38"></a>        _content <span class="op">=</span> _awaiter<span class="op">.</span><span class="fu">GetResult</span><span class="op">();</span> <span class="co">// Get the download result</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-label="39"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-label="40"></a>        <span class="dt">int</span> result <span class="op">=</span> _content<span class="op">.</span><span class="fu">Length</span><span class="op">;</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-label="41"></a>        <span class="co">// Put the result into the Task and finish the state machine</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-label="42"></a>        <span class="fu">SetResult</span><span class="op">(</span>result<span class="op">);</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-label="43"></a>    <span class="op">}</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-label="44"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>From this pseudocode, you can see more clearly how an <code>await</code> boundary takes what originally looked like a single sequential method and transforms it into a state machine controlled through <code>_state</code> and <code>goto</code>. This is one key reason <code>async/await</code> can avoid blocking the thread.</p>
 <blockquote class="blockquote">
 <p><strong>Compiler-generated async state machines may eventually become history</strong></p>
@@ -496,33 +499,33 @@ window.Quarto = {
 <p>When you use <code>Task.WhenAll</code>, if one or more tasks throw exceptions, <code>await</code> will rethrow only the <strong>first</strong> captured exception. If you need to process every exception that occurred, inspect the <code>Exception</code> property of the <code>Task</code> returned by <code>Task.WhenAll</code> instead. It is an <code>AggregateException</code>. We will cover that in Chapter 4.</p>
 </blockquote>
 <p>Let’s first compare “waiting sequentially” with “waiting together.” Assume that downloading each page takes one second:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">// ✘ Incorrect example:</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="co">// execute sequentially and retrieve results one by one.</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="co">// Inefficient.</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a>async Task <span class="fu">SequentialDownloadAsync</span><span class="op">()</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="op">{</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a>  <span class="co">// This takes 1 second + 1 second + 1 second = 3 seconds</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a>  <span class="dt">string</span> page1 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a>  <span class="dt">string</span> page2 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a>  <span class="dt">string</span> page3 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="op">}</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">// ✔ Correct example:</span></span>
-<span id="cb4-13"><a href="#cb4-13"></a><span class="co">// run concurrently, then retrieve all results at once</span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co">// after everything completes. Efficient.</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a>async Task <span class="fu">ConcurrentDownloadAsync</span><span class="op">()</span></span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="op">{</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a>  <span class="co">// 1. Start all tasks</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a>  <span class="co">// Notice: there is no await here yet,</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a>  <span class="co">// so each operation can begin independently.</span></span>
-<span id="cb4-20"><a href="#cb4-20"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task1 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
-<span id="cb4-21"><a href="#cb4-21"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task2 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
-<span id="cb4-22"><a href="#cb4-22"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task3 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
-<span id="cb4-23"><a href="#cb4-23"></a></span>
-<span id="cb4-24"><a href="#cb4-24"></a>  <span class="co">// 2. Wait for all of them to complete</span></span>
-<span id="cb4-25"><a href="#cb4-25"></a>  <span class="co">// This takes only about 1 second, depending on the slowest request.</span></span>
-<span id="cb4-26"><a href="#cb4-26"></a>  <span class="dt">string</span><span class="op">[]</span> results <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">,</span> task3<span class="op">);</span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="co">// ✘ Incorrect example:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a><span class="co">// execute sequentially and retrieve results one by one.</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a><span class="co">// Inefficient.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a>async Task <span class="fu">SequentialDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a>  <span class="co">// This takes 1 second + 1 second + 1 second = 3 seconds</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a>  <span class="dt">string</span> page1 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a>  <span class="dt">string</span> page2 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-label="9"></a>  <span class="dt">string</span> page3 <span class="op">=</span> await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-label="10"></a><span class="op">}</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-label="11"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-label="12"></a><span class="co">// ✔ Correct example:</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-label="13"></a><span class="co">// run concurrently, then retrieve all results at once</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-label="14"></a><span class="co">// after everything completes. Efficient.</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-label="15"></a>async Task <span class="fu">ConcurrentDownloadAsync</span><span class="op">()</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-label="16"></a><span class="op">{</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-label="17"></a>  <span class="co">// 1. Start all tasks</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-label="18"></a>  <span class="co">// Notice: there is no await here yet,</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-label="19"></a>  <span class="co">// so each operation can begin independently.</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-label="20"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task1 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/1"</span><span class="op">);</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-label="21"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task2 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/2"</span><span class="op">);</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-label="22"></a>  Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> task3 <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span><span class="st">"https://demo.com/3"</span><span class="op">);</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-label="23"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-label="24"></a>  <span class="co">// 2. Wait for all of them to complete</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-label="25"></a>  <span class="co">// This takes only about 1 second, depending on the slowest request.</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-label="26"></a>  <span class="dt">string</span><span class="op">[]</span> results <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAll</span><span class="op">(</span>task1<span class="op">,</span> task2<span class="op">,</span> task3<span class="op">);</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-label="27"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenAll">DemoTaskWhenAll</a></p>
 </blockquote>
@@ -541,31 +544,31 @@ window.Quarto = {
 <li><strong>Timeout control</strong>: wait for both “the main operation” and “a timer task (<code>Task.Delay</code>)” and see which finishes first. If the timer task wins, the operation has timed out.</li>
 </ul>
 <p>The following example shows how to implement timeout control with <code>Task.WhenAny</code> and <code>Task.Delay</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1"></a>async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadWithTimeoutAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="op">{</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>    <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a></span>
-<span id="cb5-5"><a href="#cb5-5"></a>    Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> downloadTask <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
-<span id="cb5-6"><a href="#cb5-6"></a>    Task timeoutTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">3000</span><span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span> <span class="co">// 3-second timeout</span></span>
-<span id="cb5-7"><a href="#cb5-7"></a></span>
-<span id="cb5-8"><a href="#cb5-8"></a>    <span class="co">// Wait until either one completes</span></span>
-<span id="cb5-9"><a href="#cb5-9"></a>    Task completedTask <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAny</span><span class="op">(</span>downloadTask<span class="op">,</span> timeoutTask<span class="op">);</span></span>
-<span id="cb5-10"><a href="#cb5-10"></a></span>
-<span id="cb5-11"><a href="#cb5-11"></a>    <span class="kw">if</span> <span class="op">(</span>completedTask <span class="op">==</span> timeoutTask<span class="op">)</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a>    <span class="op">{</span></span>
-<span id="cb5-13"><a href="#cb5-13"></a>        <span class="co">// Timed out. Cancel the download and throw an exception.</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a>        cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
-<span id="cb5-15"><a href="#cb5-15"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"The download operation timed out."</span><span class="op">);</span></span>
-<span id="cb5-16"><a href="#cb5-16"></a>    <span class="op">}</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a></span>
-<span id="cb5-18"><a href="#cb5-18"></a>    <span class="co">// The download finished first.</span></span>
-<span id="cb5-19"><a href="#cb5-19"></a>    <span class="co">// Cancel timeoutTask so it does not keep running</span></span>
-<span id="cb5-20"><a href="#cb5-20"></a>    <span class="co">// unnecessarily.</span></span>
-<span id="cb5-21"><a href="#cb5-21"></a>    cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
-<span id="cb5-22"><a href="#cb5-22"></a></span>
-<span id="cb5-23"><a href="#cb5-23"></a>    <span class="co">// The download finished first, so return the result.</span></span>
-<span id="cb5-24"><a href="#cb5-24"></a>    <span class="kw">return</span> await downloadTask<span class="op">;</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a>async Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> <span class="fu">DownloadWithTimeoutAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-label="2"></a><span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>    <span class="kw">using</span> <span class="dt">var</span> cts <span class="op">=</span> <span class="kw">new</span> <span class="fu">CancellationTokenSource</span><span class="op">();</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-label="4"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-label="5"></a>    Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> downloadTask <span class="op">=</span> httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a>    Task timeoutTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">3000</span><span class="op">,</span> cts<span class="op">.</span><span class="fu">Token</span><span class="op">);</span> <span class="co">// 3-second timeout</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-label="7"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-label="8"></a>    <span class="co">// Wait until either one completes</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-label="9"></a>    Task completedTask <span class="op">=</span> await Task<span class="op">.</span><span class="fu">WhenAny</span><span class="op">(</span>downloadTask<span class="op">,</span> timeoutTask<span class="op">);</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-label="10"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-label="11"></a>    <span class="kw">if</span> <span class="op">(</span>completedTask <span class="op">==</span> timeoutTask<span class="op">)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-label="12"></a>    <span class="op">{</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-label="13"></a>        <span class="co">// Timed out. Cancel the download and throw an exception.</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-label="14"></a>        cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-label="15"></a>        <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">TimeoutException</span><span class="op">(</span><span class="st">"The download operation timed out."</span><span class="op">);</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-label="16"></a>    <span class="op">}</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-label="17"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-label="18"></a>    <span class="co">// The download finished first.</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-label="19"></a>    <span class="co">// Cancel timeoutTask so it does not keep running</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-label="20"></a>    <span class="co">// unnecessarily.</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-label="21"></a>    cts<span class="op">.</span><span class="fu">Cancel</span><span class="op">();</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-label="22"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-label="23"></a>    <span class="co">// The download finished first, so return the result.</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-label="24"></a>    <span class="kw">return</span> await downloadTask<span class="op">;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-label="25"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The key point is that <code>Task.WhenAny</code> returns the task that completed first, not the download result itself. After confirming that <code>downloadTask</code> completed first, we still need to <code>await downloadTask</code> to obtain the downloaded content or let any exception from the download surface normally.</p>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenAny">DemoTaskWhenAny</a></p>
@@ -582,36 +585,36 @@ window.Quarto = {
 </blockquote>
 <p>.NET 9 introduced <code>Task.WhenEach</code>. If the input is <code>Task&lt;TResult&gt;</code>, it returns <code>IAsyncEnumerable&lt;Task&lt;TResult&gt;&gt;</code>. If the input is non-generic <code>Task</code>, it returns <code>IAsyncEnumerable&lt;Task&gt;</code>. That means we can directly use <code>await foreach</code> to process each completed task one by one. The syntax is cleaner, and the underlying time complexity is optimized down to <span class="math inline">\(O(N)\)</span>.</p>
 <p>Here is what it looks like in practice:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1"></a><span class="co">// New in .NET 9+: clean and intuitive</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>async Task <span class="fu">ProcessTasksAsTheyCompleteAsync</span><span class="op">()</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="op">{</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>    <span class="dt">var</span> tasks <span class="op">=</span> <span class="kw">new</span> List<span class="op">&lt;</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;&gt;();</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">5</span><span class="op">;</span> i<span class="op">++)</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a>    <span class="op">{</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>        tasks<span class="op">.</span><span class="fu">Add</span><span class="op">(</span><span class="fu">DoWorkAsync</span><span class="op">(</span>i<span class="op">));</span> <span class="co">// Assume DoWorkAsync returns Task&lt;int&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a>    <span class="op">}</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a></span>
-<span id="cb6-10"><a href="#cb6-10"></a>    <span class="co">// Here, t represents a task that has already completed</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a>    <span class="co">// The loop iterates in completion order,</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a>    <span class="co">// not in the original list order.</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a>    await <span class="kw">foreach</span> <span class="op">(</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> t <span class="kw">in</span> Task<span class="op">.</span><span class="fu">WhenEach</span><span class="op">(</span>tasks<span class="op">))</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a>    <span class="op">{</span></span>
-<span id="cb6-15"><a href="#cb6-15"></a>        <span class="kw">try</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a>        <span class="op">{</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a>            <span class="co">// The await here is only to obtain</span></span>
-<span id="cb6-18"><a href="#cb6-18"></a>            <span class="co">// the result or exception.</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a>            <span class="co">// It does not block.</span></span>
-<span id="cb6-20"><a href="#cb6-20"></a>            <span class="dt">int</span> result <span class="op">=</span> await t<span class="op">;</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
-<span id="cb6-22"><a href="#cb6-22"></a>                $<span class="st">"One task completed. "</span> <span class="op">+</span></span>
-<span id="cb6-23"><a href="#cb6-23"></a>                $<span class="st">"Its result is: {result}"</span><span class="op">);</span></span>
-<span id="cb6-24"><a href="#cb6-24"></a>        <span class="op">}</span></span>
-<span id="cb6-25"><a href="#cb6-25"></a>        <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
-<span id="cb6-26"><a href="#cb6-26"></a>        <span class="op">{</span></span>
-<span id="cb6-27"><a href="#cb6-27"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"One task failed: {ex.Message}"</span><span class="op">);</span></span>
-<span id="cb6-28"><a href="#cb6-28"></a>        <span class="op">}</span></span>
-<span id="cb6-29"><a href="#cb6-29"></a>    <span class="op">}</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a><span class="co">// New in .NET 9+: clean and intuitive</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-label="2"></a>async Task <span class="fu">ProcessTasksAsTheyCompleteAsync</span><span class="op">()</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-label="4"></a>    <span class="dt">var</span> tasks <span class="op">=</span> <span class="kw">new</span> List<span class="op">&lt;</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;&gt;();</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-label="5"></a>    <span class="kw">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">1</span><span class="op">;</span> i <span class="op">&lt;=</span> <span class="dv">5</span><span class="op">;</span> i<span class="op">++)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-label="6"></a>    <span class="op">{</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-label="7"></a>        tasks<span class="op">.</span><span class="fu">Add</span><span class="op">(</span><span class="fu">DoWorkAsync</span><span class="op">(</span>i<span class="op">));</span> <span class="co">// Assume DoWorkAsync returns Task&lt;int&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-label="8"></a>    <span class="op">}</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-label="9"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-label="10"></a>    <span class="co">// Here, t represents a task that has already completed</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-label="11"></a>    <span class="co">// The loop iterates in completion order,</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-label="12"></a>    <span class="co">// not in the original list order.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-label="13"></a>    await <span class="kw">foreach</span> <span class="op">(</span>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> t <span class="kw">in</span> Task<span class="op">.</span><span class="fu">WhenEach</span><span class="op">(</span>tasks<span class="op">))</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-label="14"></a>    <span class="op">{</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-label="15"></a>        <span class="kw">try</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-label="16"></a>        <span class="op">{</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-label="17"></a>            <span class="co">// The await here is only to obtain</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-label="18"></a>            <span class="co">// the result or exception.</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-label="19"></a>            <span class="co">// It does not block.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-label="20"></a>            <span class="dt">int</span> result <span class="op">=</span> await t<span class="op">;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-label="21"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-label="22"></a>                $<span class="st">"One task completed. "</span> <span class="op">+</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-label="23"></a>                $<span class="st">"Its result is: {result}"</span><span class="op">);</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-label="24"></a>        <span class="op">}</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-label="25"></a>        <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-label="26"></a>        <span class="op">{</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-label="27"></a>            Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"One task failed: {ex.Message}"</span><span class="op">);</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-label="28"></a>        <span class="op">}</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-label="29"></a>    <span class="op">}</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-label="30"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>One detail is especially worth noting in <code>await foreach (... in Task.WhenEach(tasks))</code>: it iterates in the order that tasks finish, not in the original order of the <code>tasks</code> list. In other words, each time a task completes, the loop runs immediately to process that newly completed task.</p>
 <blockquote class="blockquote">
 <p><strong>Source code:</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-en/ch03/DemoTaskWhenEach">DemoTaskWhenEach</a></p>
@@ -666,38 +669,38 @@ window.Quarto = {
 </ul>
 </blockquote>
 <p>Another common misuse is performing CPU-intensive work directly inside an <code>async</code> method in a UI application instead of offloading it to <code>Task.Run</code>. That causes the UI thread to stay occupied during the calculation, which freezes the interface. Here is the incorrect approach in a WPF-style example:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">// Incorrect example:</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a><span class="co">// CPU-bound calculation runs directly inside an async method</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a><span class="co">// and occupies the UI thread</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="op">{</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a>    <span class="co">// This CPU-bound calculation occupies the UI thread,</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a>    <span class="co">// causing the interface to freeze and stop responding to the user.</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a>    <span class="dt">var</span> data <span class="op">=</span> <span class="fu">PerformHeavyCalculation</span><span class="op">();</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a></span>
-<span id="cb7-10"><a href="#cb7-10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co">// Incorrect example:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-label="2"></a><span class="co">// CPU-bound calculation runs directly inside an async method</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-label="3"></a><span class="co">// and occupies the UI thread</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-label="4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-label="6"></a>    <span class="co">// This CPU-bound calculation occupies the UI thread,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-label="7"></a>    <span class="co">// causing the interface to freeze and stop responding to the user.</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a>    <span class="dt">var</span> data <span class="op">=</span> <span class="fu">PerformHeavyCalculation</span><span class="op">();</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-label="12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>In this example, <code>PerformHeavyCalculation()</code> occupies the UI thread until the calculation finishes. During that time, the interface cannot respond to the user at all.</p>
 <p>The correct approach is to use <code>await Task.Run(...)</code> to offload the heavy computation to the thread pool, allowing the UI thread to keep responding:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1"></a><span class="co">// Correct approach:</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="co">// offload CPU-bound calculation with Task.Run</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="co">// and free the UI thread</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="op">{</span></span>
-<span id="cb8-6"><a href="#cb8-6"></a>    <span class="co">// Move the CPU-bound work onto the thread pool</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a>    <span class="co">// so the UI thread can keep responding.</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a>    <span class="dt">var</span> data <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span> <span class="fu">PerformHeavyCalculation</span><span class="op">());</span></span>
-<span id="cb8-9"><a href="#cb8-9"></a></span>
-<span id="cb8-10"><a href="#cb8-10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb8-1"><a href="#cb8-1" aria-label="1"></a><span class="co">// Correct approach:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-label="2"></a><span class="co">// offload CPU-bound calculation with Task.Run</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-label="3"></a><span class="co">// and free the UI thread</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-label="4"></a>async <span class="dt">void</span> <span class="fu">GenerateReportButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-label="6"></a>    <span class="co">// Move the CPU-bound work onto the thread pool</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-label="7"></a>    <span class="co">// so the UI thread can keep responding.</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-label="8"></a>    <span class="dt">var</span> data <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span> <span class="fu">PerformHeavyCalculation</span><span class="op">());</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-label="9"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-label="10"></a>    await _repository<span class="op">.</span><span class="fu">SaveAsync</span><span class="op">(</span>data<span class="op">);</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-label="11"></a>    ResultTextBlock<span class="op">.</span><span class="fu">Text</span> <span class="op">=</span> data<span class="op">.</span><span class="fu">Summary</span><span class="op">;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-label="12"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Warning</strong></p>
 <p>This <code>Task.Run</code> technique is appropriate for UI applications, but <strong>not for ASP.NET Core Web APIs</strong>. In ASP.NET Core, the thread handling an HTTP request is already a thread pool thread. Using <code>Task.Run</code> simply moves CPU work from one thread pool thread to another. The total number of occupied threads does not decrease, and you introduce extra scheduling and thread-switching overhead. If the server has CPU-heavy work to process, a better approach is to consider background services, message queues, or similar mechanisms instead.</p>
 <p><strong>Further reading:</strong> <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices">ASP.NET Core Best Practices</a></p>
 </blockquote>
-<p>Once that boundary is clear, it becomes much easier to understand why <code>await</code> on an I/O operation can avoid blocking the UI thread: during the wait, there simply does not need to be a thread blocked in place. With that in mind, let’s move on to <code>ConfigureAwait</code>.</p>
+<p>Once that boundary is clear, it becomes much easier to understand why <code>await</code> on an operation can avoid blocking the UI thread: because during the wait for a <strong>genuine asynchronous I/O or timer</strong> to complete, there simply does not need to be a thread blocked in place. (By contrast, if you call an API that is simulated using a synchronous path, it might still occupy a thread.) With that in mind, let’s move on to <code>ConfigureAwait</code>.</p>
 </section>
 <section id="sec-ui-thread-and-configure-await-false" class="level2">
 <h2 class="anchored" data-anchor-id="sec-ui-thread-and-configure-await-false">The importance of the UI thread and <code>ConfigureAwait(false)</code></h2>
@@ -724,24 +727,24 @@ window.Quarto = {
 </figure>
 </div>
 <p>The following example shows how to use <code>ConfigureAwait(false)</code> in a class library to avoid unnecessary thread switching and reduce the risk of deadlocks:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">// Imagine this is inside a general-purpose class library</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">public</span> <span class="kw">class</span> MyApiClient</span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="op">{</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>    <span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a></span>
-<span id="cb9-6"><a href="#cb9-6"></a>    <span class="kw">public</span> async Task<span class="op">&lt;</span>JsonNode<span class="op">&gt;</span> <span class="fu">GetDataFromApiAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a>    <span class="op">{</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a>        <span class="co">// 1. Start the asynchronous download</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a>        <span class="dt">string</span> json <span class="op">=</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>            await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">)</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>                              <span class="op">.</span><span class="fu">ConfigureAwait</span><span class="op">(</span><span class="kw">false</span><span class="op">);</span> <span class="co">// &lt;--- Key point</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a></span>
-<span id="cb9-13"><a href="#cb9-13"></a>        <span class="co">// 2. The continuation is not forced back</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>        <span class="co">//    onto the original SynchronizationContext.</span></span>
-<span id="cb9-15"><a href="#cb9-15"></a>        <span class="co">//    The actual thread it resumes on is not guaranteed.</span></span>
-<span id="cb9-16"><a href="#cb9-16"></a>        <span class="kw">return</span> JsonNode<span class="op">.</span><span class="fu">Parse</span><span class="op">(</span>json<span class="op">);</span></span>
-<span id="cb9-17"><a href="#cb9-17"></a>    <span class="op">}</span></span>
-<span id="cb9-18"><a href="#cb9-18"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb9-1"><a href="#cb9-1" aria-label="1"></a><span class="co">// Imagine this is inside a general-purpose class library</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-label="2"></a><span class="kw">public</span> <span class="kw">class</span> MyApiClient</span>
+<span id="cb9-3"><a href="#cb9-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-label="4"></a>    <span class="kw">static</span> <span class="kw">readonly</span> HttpClient httpClient <span class="op">=</span> <span class="kw">new</span> <span class="fu">HttpClient</span><span class="op">();</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-label="5"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-label="6"></a>    <span class="kw">public</span> async Task<span class="op">&lt;</span>JsonNode<span class="op">&gt;</span> <span class="fu">GetDataFromApiAsync</span><span class="op">(</span><span class="dt">string</span> url<span class="op">)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-label="7"></a>    <span class="op">{</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-label="8"></a>        <span class="co">// 1. Start the asynchronous download</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-label="9"></a>        <span class="dt">string</span> json <span class="op">=</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-label="10"></a>            await httpClient<span class="op">.</span><span class="fu">GetStringAsync</span><span class="op">(</span>url<span class="op">)</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-label="11"></a>                              <span class="op">.</span><span class="fu">ConfigureAwait</span><span class="op">(</span><span class="kw">false</span><span class="op">);</span> <span class="co">// &lt;--- Key point</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-label="12"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-label="13"></a>        <span class="co">// 2. The continuation is not forced back</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-label="14"></a>        <span class="co">//    onto the original SynchronizationContext.</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-label="15"></a>        <span class="co">//    The actual thread it resumes on is not guaranteed.</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-label="16"></a>        <span class="kw">return</span> JsonNode<span class="op">.</span><span class="fu">Parse</span><span class="op">(</span>json<span class="op">);</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-label="17"></a>    <span class="op">}</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-label="18"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Using <code>ConfigureAwait(false)</code> is usually recommended when writing a reusable class library. When writing a library, you do not know what kinds of applications will eventually use it. By specifying <code>ConfigureAwait(false)</code> explicitly, you can often avoid unnecessary <code>context switch</code> overhead and reduce the risk of deadlock scenarios.</p>
 <blockquote class="blockquote">
 <p><strong>Note</strong></p>
@@ -760,19 +763,19 @@ window.Quarto = {
 </ol>
 <p>So, does <code>async void</code> ever have a valid use? Yes, but only in one scenario: <strong>event handlers</strong>, such as button-click events. The reason is that standard .NET event delegates, such as <code>EventHandler</code>, already have a <code>void</code> return type. If you declare an event handler as <code>async Task</code>, its signature no longer matches the delegate, and you get a compile-time error. That is why C# allows <code>async void</code> as a special case, so developers can still use <code>await</code> naturally inside event handlers.</p>
 <p>The following example shows the only recommended use case. Because the caller cannot catch exceptions from <code>async void</code>, you must catch all possible errors <strong>inside</strong> the method, as shown here:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1"></a><span class="co">// This is the only recommended use case for async void</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">private</span> async <span class="dt">void</span> <span class="fu">OnMyButtonClick</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="op">{</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>    <span class="kw">try</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>    <span class="op">{</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>        <span class="co">// ... await some async operations ...</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>    <span class="op">}</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a>    <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a>    <span class="op">{</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a>        <span class="co">// All exceptions must be handled here</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a>        <span class="fu">ShowErrorMessage</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a>    <span class="op">}</span></span>
-<span id="cb10-13"><a href="#cb10-13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a><span class="co">// This is the only recommended use case for async void</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a><span class="kw">private</span> async <span class="dt">void</span> <span class="fu">OnMyButtonClick</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> RoutedEventArgs e<span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-label="4"></a>    <span class="kw">try</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-label="5"></a>    <span class="op">{</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-label="6"></a>        <span class="co">// ... await some async operations ...</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-label="7"></a>    <span class="op">}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-label="8"></a>    <span class="kw">catch</span> <span class="op">(</span>Exception ex<span class="op">)</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-label="9"></a>    <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-label="10"></a>        <span class="co">// All exceptions must be handled here</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-label="11"></a>        <span class="fu">ShowErrorMessage</span><span class="op">(</span>ex<span class="op">.</span><span class="fu">Message</span><span class="op">);</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-label="12"></a>    <span class="op">}</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-label="13"></a><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>Key point</strong></p>
 <p>Unless you are writing an event handler, always use <code>async Task</code> or <code>async Task&lt;T&gt;</code>.</p>

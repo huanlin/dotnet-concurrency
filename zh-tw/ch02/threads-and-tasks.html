@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW" xml:lang="zh-TW"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -13,10 +13,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -78,10 +81,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-10c585379a930b754dadf4baebbc67b6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-4823106157d336fa738e4aca548b543e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -342,29 +345,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sec-direct-thread-creation-thread-start" class="level3">
 <h3 class="anchored" data-anchor-id="sec-direct-thread-creation-thread-start">直接建立執行緒：Thread.Start</h3>
 <p>先看最傳統的作法：手動建立 <code>System.Threading.Thread</code> 物件，然後呼叫 <code>Start</code> 方法，讓新的執行緒開始執行指定的工作。範例如下：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co">// 建立一條新的執行緒來執行 DoWork</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="dt">var</span> newThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(</span>DoWork<span class="op">);</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>newThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a></span>
-<span id="cb1-8"><a href="#cb1-8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a></span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="op">{</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"工作執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb1-14"><a href="#cb1-14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"工作正在進行中..."</span><span class="op">);</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 模擬耗時 2 秒的工作</span></span>
-<span id="cb1-16"><a href="#cb1-16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"工作完成。"</span><span class="op">);</span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb1-1"><a href="#cb1-1" aria-label="1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-label="2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-label="3"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-label="4"></a><span class="co">// 建立一條新的執行緒來執行 DoWork</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-label="5"></a><span class="dt">var</span> newThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(</span>DoWork<span class="op">);</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-label="6"></a>newThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-label="7"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-label="8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-label="9"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-label="10"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-label="11"></a><span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-label="12"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"工作執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-label="13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-label="14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"工作正在進行中..."</span><span class="op">);</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-label="15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 模擬耗時 2 秒的工作</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-label="16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"工作完成。"</span><span class="op">);</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-label="17"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>程式執行結果：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1"></a>主執行緒 ID: 2</span>
-<span id="cb2-2"><a href="#cb2-2"></a>主執行緒繼續執行...</span>
-<span id="cb2-3"><a href="#cb2-3"></a>工作執行緒 ID: 10</span>
-<span id="cb2-4"><a href="#cb2-4"></a>工作正在進行中...</span>
-<span id="cb2-5"><a href="#cb2-5"></a>工作完成。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a href="#cb2-1" aria-label="1"></a>主執行緒 ID: 2</span>
+<span id="cb2-2"><a href="#cb2-2" aria-label="2"></a>主執行緒繼續執行...</span>
+<span id="cb2-3"><a href="#cb2-3" aria-label="3"></a>工作執行緒 ID: 10</span>
+<span id="cb2-4"><a href="#cb2-4" aria-label="4"></a>工作正在進行中...</span>
+<span id="cb2-5"><a href="#cb2-5" aria-label="5"></a>工作完成。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch02/DemoThreadStart">DemoThreadStart</a></p>
 </blockquote>
@@ -389,23 +392,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>下面這個範例，基本邏輯和前一個 <code>DemoThreadStart</code> 完全相同；差別只在於，這次不再手動建立執行緒，而是改由「執行緒集區」指派現有的工人來處理工作：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">// 將工作項目排入執行緒集區</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a>ThreadPool<span class="op">.</span><span class="fu">QueueUserWorkItem</span><span class="op">(</span>_ <span class="op">=&gt;</span> <span class="fu">DoWork</span><span class="op">());</span></span>
-<span id="cb3-6"><a href="#cb3-6"></a></span>
-<span id="cb3-7"><a href="#cb3-7"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a>Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span> <span class="co">// 等待背景工作完成，否則主程式可能先結束</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="op">{</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"背景執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb3-14"><a href="#cb3-14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作正在進行中..."</span><span class="op">);</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 模擬耗時 2 秒的工作</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作完成。"</span><span class="op">);</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-label="2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-label="3"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-label="4"></a><span class="co">// 將工作項目排入執行緒集區</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-label="5"></a>ThreadPool<span class="op">.</span><span class="fu">QueueUserWorkItem</span><span class="op">(</span>_ <span class="op">=&gt;</span> <span class="fu">DoWork</span><span class="op">());</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-label="6"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-label="7"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-label="8"></a>Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span> <span class="co">// 等待背景工作完成，否則主程式可能先結束</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-label="9"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-label="10"></a><span class="dt">void</span> <span class="fu">DoWork</span><span class="op">()</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-label="11"></a><span class="op">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-label="12"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"背景執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-label="13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-label="14"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作正在進行中..."</span><span class="op">);</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-label="15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 模擬耗時 2 秒的工作</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-label="16"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作完成。"</span><span class="op">);</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-label="17"></a><span class="op">}</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch02/DemoThreadPool">DemoThreadPool</a></p>
 </blockquote>
@@ -447,68 +450,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>先用一個基本例子看它怎麼用。下面這段程式會用 <code>Task.Run</code> 把一段耗時工作推派到背景執行緒，然後透過回傳的 <code>Task</code> 物件來等待它完成：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a></span>
-<span id="cb4-4"><a href="#cb4-4"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 Task.Run 執行背景工作..."</span><span class="op">);</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="co">// 將工作交給執行緒集區，並取得 Task 物件</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a>Task task <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="op">{</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"背景執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作正在進行中..."</span><span class="op">);</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 用來簡化模擬一段耗時的同步工作</span></span>
-<span id="cb4-13"><a href="#cb4-13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作完成。"</span><span class="op">);</span></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="op">});</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a></span>
-<span id="cb4-16"><a href="#cb4-16"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒已呼叫 Task.Run，繼續執行其他事情..."</span><span class="op">);</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">// 等待 Task 完成</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a>task<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
-<span id="cb4-20"><a href="#cb4-20"></a></span>
-<span id="cb4-21"><a href="#cb4-21"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"確認 Task 已完成，主程式即將結束。"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb4-1"><a href="#cb4-1" aria-label="1"></a><span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"主執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-label="2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-label="3"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-label="4"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 Task.Run 執行背景工作..."</span><span class="op">);</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-label="5"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-label="6"></a><span class="co">// 將工作交給執行緒集區，並取得 Task 物件</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-label="7"></a>Task task <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-label="8"></a><span class="op">{</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-label="9"></a>    <span class="dt">var</span> msg <span class="op">=</span> $<span class="st">"背景執行緒 ID: {Environment.CurrentManagedThreadId}"</span><span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-label="10"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>msg<span class="op">);</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-label="11"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作正在進行中..."</span><span class="op">);</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-label="12"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span> <span class="co">// 用來簡化模擬一段耗時的同步工作</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-label="13"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景工作完成。"</span><span class="op">);</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-label="14"></a><span class="op">});</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-label="15"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-label="16"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒已呼叫 Task.Run，繼續執行其他事情..."</span><span class="op">);</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-label="17"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-label="18"></a><span class="co">// 等待 Task 完成</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-label="19"></a>task<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-label="20"></a></span>
+<span id="cb4-21"><a href="#cb4-21" aria-label="21"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"確認 Task 已完成，主程式即將結束。"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>執行結果：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href="#cb5-1"></a>主執行緒 ID: 2</span>
-<span id="cb5-2"><a href="#cb5-2"></a>準備使用 Task.Run 執行背景工作...</span>
-<span id="cb5-3"><a href="#cb5-3"></a>主執行緒已呼叫 Task.Run，繼續執行其他事情...</span>
-<span id="cb5-4"><a href="#cb5-4"></a>背景執行緒 ID: 9</span>
-<span id="cb5-5"><a href="#cb5-5"></a>背景工作正在進行中...</span>
-<span id="cb5-6"><a href="#cb5-6"></a>背景工作完成。</span>
-<span id="cb5-7"><a href="#cb5-7"></a>確認 Task 已完成，主程式即將結束。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a href="#cb5-1" aria-label="1"></a>主執行緒 ID: 2</span>
+<span id="cb5-2"><a href="#cb5-2" aria-label="2"></a>準備使用 Task.Run 執行背景工作...</span>
+<span id="cb5-3"><a href="#cb5-3" aria-label="3"></a>主執行緒已呼叫 Task.Run，繼續執行其他事情...</span>
+<span id="cb5-4"><a href="#cb5-4" aria-label="4"></a>背景執行緒 ID: 9</span>
+<span id="cb5-5"><a href="#cb5-5" aria-label="5"></a>背景工作正在進行中...</span>
+<span id="cb5-6"><a href="#cb5-6" aria-label="6"></a>背景工作完成。</span>
+<span id="cb5-7"><a href="#cb5-7" aria-label="7"></a>確認 Task 已完成，主程式即將結束。</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>這裡使用 <code>task.Wait()</code>，只是為了在 Console 應用程式中確保背景工作能執行完畢。在真實的非同步程式碼中，特別是 UI 或伺服器端應用，我們通常應該使用 <code>await</code> 來非同步地等待 <code>Task</code>，而不是用 <code>Wait()</code> 阻塞當前執行緒。這部分我們會在下一章深入探討。</p>
 <blockquote class="blockquote">
 <p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch02/DemoTaskRun">DemoTaskRun</a></p>
 </blockquote>
 <p>如果背景工作還需要回傳結果，<code>Task.Run</code> 同樣能處理：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 Task.Run 執行有回傳值的背景工作..."</span><span class="op">);</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co">// Task&lt;string&gt; 代表此工作未來會回傳一個 string</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> taskWithResult <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="op">{</span></span>
-<span id="cb6-6"><a href="#cb6-6"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
-<span id="cb6-7"><a href="#cb6-7"></a>    <span class="kw">return</span> <span class="st">"這是背景工作的計算結果"</span><span class="op">;</span></span>
-<span id="cb6-8"><a href="#cb6-8"></a><span class="op">});</span></span>
-<span id="cb6-9"><a href="#cb6-9"></a></span>
-<span id="cb6-10"><a href="#cb6-10"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co">// 使用 .Result 屬性會阻塞當前執行緒，直到 Task 完成並取得結果</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="dt">string</span> result <span class="op">=</span> taskWithResult<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
-<span id="cb6-14"><a href="#cb6-14"></a></span>
-<span id="cb6-15"><a href="#cb6-15"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"從背景工作取得的結果: {result}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb6-1"><a href="#cb6-1" aria-label="1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 Task.Run 執行有回傳值的背景工作..."</span><span class="op">);</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-label="2"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-label="3"></a><span class="co">// Task&lt;string&gt; 代表此工作未來會回傳一個 string</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-label="4"></a>Task<span class="op">&lt;</span><span class="dt">string</span><span class="op">&gt;</span> taskWithResult <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-label="5"></a><span class="op">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-label="6"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-label="7"></a>    <span class="kw">return</span> <span class="st">"這是背景工作的計算結果"</span><span class="op">;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-label="8"></a><span class="op">});</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-label="9"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-label="10"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"主執行緒繼續執行..."</span><span class="op">);</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-label="11"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-label="12"></a><span class="co">// 使用 .Result 屬性會阻塞當前執行緒，直到 Task 完成並取得結果</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-label="13"></a><span class="dt">string</span> result <span class="op">=</span> taskWithResult<span class="op">.</span><span class="fu">Result</span><span class="op">;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-label="14"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-label="15"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"從背景工作取得的結果: {result}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>不過，這裡要再提醒一次：如前面提過的，呼叫 <code>Task</code> 的 <code>.Wait()</code> 方法會阻塞當前執行緒；這個範例使用 <code>.Result</code> 屬性取得非同步工作的結果，也同樣會阻塞執行緒，因而失去非同步原本該有的優勢。所以在撰寫非同步程式時，應盡量避免呼叫 <code>.Wait()</code> 或讀取 <code>.Result</code> 屬性。</p>
 <p>更自然、也更符合現代寫法的作法，是直接使用 <code>await</code> 關鍵字：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">// (假設在一個 async Main 方法中)</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 async/await 非阻塞地等待背景工作..."</span><span class="op">);</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="co">// ✓ 正確示範：以非阻塞方式等待 Task 完成</span></span>
-<span id="cb7-5"><a href="#cb7-5"></a><span class="dt">string</span> resultAsync <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb7-6"><a href="#cb7-6"></a><span class="op">{</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a>    <span class="kw">return</span> <span class="st">"這是使用 await 得到的結果"</span><span class="op">;</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="op">});</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a></span>
-<span id="cb7-11"><a href="#cb7-11"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"從背景工作取得的結果: {resultAsync}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb7-1"><a href="#cb7-1" aria-label="1"></a><span class="co">// (假設在一個 async Main 方法中)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-label="2"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"準備使用 async/await 非阻塞地等待背景工作..."</span><span class="op">);</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-label="3"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-label="4"></a><span class="co">// ✓ 正確示範：以非阻塞方式等待 Task 完成</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-label="5"></a><span class="dt">string</span> resultAsync <span class="op">=</span> await Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-label="6"></a><span class="op">{</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-label="7"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-label="8"></a>    <span class="kw">return</span> <span class="st">"這是使用 await 得到的結果"</span><span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-label="9"></a><span class="op">});</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-label="10"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-label="11"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"從背景工作取得的結果: {resultAsync}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>如你所見，使用 <code>await</code> 之後，程式碼在保持非同步優勢的同時，讀起來仍然像同步程式碼一樣直觀、簡潔。至於這背後的魔法，我們會在下一章再深入探討。</p>
 <blockquote class="blockquote">
 <p><strong>Note:</strong> 此範例中，交給 <code>Task.Run</code> 執行的程式碼在實際執行時會佔住一條背景執行緒。</p>
@@ -558,36 +561,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>這些狀態名稱光看有點抽象，所以我們直接用一個簡短範例來觀察變化：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"建立並啟動一個會故意失敗的任務..."</span><span class="op">);</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a>Task myTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="op">{</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"任務開始執行，即將拋出例外..."</span><span class="op">);</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>    <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">InvalidOperationException</span><span class="op">(</span><span class="st">"哎呀，任務失敗了！"</span><span class="op">);</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="op">});</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a></span>
-<span id="cb10-10"><a href="#cb10-10"></a><span class="kw">try</span></span>
-<span id="cb10-11"><a href="#cb10-11"></a><span class="op">{</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a>    <span class="co">// 故意等待任務完成，以觀察它的最終狀態</span></span>
-<span id="cb10-13"><a href="#cb10-13"></a>    myTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="op">}</span></span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException<span class="op">)</span></span>
-<span id="cb10-16"><a href="#cb10-16"></a><span class="op">{</span></span>
-<span id="cb10-17"><a href="#cb10-17"></a>    <span class="co">// 使用 Wait() 等待失敗的 Task 時，</span></span>
-<span id="cb10-18"><a href="#cb10-18"></a>    <span class="co">// 例外會被包裹在 AggregateException 中。</span></span>
-<span id="cb10-19"><a href="#cb10-19"></a>    <span class="co">// 在此先捕獲並忽略，以觀察任務的最終狀態。</span></span>
-<span id="cb10-20"><a href="#cb10-20"></a><span class="op">}</span></span>
-<span id="cb10-21"><a href="#cb10-21"></a></span>
-<span id="cb10-22"><a href="#cb10-22"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"任務最終狀態: {myTask.Status}"</span><span class="op">);</span></span>
-<span id="cb10-23"><a href="#cb10-23"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsFaulted: {myTask.IsFaulted}"</span><span class="op">);</span></span>
-<span id="cb10-24"><a href="#cb10-24"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsCompleted: {myTask.IsCompleted}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb10-1"><a href="#cb10-1" aria-label="1"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"建立並啟動一個會故意失敗的任務..."</span><span class="op">);</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-label="2"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-label="3"></a>Task myTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-label="4"></a><span class="op">{</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-label="5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"任務開始執行，即將拋出例外..."</span><span class="op">);</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-label="6"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">500</span><span class="op">);</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-label="7"></a>    <span class="kw">throw</span> <span class="kw">new</span> <span class="fu">InvalidOperationException</span><span class="op">(</span><span class="st">"哎呀，任務失敗了！"</span><span class="op">);</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-label="8"></a><span class="op">});</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-label="9"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-label="10"></a><span class="kw">try</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-label="11"></a><span class="op">{</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-label="12"></a>    <span class="co">// 故意等待任務完成，以觀察它的最終狀態</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-label="13"></a>    myTask<span class="op">.</span><span class="fu">Wait</span><span class="op">();</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-label="14"></a><span class="op">}</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-label="15"></a><span class="kw">catch</span> <span class="op">(</span>AggregateException<span class="op">)</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-label="16"></a><span class="op">{</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-label="17"></a>    <span class="co">// 使用 Wait() 等待失敗的 Task 時，</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-label="18"></a>    <span class="co">// 例外會被包裹在 AggregateException 中。</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-label="19"></a>    <span class="co">// 在此先捕獲並忽略，以觀察任務的最終狀態。</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-label="20"></a><span class="op">}</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-label="21"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-label="22"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"任務最終狀態: {myTask.Status}"</span><span class="op">);</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-label="23"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsFaulted: {myTask.IsFaulted}"</span><span class="op">);</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-label="24"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"IsCompleted: {myTask.IsCompleted}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>執行結果：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a href="#cb11-1"></a>建立並啟動一個會故意失敗的任務...</span>
-<span id="cb11-2"><a href="#cb11-2"></a>任務開始執行，即將拋出例外...</span>
-<span id="cb11-3"><a href="#cb11-3"></a>任務最終狀態: Faulted</span>
-<span id="cb11-4"><a href="#cb11-4"></a>IsFaulted: True</span>
-<span id="cb11-5"><a href="#cb11-5"></a>IsCompleted: True</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a href="#cb11-1" aria-label="1"></a>建立並啟動一個會故意失敗的任務...</span>
+<span id="cb11-2"><a href="#cb11-2" aria-label="2"></a>任務開始執行，即將拋出例外...</span>
+<span id="cb11-3"><a href="#cb11-3" aria-label="3"></a>任務最終狀態: Faulted</span>
+<span id="cb11-4"><a href="#cb11-4" aria-label="4"></a>IsFaulted: True</span>
+<span id="cb11-5"><a href="#cb11-5" aria-label="5"></a>IsCompleted: True</span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>這段程式碼也同時展示了前面提過的例外處理機制：當你使用傳統的阻塞方式，例如 <code>.Wait()</code> 或 <code>.Result</code>，去等待一個發生錯誤的 Task 時，原始例外會被包裹在 <code>AggregateException</code> 當中。至於這個機制，以及現代 <code>await</code> 的解包魔法，會在第 4 章詳細介紹。</p>
 <blockquote class="blockquote">
 <p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch02/DemoTaskStatus">DemoTaskStatus</a></p>
@@ -603,21 +606,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="task.delay不阻塞執行緒的等待"><code>Task.Delay</code>：不阻塞執行緒的等待</h3>
 <p>還記得 <code>Thread.Sleep</code> 嗎？它會讓當前的工人，也就是執行緒，呆站在原地睡覺，什麼事都不做。如果你在主執行緒使用它，整個應用程式就會卡在那裡。</p>
 <p>面對「需要等一段時間，但不想卡住執行緒」的需求，.NET 提供了非同步版本的替代方案：<code>Task.Delay</code>。它代表一個「在指定時間後會完成的工作」。在這段等待期間內，通常<strong>不會有一條執行緒被專門卡住等它完成</strong>；它的底層依賴的是系統內建的計時器（timer），時間一到，再由執行環境安排後續的接續工作（continuation）。</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">// 模擬一個非同步的等待，期間不會阻塞執行緒</span></span>
-<span id="cb12-2"><a href="#cb12-2"></a>Task delayTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1" aria-label="1"></a><span class="co">// 模擬一個非同步的等待，期間不會阻塞執行緒</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-label="2"></a>Task delayTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">Delay</span><span class="op">(</span><span class="dv">2000</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p>這也是為什麼 <code>Task.Delay</code> 很常被拿來模擬 I/O 密集型的等待操作，例如等待網路封包或等待資料庫回應。</p>
 </section>
 <section id="task.fromresult已經完成的承諾" class="level3">
 <h3 class="anchored" data-anchor-id="task.fromresult已經完成的承諾"><code>Task.FromResult</code>：已經完成的承諾</h3>
 <p>如果你手上其實已經有現成結果，但某個方法的介面又要求你必須回傳一個 <code>Task&lt;T&gt;</code>，該怎麼辦？這時候，你不需要動用 <code>Task.Run</code> 去叫一個背景執行緒來回傳結果，直接使用 <code>Task.FromResult</code> 就可以了：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1"></a><span class="co">// 建立一個 "剛出生就已經完成" 且帶著結果 42 的 Task</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> completedTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">FromResult</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
-<span id="cb13-3"><a href="#cb13-3"></a></span>
-<span id="cb13-4"><a href="#cb13-4"></a><span class="co">// 狀態會直接是 RanToCompletion</span></span>
-<span id="cb13-5"><a href="#cb13-5"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"狀態: {completedTask.Status}"</span><span class="op">);</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="co">// 立刻取得 42，不需要等待</span></span>
-<span id="cb13-8"><a href="#cb13-8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"結果: {completedTask.Result}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb13-1"><a href="#cb13-1" aria-label="1"></a><span class="co">// 建立一個 "剛出生就已經完成" 且帶著結果 42 的 Task</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-label="2"></a>Task<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> completedTask <span class="op">=</span> Task<span class="op">.</span><span class="fu">FromResult</span><span class="op">(</span><span class="dv">42</span><span class="op">);</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-label="3"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-label="4"></a><span class="co">// 狀態會直接是 RanToCompletion</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-label="5"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"狀態: {completedTask.Status}"</span><span class="op">);</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-label="6"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-label="7"></a><span class="co">// 立刻取得 42，不需要等待</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-label="8"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span>$<span class="st">"結果: {completedTask.Result}"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>Task.FromResult</code> 的存在，再次證明了一件事：<code>Task</code> 代表的主要是狀態與承諾。它甚至可以代表一個在建立瞬間就已經完成的工作，連排程都不需要。</p>
 <p>理解「Task 不等於 Thread」，是往更高階非同步思維前進的一個關鍵轉折。當我們面對 I/O 密集型工作時，拿到的 <code>Task</code> 往往只是在等待一個硬體或作業系統層級的完成通知，此時通常不會有任何一條執行緒在背景「專門」傻等這個結果。</p>
 <blockquote class="blockquote">
@@ -649,26 +652,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>從 <code>ThreadPool</code> 取得的執行緒（因此也包括 <code>Task.Run</code> 所使用的執行緒），永遠都是背景執行緒。</li>
 </ul>
 <p>以下範例可用來觀察這兩種執行緒的行為差異：</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">// 範例一：使用 Thread (前景執行緒)</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="dt">var</span> foregroundThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="op">{</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"前景執行緒完成。"</span><span class="op">);</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="op">});</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a></span>
-<span id="cb14-8"><a href="#cb14-8"></a>foregroundThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
-<span id="cb14-9"><a href="#cb14-9"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
-<span id="cb14-10"><a href="#cb14-10"></a>    <span class="st">"Main 函式 (前景) 即將結束，但程式會等待前景執行緒完成。"</span><span class="op">);</span></span>
-<span id="cb14-11"><a href="#cb14-11"></a></span>
-<span id="cb14-12"><a href="#cb14-12"></a><span class="co">// 範例二：使用 Task.Run (背景執行緒)</span></span>
-<span id="cb14-13"><a href="#cb14-13"></a>_ <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
-<span id="cb14-14"><a href="#cb14-14"></a><span class="op">{</span></span>
-<span id="cb14-15"><a href="#cb14-15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
-<span id="cb14-16"><a href="#cb14-16"></a>    </span>
-<span id="cb14-17"><a href="#cb14-17"></a>    <span class="co">// 底下這行可能永遠不會被執行</span></span>
-<span id="cb14-18"><a href="#cb14-18"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景執行緒完成。"</span><span class="op">);</span></span>
-<span id="cb14-19"><a href="#cb14-19"></a><span class="op">});</span></span>
-<span id="cb14-20"><a href="#cb14-20"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Main 函式 (前景) 即將結束，程式不會等待背景執行緒。"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb14-1"><a href="#cb14-1" aria-label="1"></a><span class="co">// 範例一：使用 Thread (前景執行緒)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-label="2"></a><span class="dt">var</span> foregroundThread <span class="op">=</span> <span class="kw">new</span> <span class="fu">Thread</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-label="3"></a><span class="op">{</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-label="4"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">3000</span><span class="op">);</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-label="5"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"前景執行緒完成。"</span><span class="op">);</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-label="6"></a><span class="op">});</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-label="7"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-label="8"></a>foregroundThread<span class="op">.</span><span class="fu">Start</span><span class="op">();</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-label="9"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-label="10"></a>    <span class="st">"Main 函式 (前景) 即將結束，但程式會等待前景執行緒完成。"</span><span class="op">);</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-label="11"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-label="12"></a><span class="co">// 範例二：使用 Task.Run (背景執行緒)</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-label="13"></a>_ <span class="op">=</span> Task<span class="op">.</span><span class="fu">Run</span><span class="op">(()</span> <span class="op">=&gt;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-label="14"></a><span class="op">{</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-label="15"></a>    Thread<span class="op">.</span><span class="fu">Sleep</span><span class="op">(</span><span class="dv">5000</span><span class="op">);</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-label="16"></a>    </span>
+<span id="cb14-17"><a href="#cb14-17" aria-label="17"></a>    <span class="co">// 底下這行可能永遠不會被執行</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-label="18"></a>    Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"背景執行緒完成。"</span><span class="op">);</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-label="19"></a><span class="op">});</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-label="20"></a>Console<span class="op">.</span><span class="fu">WriteLine</span><span class="op">(</span><span class="st">"Main 函式 (前景) 即將結束，程式不會等待背景執行緒。"</span><span class="op">);</span></span></code></pre></div><button title="複製到剪貼簿" class="code-copy-button"><i class="bi"></i></button></div>
 <blockquote class="blockquote">
 <p><strong>原始碼：</strong> <a href="https://github.com/huanlin/dotnet-async-book-support/tree/master/example-zh-tw/ch02/DemoForegroundBackgroundThreads">DemoForegroundBackgroundThreads</a></p>
 </blockquote>
