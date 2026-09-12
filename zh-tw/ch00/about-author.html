@@ -231,7 +231,7 @@ ul.task-list li input[type="checkbox"] {
     
   
     <div>
-    <div class="quarto-title-meta-heading">修改於</div>
+    <div class="quarto-title-meta-heading">更新日期</div>
     <div class="quarto-title-meta-contents">
       <p class="date-modified">2026-09-02</p>
     </div>
@@ -246,7 +246,7 @@ ul.task-list li input[type="checkbox"] {
 
 <p>蔡煥麟（Michael Tsai）</p>
 <p>從事軟體開發與技術寫作十餘年，連續 20 年獲選微軟最有價值專家（Microsoft .NET MVP）。</p>
-<p>著有《深入淺出 .NET 10 非同步程式設計》、《現代 C#：AI 時代的開發者修煉》與《.NET 相依性注入》。</p>
+<p>著有《現代 C#：AI 時代的開發者修煉》與《.NET 相依性注入》。</p>
 <p>譯有《軟體構築美學》與《物件導向分析設計與應用》。</p>
 <p>部落格：<a href="https://www.huanlintalk.com" class="uri">https://www.huanlintalk.com</a></p>
 <p>Facebook：<a href="https://www.facebook.com/huanlin.notes" class="uri">https://www.facebook.com/huanlin.notes</a></p>
@@ -255,71 +255,137 @@ ul.task-list li input[type="checkbox"] {
 
 </main> <!-- /main -->
 <script>
+
 (() => {
+
   const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+
   if (!match) {
+
     return;
+
   }
+
+
 
   const current = match[1];
+
   const target = current === "zh-tw" ? "en" : "zh-tw";
+
   const link = document.createElement("a");
 
+
+
   link.className = "language-switch";
+
   link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+
     + window.location.search
+
     + window.location.hash;
+
   link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+
   link.setAttribute(
+
     "aria-label",
+
     current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+
   );
+
+
 
   const languageIcon = document.createElement("i");
+
   languageIcon.className = "bi bi-globe2";
+
   languageIcon.setAttribute("aria-hidden", "true");
+
   link.appendChild(languageIcon);
+
   link.appendChild(document.createTextNode(
+
     current === "zh-tw" ? "English" : "繁體中文"
+
   ));
 
+
+
   const githubLink = document.querySelector(
+
     "#quarto-sidebar .sidebar-tools-main a.quarto-navigation-tool[href*='github.com']"
+
   );
+
   const generatedTools = githubLink?.parentElement;
 
+
+
   const tools = document.createElement("div");
+
   tools.className = "site-tools";
+
   tools.appendChild(link);
 
+
+
   if (githubLink) {
+
     githubLink.className = "github-repo-link";
+
     githubLink.target = "_blank";
+
     githubLink.rel = "noopener noreferrer";
+
     githubLink.title = current === "zh-tw" ? "查看 GitHub repository" : "View the GitHub repository";
+
     githubLink.setAttribute("aria-label", githubLink.title);
+
     tools.appendChild(githubLink);
+
     generatedTools?.remove();
+
   }
+
+
 
   const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+
   if (sidebarHeader) {
+
     tools.classList.add("site-tools-sidebar");
+
     sidebarHeader.appendChild(tools);
+
     return;
+
   }
 
+
+
   const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+
   const searchButton = header?.querySelector(".quarto-search-button");
+
   if (header && searchButton) {
+
     tools.classList.add("site-tools-header");
+
     header.insertBefore(tools, searchButton);
+
   } else {
+
     tools.classList.add("site-tools-fallback");
+
     document.body.appendChild(tools);
+
   }
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

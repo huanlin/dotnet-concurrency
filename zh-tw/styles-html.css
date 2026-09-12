@@ -1,1 +1,205 @@
-@import url("../styles-html.css");
+/* ========== HTML 專用版面設定 ========== */
+/* 僅補齊程式碼中的繁中文字形；英數仍由等寬字型顯示。 */
+@font-face {
+    font-family: "CJK Code Fallback";
+    src: local("Noto Sans Mono CJK TC"), local("PingFang TC"), local("Microsoft JhengHei");
+    unicode-range:
+        U+2E80-2EFF,
+        U+2F00-2FDF,
+        U+3000-303F,
+        U+3100-312F,
+        U+31A0-31BF,
+        U+3400-4DBF,
+        U+4E00-9FFF,
+        U+F900-FAFF,
+        U+FE30-FE4F,
+        U+FF00-FFEF;
+}
+
+:not(pre) > code {
+    font-family: "CJK Code Fallback", "Source Code Pro", ui-monospace,
+        "Cascadia Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+}
+
+body {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-rows-contents {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ========== 標題字級（只影響 HTML）========== */
+h2 { font-size: 1.6em; }
+h3 { font-size: 1.4em; }
+h4 { font-size: 1.2em; }
+h5 { font-size: 1.05em; }
+
+/* ========== 正文對齊（只影響 HTML）========== */
+p,
+li,
+blockquote,
+.blockquote,
+.callout {
+    text-align: start;
+}
+
+/* ========== 引言區塊版面（只影響 HTML）========== */
+blockquote,
+.blockquote {
+    display: flow-root;
+}
+
+blockquote > :first-child,
+.blockquote > :first-child {
+    margin-top: 0;
+}
+
+/* ========== Sidebar 導覽項目間距與對齊（只影響 HTML）========== */
+.sidebar-navigation .sidebar-item a {
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    text-align: left;
+}
+
+#quarto-margin-sidebar li {
+    text-align: start;
+}
+
+#quarto-margin-sidebar nav[role="doc-toc"] > ul > li > ul > li > a {
+    padding-left: 2em;
+}
+
+.language-switch {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    font-size: 0.875rem;
+    line-height: 1.2;
+    text-decoration: none;
+    box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08);
+}
+
+.site-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.site-tools-sidebar { margin-top: 0.75rem; }
+.quarto-secondary-nav .site-tools { margin-left: 0.5rem; }
+
+.github-repo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background: var(--bs-body-bg, #fff);
+    color: var(--bs-body-color, #212529);
+    font-size: 1.15rem;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 0.125rem 0.35rem rgba(0, 0, 0, 0.08);
+}
+
+.language-switch:hover,
+.language-switch:focus,
+.github-repo-link:hover,
+.github-repo-link:focus {
+    color: var(--bs-link-color, #0d6efd);
+    text-decoration: none;
+}
+
+@media (max-width: 575.98px) {
+    .language-switch {
+        font-size: 0.8125rem;
+        min-height: 1.85rem;
+        padding-left: 0.45rem;
+        padding-right: 0.45rem;
+    }
+
+    .github-repo-link {
+        width: 1.85rem;
+        height: 1.85rem;
+        font-size: 1.05rem;
+    }
+}
+
+main.content > section:first-of-type > h2:nth-child(1) {
+    margin-top: 2em;
+}
+
+/* ========== 首頁書籍封面圖邊框 ========== */
+.quarto-cover-image {
+    max-width: 25%;
+    border: 1px solid #dee2e6;
+    border-radius: 2px;
+}
+
+/* ========== 書籍標題 metadata（只影響 HTML）========== */
+#title-block-header .quarto-title-meta > div {
+    display: flex;
+    align-items: baseline;
+}
+
+#title-block-header.quarto-title-block.default .quarto-title-meta-heading {
+    font-size: 0.9em;
+}
+
+#title-block-header .quarto-title-meta-heading::after {
+    content: ":";
+    margin-right: 0.35em;
+}
+
+#title-block-header:lang(zh) .quarto-title-meta-heading::after {
+    content: "：";
+    margin-right: 0;
+}
+
+#title-block-header .quarto-title-meta-contents {
+    font-size: 0.9em;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#title-block-header .quarto-title-meta-contents p {
+    margin: 0;
+}
+
+/* ========== 首頁全書目錄（只影響 HTML）========== */
+.home-book-toc ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* ========== .NET async preview-site components ========== */
+.full-edition-notice {
+    margin: 1.75rem 0;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid #cfe2ff;
+    border-left: 0.35rem solid #0d6efd;
+    border-radius: 0.5rem;
+    background: #f3f8ff;
+}
+
+.full-edition-notice > :first-child { margin-top: 0; }
+.full-edition-notice > :last-child { margin-bottom: 0; }
+
+.preview-status {
+    margin: 1rem 0 1.5rem;
+    color: #495057;
+    font-size: 0.95rem;
+}

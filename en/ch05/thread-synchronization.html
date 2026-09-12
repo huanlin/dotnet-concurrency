@@ -296,7 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 3, 2026</p>
+      <p class="date-modified">September 11, 2026</p>
     </div>
   </div>
     
@@ -463,7 +463,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sec-the-lock-keyword" class="level3">
 <h3 class="anchored" data-anchor-id="sec-the-lock-keyword">The <code>lock</code> keyword: the simplest lock</h3>
-<p>Now that we have seen how to protect a single variable, let’s move on to the most common synchronization tool: <code>lock</code>.</p>
 <p><code>lock</code> is one of the most widely used synchronization mechanisms in C#. It ensures that only one thread can enter a <code>lock</code> block at a time.</p>
 <p>To use <code>lock</code>, you must first prepare a lock object that all participating threads can access. In practice, that object is usually a private <code>readonly object</code> field.</p>
 <p>Here is the broken counter example rewritten using <code>lock</code>:</p>
@@ -853,79 +852,144 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="images/sync-tools-matrix-en.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
 </figure>
 </div>
-<p>Is there a safer and simpler way to handle shared data in multithreaded code?</p>
-<p>Yes. In the next chapter, we will explore the thread-safe collections provided by .NET. These specially designed collections handle many of the tricky synchronization details internally, allowing us to work with concurrent data much more safely.</p>
+<p>In the next chapter, we will explore the thread-safe collections provided by .NET. These specially designed collections handle many of the tricky synchronization details internally, allowing us to work with concurrent data more safely.</p>
 
 
 </section>
 
 </main> <!-- /main -->
 <script>
+
 (() => {
+
   const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+
   if (!match) {
+
     return;
+
   }
+
+
 
   const current = match[1];
+
   const target = current === "zh-tw" ? "en" : "zh-tw";
+
   const link = document.createElement("a");
 
+
+
   link.className = "language-switch";
+
   link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+
     + window.location.search
+
     + window.location.hash;
+
   link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+
   link.setAttribute(
+
     "aria-label",
+
     current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+
   );
+
+
 
   const languageIcon = document.createElement("i");
+
   languageIcon.className = "bi bi-globe2";
+
   languageIcon.setAttribute("aria-hidden", "true");
+
   link.appendChild(languageIcon);
+
   link.appendChild(document.createTextNode(
+
     current === "zh-tw" ? "English" : "繁體中文"
+
   ));
 
+
+
   const githubLink = document.querySelector(
+
     "#quarto-sidebar .sidebar-tools-main a.quarto-navigation-tool[href*='github.com']"
+
   );
+
   const generatedTools = githubLink?.parentElement;
 
+
+
   const tools = document.createElement("div");
+
   tools.className = "site-tools";
+
   tools.appendChild(link);
 
+
+
   if (githubLink) {
+
     githubLink.className = "github-repo-link";
+
     githubLink.target = "_blank";
+
     githubLink.rel = "noopener noreferrer";
+
     githubLink.title = current === "zh-tw" ? "查看 GitHub repository" : "View the GitHub repository";
+
     githubLink.setAttribute("aria-label", githubLink.title);
+
     tools.appendChild(githubLink);
+
     generatedTools?.remove();
+
   }
+
+
 
   const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+
   if (sidebarHeader) {
+
     tools.classList.add("site-tools-sidebar");
+
     sidebarHeader.appendChild(tools);
+
     return;
+
   }
 
+
+
   const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+
   const searchButton = header?.querySelector(".quarto-search-button");
+
   if (header && searchButton) {
+
     tools.classList.add("site-tools-header");
+
     header.insertBefore(tools, searchButton);
+
   } else {
+
     tools.classList.add("site-tools-fallback");
+
     document.body.appendChild(tools);
+
   }
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

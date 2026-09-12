@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 3, 2026</p>
+      <p class="date-modified">September 11, 2026</p>
     </div>
   </div>
     
@@ -327,7 +327,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="images/spinning-problem.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
 </figure>
 </div>
-<p>In the digital age, we expect applications to feel responsive and provide immediate feedback. Whether that means keeping a desktop app’s user interface (UI) snappy or letting a web server serve thousands of users at the same time, both cases rely on the same underlying capability: <strong>handling multiple pieces of work at once</strong>. Without that capability, applications feel sluggish, the user experience suffers, and servers struggle to keep up with modern traffic.</p>
 <p>To make this idea more concrete, let’s start with an analogy: a pizza shop. Imagine that we are running this shop together, starting with its simplest operating model and then gradually improving its efficiency. As we follow that journey, we will naturally run into two core ideas in C# programming: <strong>multithreading</strong> and <strong>asynchronous programming</strong>.</p>
 <section id="learning-path-for-this-chapter" class="level3">
 <h3 class="anchored" data-anchor-id="learning-path-for-this-chapter">Learning path for this chapter</h3>
@@ -458,7 +457,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="a-blocking-example-in-real-code" class="level3">
 <h3 class="anchored" data-anchor-id="a-blocking-example-in-real-code">A “blocking” example in real code</h3>
-<p>Next, let’s look at what “blocking” looks like in real code.</p>
 <p>Consider desktop applications like WinForms and WPF. These programs typically have only one <strong>UI thread</strong>, which is responsible for handling all user interactions, such as button clicks and moving windows. Once we run a time-consuming operation on that thread, the whole program appears “frozen.” The following Windows desktop UI event handler demonstrates that situation:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="kw">private</span> <span class="dt">void</span> <span class="fu">SaveButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> EventArgs e<span class="op">)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="op">{</span></span>
@@ -804,71 +802,137 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </main> <!-- /main -->
 <script>
+
 (() => {
+
   const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+
   if (!match) {
+
     return;
+
   }
+
+
 
   const current = match[1];
+
   const target = current === "zh-tw" ? "en" : "zh-tw";
+
   const link = document.createElement("a");
 
+
+
   link.className = "language-switch";
+
   link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+
     + window.location.search
+
     + window.location.hash;
+
   link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+
   link.setAttribute(
+
     "aria-label",
+
     current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+
   );
+
+
 
   const languageIcon = document.createElement("i");
+
   languageIcon.className = "bi bi-globe2";
+
   languageIcon.setAttribute("aria-hidden", "true");
+
   link.appendChild(languageIcon);
+
   link.appendChild(document.createTextNode(
+
     current === "zh-tw" ? "English" : "繁體中文"
+
   ));
 
+
+
   const githubLink = document.querySelector(
+
     "#quarto-sidebar .sidebar-tools-main a.quarto-navigation-tool[href*='github.com']"
+
   );
+
   const generatedTools = githubLink?.parentElement;
 
+
+
   const tools = document.createElement("div");
+
   tools.className = "site-tools";
+
   tools.appendChild(link);
 
+
+
   if (githubLink) {
+
     githubLink.className = "github-repo-link";
+
     githubLink.target = "_blank";
+
     githubLink.rel = "noopener noreferrer";
+
     githubLink.title = current === "zh-tw" ? "查看 GitHub repository" : "View the GitHub repository";
+
     githubLink.setAttribute("aria-label", githubLink.title);
+
     tools.appendChild(githubLink);
+
     generatedTools?.remove();
+
   }
+
+
 
   const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+
   if (sidebarHeader) {
+
     tools.classList.add("site-tools-sidebar");
+
     sidebarHeader.appendChild(tools);
+
     return;
+
   }
 
+
+
   const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+
   const searchButton = header?.querySelector(".quarto-search-button");
+
   if (header && searchButton) {
+
     tools.classList.add("site-tools-header");
+
     header.insertBefore(tools, searchButton);
+
   } else {
+
     tools.classList.add("site-tools-fallback");
+
     document.body.appendChild(tools);
+
   }
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

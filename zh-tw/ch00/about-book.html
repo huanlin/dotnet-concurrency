@@ -242,7 +242,7 @@ ul.task-list li input[type="checkbox"] {
     
   
     <div>
-    <div class="quarto-title-meta-heading">修改於</div>
+    <div class="quarto-title-meta-heading">更新日期</div>
     <div class="quarto-title-meta-contents">
       <p class="date-modified">2026-09-02</p>
     </div>
@@ -255,7 +255,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>本書專注於現代 .NET 非同步程式設計的核心觀念、實務技巧與設計判斷。除了介紹 <code>Task</code>、<code>async/await</code>、取消、例外、同步機制、平行處理與非同步資料流之外，內容也會一路延伸到 API 設計與實戰應用，幫助你建立完整而可靠的知識體系。</p>
+<p>本書專注於現代 .NET 非同步程式設計的核心觀念、實務技巧與設計判斷。除了介紹 <code>Task</code>、<code>async/await</code>、取消、例外、同步機制、平行處理與非同步資料流之外，內容也會一路延伸到 API 設計與實戰應用，幫助你理解這些工具的適用情境與設計取捨。</p>
 <p>現在，利用 AI 工具寫程式已經相當普遍，然而從個人學習成長的角度來看，深厚的基礎知識才是長期競爭力與技術精進的關鍵。因此，本書特別注重基礎觀念與心智模型的建立，希望讀者真正理解：為什麼這樣寫比較好、什麼時候該用、什麼時候不該用哪些 API，以及用錯時可能付出什麼代價。</p>
 <section id="目標讀者" class="level2">
 <h2 class="anchored" data-anchor-id="目標讀者">目標讀者</h2>
@@ -316,71 +316,137 @@ ul.task-list li input[type="checkbox"] {
 
 </main> <!-- /main -->
 <script>
+
 (() => {
+
   const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+
   if (!match) {
+
     return;
+
   }
+
+
 
   const current = match[1];
+
   const target = current === "zh-tw" ? "en" : "zh-tw";
+
   const link = document.createElement("a");
 
+
+
   link.className = "language-switch";
+
   link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+
     + window.location.search
+
     + window.location.hash;
+
   link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+
   link.setAttribute(
+
     "aria-label",
+
     current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+
   );
+
+
 
   const languageIcon = document.createElement("i");
+
   languageIcon.className = "bi bi-globe2";
+
   languageIcon.setAttribute("aria-hidden", "true");
+
   link.appendChild(languageIcon);
+
   link.appendChild(document.createTextNode(
+
     current === "zh-tw" ? "English" : "繁體中文"
+
   ));
 
+
+
   const githubLink = document.querySelector(
+
     "#quarto-sidebar .sidebar-tools-main a.quarto-navigation-tool[href*='github.com']"
+
   );
+
   const generatedTools = githubLink?.parentElement;
 
+
+
   const tools = document.createElement("div");
+
   tools.className = "site-tools";
+
   tools.appendChild(link);
 
+
+
   if (githubLink) {
+
     githubLink.className = "github-repo-link";
+
     githubLink.target = "_blank";
+
     githubLink.rel = "noopener noreferrer";
+
     githubLink.title = current === "zh-tw" ? "查看 GitHub repository" : "View the GitHub repository";
+
     githubLink.setAttribute("aria-label", githubLink.title);
+
     tools.appendChild(githubLink);
+
     generatedTools?.remove();
+
   }
+
+
 
   const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+
   if (sidebarHeader) {
+
     tools.classList.add("site-tools-sidebar");
+
     sidebarHeader.appendChild(tools);
+
     return;
+
   }
 
+
+
   const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+
   const searchButton = header?.querySelector(".quarto-search-button");
+
   if (header && searchButton) {
+
     tools.classList.add("site-tools-header");
+
     header.insertBefore(tools, searchButton);
+
   } else {
+
     tools.classList.add("site-tools-fallback");
+
     document.body.appendChild(tools);
+
   }
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";

@@ -304,9 +304,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     
   
     <div>
-    <div class="quarto-title-meta-heading">修改於</div>
+    <div class="quarto-title-meta-heading">更新日期</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-05-03</p>
+      <p class="date-modified">2026-09-11</p>
     </div>
   </div>
     
@@ -327,7 +327,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="images/spinning-problem.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:85.0%"></p>
 </figure>
 </div>
-<p>在數位時代，我們期待應用程式能提供即時回饋與流暢體驗。無論是讓桌面應用程式的使用者介面（UI）保持靈敏，還是讓網站伺服器同時服務成千上萬名使用者，背後都仰賴同一種能力：<strong>同時處理多項任務</strong>。若缺乏這種能力，應用程式的反應就會變得遲鈍，使用者體驗大打折扣，伺服器也無法應付現代網路的龐大流量。</p>
+<p>無論是讓桌面應用程式的使用者介面（UI）保持靈敏，還是讓網站伺服器同時服務成千上萬名使用者，背後都仰賴同一種能力：<strong>同時處理多項任務</strong>。若缺乏這種能力，應用程式的反應就會變得遲鈍，使用者體驗大打折扣，伺服器也無法應付現代網路的龐大流量。</p>
 <p>為了更具體瞭解這項能力，我們先用一間披薩店當作類比。請想像我們要一起經營這家店，從最原始的營運模式出發，逐步探索如何提升效率。沿著這條路走下去，我們自然會碰到 C# 程式設計中的兩個核心概念：<strong>多執行緒（multithreading）</strong> 和 <strong>非同步程式設計（asynchronous programming）</strong>。</p>
 <section id="本章學習路徑" class="level3">
 <h3 class="anchored" data-anchor-id="本章學習路徑">本章學習路徑</h3>
@@ -447,7 +447,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="程式碼中的阻塞範例" class="level3">
 <h3 class="anchored" data-anchor-id="程式碼中的阻塞範例">程式碼中的「阻塞」範例</h3>
-<p>接著來看程式碼中的「阻塞」是什麼樣子。</p>
 <p>以桌面應用程式（如 WinForms、WPF）為例。這類程式通常只有一條「UI 執行緒」，負責處理所有使用者操作，例如點擊按鈕、移動視窗等等。一旦我們在這條執行緒上執行耗時操作，整個程式看起來就會像「當掉」一樣。下面這段常見的 Windows 桌面 UI 事件處理器，示範的就是這種情況：</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource csharp number-lines code-with-copy"><code class="sourceCode cs"><span id="cb3-1"><a href="#cb3-1" aria-label="1"></a><span class="kw">private</span> <span class="dt">void</span> <span class="fu">SaveButton_Click</span><span class="op">(</span><span class="dt">object</span> sender<span class="op">,</span> EventArgs e<span class="op">)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-label="2"></a><span class="op">{</span></span>
@@ -772,71 +771,137 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </main> <!-- /main -->
 <script>
+
 (() => {
+
   const match = window.location.pathname.match(/\/(zh-tw|en)(\/|$)/);
+
   if (!match) {
+
     return;
+
   }
+
+
 
   const current = match[1];
+
   const target = current === "zh-tw" ? "en" : "zh-tw";
+
   const link = document.createElement("a");
 
+
+
   link.className = "language-switch";
+
   link.href = window.location.pathname.replace(`/${current}`, `/${target}`)
+
     + window.location.search
+
     + window.location.hash;
+
   link.lang = current === "zh-tw" ? "en" : "zh-Hant";
+
   link.setAttribute(
+
     "aria-label",
+
     current === "zh-tw" ? "Switch to English" : "切換至繁體中文"
+
   );
+
+
 
   const languageIcon = document.createElement("i");
+
   languageIcon.className = "bi bi-globe2";
+
   languageIcon.setAttribute("aria-hidden", "true");
+
   link.appendChild(languageIcon);
+
   link.appendChild(document.createTextNode(
+
     current === "zh-tw" ? "English" : "繁體中文"
+
   ));
 
+
+
   const githubLink = document.querySelector(
+
     "#quarto-sidebar .sidebar-tools-main a.quarto-navigation-tool[href*='github.com']"
+
   );
+
   const generatedTools = githubLink?.parentElement;
 
+
+
   const tools = document.createElement("div");
+
   tools.className = "site-tools";
+
   tools.appendChild(link);
 
+
+
   if (githubLink) {
+
     githubLink.className = "github-repo-link";
+
     githubLink.target = "_blank";
+
     githubLink.rel = "noopener noreferrer";
+
     githubLink.title = current === "zh-tw" ? "查看 GitHub repository" : "View the GitHub repository";
+
     githubLink.setAttribute("aria-label", githubLink.title);
+
     tools.appendChild(githubLink);
+
     generatedTools?.remove();
+
   }
+
+
 
   const sidebarHeader = document.querySelector("#quarto-sidebar .sidebar-header");
+
   if (sidebarHeader) {
+
     tools.classList.add("site-tools-sidebar");
+
     sidebarHeader.appendChild(tools);
+
     return;
+
   }
 
+
+
   const header = document.querySelector(".quarto-secondary-nav .container-fluid");
+
   const searchButton = header?.querySelector(".quarto-search-button");
+
   if (header && searchButton) {
+
     tools.classList.add("site-tools-header");
+
     header.insertBefore(tools, searchButton);
+
   } else {
+
     tools.classList.add("site-tools-fallback");
+
     document.body.appendChild(tools);
+
   }
+
 })();
+
 </script>
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
