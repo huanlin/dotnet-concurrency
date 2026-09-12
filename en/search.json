@@ -444,7 +444,7 @@
     "href": "ch06/thread-safety-and-immutable-collections.html",
     "title": "Chapter 6: Thread safety and immutable collections",
     "section": "",
-    "text": "This chapter approaches thread safety through data structures and state management, comparing concurrent, immutable, and frozen collections.\nTopics covered\n\nThe purpose and use of .NET concurrent collections.\nHow immutable design reduces shared mutable state.\nHow to choose among concurrent, immutable, and frozen collections.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter approaches thread safety through data structures and state management, comparing concurrent, immutable, and frozen collections.\nTopics covered\n\nThe purpose and use of .NET concurrent collections.\nHow immutable design reduces shared mutable state.\nHow to choose among concurrent, immutable, and frozen collections.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "6 Thread safety and immutable collections"
     ]
@@ -454,7 +454,7 @@
     "href": "ch07/parallel-programming-and-plinq.html",
     "title": "Chapter 7: Parallel processing and PLINQ",
     "section": "",
-    "text": "This chapter focuses on CPU-bound work and explains how .NET parallel-processing tools can shorten the execution time of divisible workloads.\nTopics covered\n\nRecognizing CPU-bound work that can benefit from parallelism.\nThe Parallel class and the costs of parallel execution.\nPLINQ execution, ordering, and performance tradeoffs.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter focuses on CPU-bound work and explains how .NET parallel-processing tools can shorten the execution time of divisible workloads.\nTopics covered\n\nRecognizing CPU-bound work that can benefit from parallelism.\nThe Parallel class and the costs of parallel execution.\nPLINQ execution, ordering, and performance tradeoffs.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "7 Parallel processing and PLINQ"
     ]
@@ -464,7 +464,7 @@
     "href": "ch08/async-streams.html",
     "title": "Chapter 8: Asynchronous streams and resource management",
     "section": "",
-    "text": "This chapter extends asynchronous processing to streams of values and resource lifetimes, enabling incremental consumption and correct asynchronous cleanup.\nTopics covered\n\nSystem.Threading.Channels and the producer/consumer pattern.\nIAsyncEnumerable&lt;T&gt;, await foreach, and asynchronous iterators.\nStream cancellation, IAsyncDisposable, and await using.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter extends asynchronous processing to streams of values and resource lifetimes, enabling incremental consumption and correct asynchronous cleanup.\nTopics covered\n\nSystem.Threading.Channels and the producer/consumer pattern.\nIAsyncEnumerable&lt;T&gt;, await foreach, and asynchronous iterators.\nStream cancellation, IAsyncDisposable, and await using.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "8 Asynchronous streams"
     ]
@@ -474,7 +474,7 @@
     "href": "ch09/advanced-task-programming.html",
     "title": "Chapter 9: Advanced Task programming",
     "section": "",
-    "text": "This chapter examines advanced tools and execution contexts in the Task-based Asynchronous Pattern, including bridging, performance, and scheduling concerns.\nTopics covered\n\nBridging older asynchronous patterns with TaskCompletionSource.\nThe tradeoffs of ValueTask and Task.Yield.\nExecutionContext, TaskScheduler, and thread pool starvation.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter examines advanced tools and execution contexts in the Task-based Asynchronous Pattern, including bridging, performance, and scheduling concerns.\nTopics covered\n\nBridging older asynchronous patterns with TaskCompletionSource.\nThe tradeoffs of ValueTask and Task.Yield.\nExecutionContext, TaskScheduler, and thread pool starvation.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "9 Advanced Task programming"
     ]
@@ -484,7 +484,7 @@
     "href": "ch10/async-patterns-and-practices.html",
     "title": "Chapter 10: Practical scenarios and best practices",
     "section": "",
-    "text": "This chapter applies the earlier concepts to I/O, streaming, server-side applications, and desktop UI scenarios, then consolidates asynchronous-programming best practices.\nTopics covered\n\nPractical I/O and streaming design.\nA review of asynchronous-programming best practices.\nScenarios in ASP.NET Core, WinForms, WPF, and MAUI.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter applies the earlier concepts to I/O, streaming, server-side applications, and desktop UI scenarios, then consolidates asynchronous-programming best practices.\nTopics covered\n\nPractical I/O and streaming design.\nA review of asynchronous-programming best practices.\nScenarios in ASP.NET Core, WinForms, WPF, and MAUI.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "10 Practical scenarios and best practices"
     ]
@@ -494,7 +494,7 @@
     "href": "ch11/async-api-design.html",
     "title": "Chapter 11: Guidelines for designing asynchronous APIs",
     "section": "",
-    "text": "This chapter presents asynchronous API design principles that help callers understand, combine, cancel, and correctly manage asynchronous operations.\nTopics covered\n\nThe Async suffix, method signatures, and cancellation conventions.\nException, cancellation, timeout, and synchronous/asynchronous API semantics.\nDesign guidance for ValueTask, ConfigureAwait(false), and IAsyncDisposable.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\nView the author’s works and full-edition information\n\nBuy the ebook: Amazon Google Play Books Kobo",
+    "text": "This chapter presents asynchronous API design principles that help callers understand, combine, cancel, and correctly manage asynchronous operations.\nTopics covered\n\nThe Async suffix, method signatures, and cancellation conventions.\nException, cancellation, timeout, and synchronous/asynchronous API semantics.\nDesign guidance for ValueTask, ConfigureAwait(false), and IAsyncDisposable.\n\n\nThis chapter is part of the full edition. The free preview edition does not include its full text.\n\nBuy the ebook: Amazon Google Play Books Kobo",
     "crumbs": [
       "11 Guidelines for designing async APIs"
     ]

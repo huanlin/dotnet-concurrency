@@ -174,7 +174,7 @@
     "href": "ch01/introduction.html#sec-next-steps",
     "title": "第 1 章：理解執行緒與非同步",
     "section": "下一步",
-    "text": "下一步\n透過經營一家披薩店，我們逐步認識了最基本的阻塞模型，以及更高效的非同步模型。這一章最想先建立的觀念是：async/await 是現代 C# 開發者處理耗時操作，特別是 I/O 操作時重要且常用的工具。它通常不會讓 CPU 密集型工作憑空變快，但往往能在 I/O 等待期間提升應用程式的回應性與延展性，讓你的應用程式像那位「超級廚師」一樣，更自然、順暢地處理各種任務。\n如果這個披薩店的類比有幫你把基礎觀念建立起來，那麼這一章的任務就達成了一大半。接下來，就能以此為起點，繼續探索更進階的主題，例如 Parallel 類別、PLINQ，以及更複雜的同步機制，逐步打造出真正高效、可靠的現代化應用程式。\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "下一步\n透過經營一家披薩店，我們逐步認識了最基本的阻塞模型，以及更高效的非同步模型。這一章最想先建立的觀念是：async/await 是現代 C# 開發者處理耗時操作，特別是 I/O 操作時重要且常用的工具。它通常不會讓 CPU 密集型工作憑空變快，但往往能在 I/O 等待期間提升應用程式的回應性與延展性，讓你的應用程式像那位「超級廚師」一樣，更自然、順暢地處理各種任務。\n如果這個披薩店的類比有幫你把基礎觀念建立起來，那麼這一章的任務就達成了一大半。接下來，就能以此為起點，繼續探索更進階的主題，例如 Parallel 類別、PLINQ，以及更複雜的同步機制，逐步打造出真正高效、可靠的現代化應用程式。\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "<span class='chapter-number'>5</span>  <span class='chapter-title'>第 1 章：理解執行緒與非同步</span>"
     ]
@@ -254,7 +254,7 @@
     "href": "ch02/threads-and-tasks.html#結語",
     "title": "第 2 章：.NET 中的執行緒與工作",
     "section": "結語",
-    "text": "結語\n本章先從傳統執行緒管理的挑戰談起，讓我們看見直接使用 Thread 和 ThreadPool 所帶來的複雜性與侷限。接著，我們引入了 Task 這個高階抽象，讓開發者能把注意力放回「工作本身」，而把底層執行緒管理交給 .NET 執行環境處理。\n讀完本章，你已經掌握了建立與管理非同步操作的基本工具，也知道如何使用 Task.Run 把 CPU 密集型工作交給背景執行緒處理。不過，本章範例中用到的 task.Wait() 和 task.Result，其實都會「阻塞」程式，這正是下一章要處理的問題。\n\n\n\n\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "結語\n本章先從傳統執行緒管理的挑戰談起，讓我們看見直接使用 Thread 和 ThreadPool 所帶來的複雜性與侷限。接著，我們引入了 Task 這個高階抽象，讓開發者能把注意力放回「工作本身」，而把底層執行緒管理交給 .NET 執行環境處理。\n讀完本章，你已經掌握了建立與管理非同步操作的基本工具，也知道如何使用 Task.Run 把 CPU 密集型工作交給背景執行緒處理。不過，本章範例中用到的 task.Wait() 和 task.Result，其實都會「阻塞」程式，這正是下一章要處理的問題。\n\n\n\n\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "<span class='chapter-number'>6</span>  <span class='chapter-title'>第 2 章：.NET 中的執行緒與工作</span>"
     ]
@@ -334,7 +334,7 @@
     "href": "ch03/async-await-essentials.html#結語",
     "title": "第 3 章：async 與 await",
     "section": "結語",
-    "text": "結語\n本章介紹了 async 與 await 的核心概念。這對關鍵字透過編譯器產生的狀態機，讓我們能以近乎同步的語法，寫出易於理解、而且不會阻塞執行緒的非同步程式碼。\n我們也學到了，await 如何在 SynchronizationContext 的幫助下，決定後續程式碼該在哪裡恢復執行，以及如何使用 ConfigureAwait(false) 來優化這個行為。同時，我們也理解了 async void 帶來的風險，並知道它只該出現在什麼場合。\n掌握了 async/await 的基礎後，我們已經具備了撰寫現代非同步程式碼的核心能力。不過，真實世界的應用程式還會面臨更多挑戰，例如：如何處理非同步操作中發生的錯誤？又該如何取消一個已經開始、但後來不再需要的非同步任務？\n這些問題，將是我們下一章要探討的主題。\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "結語\n本章介紹了 async 與 await 的核心概念。這對關鍵字透過編譯器產生的狀態機，讓我們能以近乎同步的語法，寫出易於理解、而且不會阻塞執行緒的非同步程式碼。\n我們也學到了，await 如何在 SynchronizationContext 的幫助下，決定後續程式碼該在哪裡恢復執行，以及如何使用 ConfigureAwait(false) 來優化這個行為。同時，我們也理解了 async void 帶來的風險，並知道它只該出現在什麼場合。\n掌握了 async/await 的基礎後，我們已經具備了撰寫現代非同步程式碼的核心能力。不過，真實世界的應用程式還會面臨更多挑戰，例如：如何處理非同步操作中發生的錯誤？又該如何取消一個已經開始、但後來不再需要的非同步任務？\n這些問題，將是我們下一章要探討的主題。\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "<span class='chapter-number'>7</span>  <span class='chapter-title'>第 3 章：async 與 await</span>"
     ]
@@ -394,7 +394,7 @@
     "href": "ch04/exceptions-and-cancellation.html#結語",
     "title": "第 4 章：例外處理與取消",
     "section": "結語",
-    "text": "結語\n本章聚焦在非同步程式設計裡最常見的「非理想情境」。我們學會了如何用熟悉的 try-catch 處理非同步例外，也理解了 await 如何幫我們免去手動拆解 AggregateException 的負擔。\n更重要的是，我們掌握了 .NET 標準的協同式取消模式。透過 CancellationTokenSource 與 CancellationToken，我們不但能讓使用者主動取消長時間任務，也能替非同步操作加入逾時保護。\n現在，你已經具備撰寫穩健非同步程式碼的重要基礎：不只會處理成功路徑，也知道如何妥善因應失敗與取消。下一個挑戰則是，當多個非同步任務同時執行並共享資源時，該如何確保資料的完整性與一致性；這正是下一章「執行緒同步與經典問題」要探討的主題。\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "結語\n本章聚焦在非同步程式設計裡最常見的「非理想情境」。我們學會了如何用熟悉的 try-catch 處理非同步例外，也理解了 await 如何幫我們免去手動拆解 AggregateException 的負擔。\n更重要的是，我們掌握了 .NET 標準的協同式取消模式。透過 CancellationTokenSource 與 CancellationToken，我們不但能讓使用者主動取消長時間任務，也能替非同步操作加入逾時保護。\n現在，你已經具備撰寫穩健非同步程式碼的重要基礎：不只會處理成功路徑，也知道如何妥善因應失敗與取消。下一個挑戰則是，當多個非同步任務同時執行並共享資源時，該如何確保資料的完整性與一致性；這正是下一章「執行緒同步與經典問題」要探討的主題。\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "<span class='chapter-number'>8</span>  <span class='chapter-title'>第 4 章：例外處理與取消</span>"
     ]
@@ -444,7 +444,7 @@
     "href": "ch05/thread-synchronization.html#結語",
     "title": "第 5 章：執行緒同步與經典問題",
     "section": "結語",
-    "text": "結語\n本章介紹了多執行緒程式設計中最棘手的一類問題。我們先透過一個簡單的計數器範例，看見共享資料在缺乏保護時如何引發「競爭狀況」；並且透過轉帳的範例了解「死結」是怎麼讓多個執行緒陷入無限等待的僵局。\n為了克服這些挑戰，我們學習了四種關鍵的同步機制：\n\nInterlocked：用於單一共享欄位的原子操作（例如遞增計數器、交換旗標），在合適場景下比 lock 更輕量。\nlock 與 System.Threading.Lock：用於建立簡單的獨佔關鍵區段，保護單一記憶體資源，是日常開發中最常用的互斥工具。\nSemaphoreSlim：用於限制能同時進入某個資源或關鍵區段的操作數量，是控制併發度 (concurrency level) 和流量管制 (throttling) 的利器。\nMutex：用於實現跨處理序 (cross-process) 的同步，是解決系統級資源協調（例如防止程式重複啟動）的方案。\n\n理解這些同步工具之後，你就能更有把握地撰寫可靠的併發程式碼。不過，手動管理的鎖 (locks) 仍然伴隨著隱形風險。哪怕只是忘了在 finally 區塊裡釋放一次鎖，都可能導致嚴重問題。\n\n\n\n\n\n在下一章，我們會探索 .NET 提供的「執行緒安全集合 (thread-safe collections)」。這些特殊設計的集合類別，已經在內部替我們處理好許多複雜的同步細節，讓我們能更安穩地操作併發資料。\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "結語\n本章介紹了多執行緒程式設計中最棘手的一類問題。我們先透過一個簡單的計數器範例，看見共享資料在缺乏保護時如何引發「競爭狀況」；並且透過轉帳的範例了解「死結」是怎麼讓多個執行緒陷入無限等待的僵局。\n為了克服這些挑戰，我們學習了四種關鍵的同步機制：\n\nInterlocked：用於單一共享欄位的原子操作（例如遞增計數器、交換旗標），在合適場景下比 lock 更輕量。\nlock 與 System.Threading.Lock：用於建立簡單的獨佔關鍵區段，保護單一記憶體資源，是日常開發中最常用的互斥工具。\nSemaphoreSlim：用於限制能同時進入某個資源或關鍵區段的操作數量，是控制併發度 (concurrency level) 和流量管制 (throttling) 的利器。\nMutex：用於實現跨處理序 (cross-process) 的同步，是解決系統級資源協調（例如防止程式重複啟動）的方案。\n\n理解這些同步工具之後，你就能更有把握地撰寫可靠的併發程式碼。不過，手動管理的鎖 (locks) 仍然伴隨著隱形風險。哪怕只是忘了在 finally 區塊裡釋放一次鎖，都可能導致嚴重問題。\n\n\n\n\n\n在下一章，我們會探索 .NET 提供的「執行緒安全集合 (thread-safe collections)」。這些特殊設計的集合類別，已經在內部替我們處理好許多複雜的同步細節，讓我們能更安穩地操作併發資料。\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "<span class='chapter-number'>9</span>  <span class='chapter-title'>第 5 章：執行緒同步與經典問題</span>"
     ]
@@ -454,7 +454,7 @@
     "href": "ch06/thread-safety-and-immutable-collections.html",
     "title": "第 6 章：執行緒安全與不可變集合",
     "section": "",
-    "text": "本章從資料結構與狀態管理的角度處理 thread safety，並比較 concurrent、immutable 與 frozen collections。\n主要內容\n\n.NET concurrent collections 的設計目的與使用方式。\n不可變設計如何減少共享可變狀態。\nconcurrent、immutable 與 frozen collections 的選擇準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章從資料結構與狀態管理的角度處理 thread safety，並比較 concurrent、immutable 與 frozen collections。\n主要內容\n\n.NET concurrent collections 的設計目的與使用方式。\n不可變設計如何減少共享可變狀態。\nconcurrent、immutable 與 frozen collections 的選擇準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 6 章：執行緒安全與不可變集合"
     ]
@@ -464,7 +464,7 @@
     "href": "ch07/parallel-programming-and-plinq.html",
     "title": "第 7 章：平行處理與 PLINQ",
     "section": "",
-    "text": "本章聚焦 CPU 密集型工作，說明如何使用 .NET 的平行處理工具縮短可分割工作負載的執行時間。\n主要內容\n\n分辨適合平行化的 CPU-bound 工作。\nParallel 類別的使用方式與成本。\nPLINQ 的執行模型、排序與效能取捨。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章聚焦 CPU 密集型工作，說明如何使用 .NET 的平行處理工具縮短可分割工作負載的執行時間。\n主要內容\n\n分辨適合平行化的 CPU-bound 工作。\nParallel 類別的使用方式與成本。\nPLINQ 的執行模型、排序與效能取捨。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 7 章：平行處理與 PLINQ"
     ]
@@ -474,7 +474,7 @@
     "href": "ch08/async-streams.html",
     "title": "第 8 章：非同步資料流與資源管理",
     "section": "",
-    "text": "本章把非同步處理延伸到連續資料流與資源生命週期，讓程式能逐筆處理資料並正確釋放非同步資源。\n主要內容\n\nSystem.Threading.Channels 與生產者／消費者模式。\nIAsyncEnumerable&lt;T&gt;、await foreach 與非同步 iterator。\n資料流取消、IAsyncDisposable 與 await using。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章把非同步處理延伸到連續資料流與資源生命週期，讓程式能逐筆處理資料並正確釋放非同步資源。\n主要內容\n\nSystem.Threading.Channels 與生產者／消費者模式。\nIAsyncEnumerable&lt;T&gt;、await foreach 與非同步 iterator。\n資料流取消、IAsyncDisposable 與 await using。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 8 章：非同步資料流與資源管理"
     ]
@@ -484,7 +484,7 @@
     "href": "ch09/advanced-task-programming.html",
     "title": "第 9 章：Task 進階用法",
     "section": "",
-    "text": "本章深入 Task-based Asynchronous Pattern 的進階工具與執行環境，協助讀者處理橋接、效能與排程問題。\n主要內容\n\n使用 TaskCompletionSource 橋接舊式非同步模式。\nValueTask、Task.Yield 與效能取捨。\nExecutionContext、TaskScheduler 與 thread pool starvation。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章深入 Task-based Asynchronous Pattern 的進階工具與執行環境，協助讀者處理橋接、效能與排程問題。\n主要內容\n\n使用 TaskCompletionSource 橋接舊式非同步模式。\nValueTask、Task.Yield 與效能取捨。\nExecutionContext、TaskScheduler 與 thread pool starvation。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 9 章：Task 進階用法"
     ]
@@ -494,7 +494,7 @@
     "href": "ch10/async-patterns-and-practices.html",
     "title": "第 10 章：實戰案例與最佳實務",
     "section": "",
-    "text": "本章把前面建立的觀念套用到 I/O、streaming、伺服器端與桌面 UI 情境，並整理常見非同步最佳實務。\n主要內容\n\nI/O 與 streaming 的實務設計。\n非同步程式設計最佳實務回顧。\nASP.NET Core 與 WinForms、WPF、MAUI 的應用情境。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章把前面建立的觀念套用到 I/O、streaming、伺服器端與桌面 UI 情境，並整理常見非同步最佳實務。\n主要內容\n\nI/O 與 streaming 的實務設計。\n非同步程式設計最佳實務回顧。\nASP.NET Core 與 WinForms、WPF、MAUI 的應用情境。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 10 章：實戰案例與最佳實務"
     ]
@@ -504,7 +504,7 @@
     "href": "ch11/async-api-design.html",
     "title": "第 11 章：非同步 API 設計指南",
     "section": "",
-    "text": "本章從函式庫與應用程式介面的角度，整理能讓呼叫端正確理解與組合的非同步 API 設計原則。\n主要內容\n\nAsync 後綴、簽名與取消慣例。\n例外、取消、逾時與同步／非同步 API 的語意。\nValueTask、ConfigureAwait(false) 與 IAsyncDisposable 的設計準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n查看作者作品與正式版資訊\n\n購買電子書： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
+    "text": "本章從函式庫與應用程式介面的角度，整理能讓呼叫端正確理解與組合的非同步 API 設計原則。\n主要內容\n\nAsync 後綴、簽名與取消慣例。\n例外、取消、逾時與同步／非同步 API 的語意。\nValueTask、ConfigureAwait(false) 與 IAsyncDisposable 的設計準則。\n\n\n本章屬於完整正式版內容，免費試讀版不公開全文。\n\n購買電子書（無 DRM）： Google Play 圖書 樂天 Kobo 讀墨 Readmoo",
     "crumbs": [
       "第 11 章：非同步 API 設計指南"
     ]
