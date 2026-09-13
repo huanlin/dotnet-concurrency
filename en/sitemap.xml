@@ -2,62 +2,62 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/index.html</loc>
-    <lastmod>2026-09-12T13:57:53.368Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.820Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/preface.html</loc>
-    <lastmod>2026-07-24T14:09:39.483Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.478Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-book.html</loc>
-    <lastmod>2026-07-24T14:09:39.483Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.479Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch00/about-author.html</loc>
-    <lastmod>2026-07-24T14:09:39.482Z</lastmod>
+    <lastmod>2026-07-21T15:08:45.480Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch01/introduction.html</loc>
-    <lastmod>2026-09-12T15:24:28.485Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.811Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch02/threads-and-tasks.html</loc>
-    <lastmod>2026-09-12T15:24:39.139Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.811Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch03/async-await-essentials.html</loc>
-    <lastmod>2026-09-12T15:24:43.973Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.812Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch04/exceptions-and-cancellation.html</loc>
-    <lastmod>2026-09-12T15:24:48.227Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.815Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch05/thread-synchronization.html</loc>
-    <lastmod>2026-09-12T15:24:52.296Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.816Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch06/thread-safety-and-immutable-collections.html</loc>
-    <lastmod>2026-09-12T14:47:17.043Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.817Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch07/parallel-programming-and-plinq.html</loc>
-    <lastmod>2026-09-12T14:47:26.283Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.817Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch08/async-streams.html</loc>
-    <lastmod>2026-09-12T14:47:48.565Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.818Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch09/advanced-task-programming.html</loc>
-    <lastmod>2026-09-12T14:47:54.745Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.819Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch10/async-patterns-and-practices.html</loc>
-    <lastmod>2026-09-12T14:48:01.526Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.819Z</lastmod>
   </url>
   <url>
     <loc>https://dotnetconcurrency.huanlin.cc/en/ch11/async-api-design.html</loc>
-    <lastmod>2026-09-12T14:48:08.141Z</lastmod>
+    <lastmod>2026-09-13T04:51:56.820Z</lastmod>
   </url>
 </urlset>
