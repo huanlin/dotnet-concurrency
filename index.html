@@ -7,6 +7,7 @@
   <meta name="description" content="Free Traditional Chinese and English preview of Concurrency in .NET 10.">
   <link rel="canonical" href="https://dotnetconcurrency.huanlin.cc/">
   <link rel="icon" href="images/cover-en-small.webp" type="image/webp">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.1/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="styles-html.css">
   <style>
@@ -130,14 +131,21 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
       margin-top: 2.5rem;
       padding-top: 1.5rem;
       border-top: 1px solid #dce3ea;
     }
 
     .more-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
       font-weight: 650;
+    }
+
+    .more-links i {
+      font-size: 1.1em;
+      flex-shrink: 0;
     }
 
     @media (max-width: 720px) {
@@ -195,8 +203,15 @@
     </nav>
 
     <nav class="more-links" aria-label="More from Michael Tsai">
-      <a href="https://huanlin.cc/">Author website</a>
-      <a href="https://www.huanlintalk.com/">Blog</a>
+      <i class="fa-solid fa-house" aria-hidden="true"></i>&nbsp;
+      <a href="https://huanlin.cc/">
+        Author website
+      </a>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <i class="fa-brands fa-blogger-b" aria-hidden="true"></i>&nbsp;
+      <a href="https://www.huanlintalk.com/">
+        Blog
+      </a>
     </nav>
   </main>
 </body>
